@@ -161,8 +161,6 @@ namespace RandomizerMod
 
             //Set instance for outside use
             instance = this;
-
-            ModHooks.Instance.AttackHook += (dir) => BigItemPopup.Show("Prompts.Dash.png", "GET_ITEM_INTRO1", "INV_NAME_DASH", "BUTTON_DESC_PRESS", "GET_DASH_1", "GET_DASH_2");
         }
 
         public override string GetVersion()
@@ -635,7 +633,7 @@ namespace RandomizerMod
 
             if (randomizer)
             {
-                Settings.actions.Add(new ChangeShinyIntoBigItem("Tutorial_01", "Shiny Item (1)", "Shiny Control", "hasDash"));
+                Settings.actions.Add(new ChangeShinyIntoBigItem("Tutorial_01", "Shiny Item (1)", "Shiny Control", "hasDash", "Prompts.Dash.png", "GET_ITEM_INTRO1", "INV_NAME_DASH", "BUTTON_DESC_PRESS", "GET_DASH_1", "GET_DASH_2"));
             }
         }
     }

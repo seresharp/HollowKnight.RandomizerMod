@@ -5,6 +5,8 @@ using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
 
+using CallStaticMethod = RandomizerMod.FsmStateActions.CallStaticMethod;
+
 namespace RandomizerMod.Actions
 {
     [Serializable]
@@ -14,41 +16,25 @@ namespace RandomizerMod.Actions
         [SerializeField] private string objectName;
         [SerializeField] private string fsmName;
         [SerializeField] private string boolName;
-        [SerializeField] private string spriteName;
-        [SerializeField] private string itemStateName;
+        [SerializeField] private string spriteKey;
+        [SerializeField] private string takeKey;
+        [SerializeField] private string nameKey;
+        [SerializeField] private string buttonKey;
+        [SerializeField] private string descOneKey;
+        [SerializeField] private string descTwoKey;
 
-        public ChangeShinyIntoBigItem(string sceneName, string objectName, string fsmName, string boolName)
+        public ChangeShinyIntoBigItem(string sceneName, string objectName, string fsmName, string boolName, string spriteKey, string takeKey, string nameKey, string buttonKey, string descOneKey, string descTwoKey)
         {
             this.sceneName = sceneName;
             this.objectName = objectName;
             this.fsmName = fsmName;
             this.boolName = boolName;
-
-            switch (boolName)
-            {
-                case "hasDash":
-                    spriteName = "Prompts.Dash.png";
-                    itemStateName = "Dash";
-                    break;
-                case "hasWalljump":
-                    spriteName = "Prompts.Walljump.png";
-                    itemStateName = "Walljump";
-                    break;
-                case "hasSuperDash":
-                    spriteName = "Prompts.Superdash.png";
-                    itemStateName = "Super Dash";
-                    break;
-                case "hasAcidArmour":
-                    spriteName = "Prompts.Isma.png";
-                    itemStateName = "Pure Seed";
-                    break;
-                case "hasKingsBrand":
-                    spriteName = "Prompts.Kingsbrand.png";
-                    itemStateName = "King's Brand";
-                    break;
-                default:
-                    throw new ArgumentException(boolName + " is not a big item, or is not implemented yet.");
-            }
+            this.spriteKey = spriteKey;
+            this.takeKey = takeKey;
+            this.nameKey = nameKey;
+            this.buttonKey = buttonKey;
+            this.descOneKey = descOneKey;
+            this.descTwoKey = descTwoKey;
         }
 
         public override void Process()
@@ -70,20 +56,27 @@ namespace RandomizerMod.Actions
                         //Add action to potentially despawn the object
                         pdBool.AddAction(new RandomizerBoolTest(boolName, null, "COLLECTED", true));
 
-                        //Force the FSM into the correct item state
+                        //Force the FSM to show the big item flash
                         charm.ClearTransitions();
                         charm.AddTransition("FINISHED", "Big Get Flash");
-                        bigGetFlash.ClearTransitions();
-                        bigGetFlash.AddTransition("FINISHED", itemStateName);
 
-                        //Apply the correct sprite to the popup
-                        //TODO: Create my own popup functionality, this sucks
-                        CreateUIMsgGetItem createMsg = fsm.GetState(itemStateName).GetActionsOfType<CreateUIMsgGetItem>()[0];
-                        PlayMakerFSM msgControl = FSMUtility.LocateFSM(createMsg.gameObject.Value, "Msg Control");
-                        FsmState topUp = msgControl.GetState("Top Up");
-                        SendEventByName sendEvent = topUp.GetActionsOfType<SendEventByName>()[1];
-                        SpriteRenderer renderer = sendEvent.eventTarget.gameObject.GameObject.Value.GetComponent<SpriteRenderer>();
-                        renderer.sprite = RandomizerMod.sprites[spriteName];
+                        //Set bool and show the popup after the flash
+                        bigGetFlash.AddAction(new RandomizerSetBool(boolName, true, true));
+                        bigGetFlash.AddAction(new CallStaticMethod(typeof(BigItemPopup), "Show", new object[]
+                        {
+                            spriteKey,
+                            takeKey,
+                            nameKey,
+                            buttonKey,
+                            descOneKey,
+                            descTwoKey,
+                            fsm.gameObject,
+                            "GET ITEM MSG END"
+                        }));
+
+                        //Exit the fsm after the popup
+                        bigGetFlash.ClearTransitions();
+                        bigGetFlash.AddTransition("GET ITEM MSG END", "Hero Up");
 
                         //Changes have been made, stop looping
                         break;
