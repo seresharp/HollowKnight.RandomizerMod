@@ -1,0 +1,623 @@
+<randomizer version="1.3.1">
+	<keyitems>
+		<item>"Mothwing Cloak"</item>
+		<item>"Shade Cloak"</item>
+		<item>"Mantis Claw"</item>
+		<item>"Monarch Wings"</item>
+		<item>"Isma's Tear"</item>
+		<item>"Crystal Heart"</item>
+		<item>"Dream Nail" | "Awoken Dream Nail" | "Dream Gate"</item>
+		<item>"Howling Wraiths" | "Abyss Shriek"</item>
+		<item>"Desolate Dive" | "Descending Dark"</item>
+		<item>"Vengeful Spirit" | "Shade Soul"</item>
+	</keyitems>
+	<entry minversion="1.0.0.5">
+		<name>Mothwing Cloak</name>
+		<type>Ability</type>
+		<vars>
+			<bool>hasDash</bool>
+			<bool>canDash</bool>
+		</vars>
+		<requirements>"Vengeful Spirit" | "Shade Soul" | "Isma's Tear" | "Grubberfly's Elegy" | "Mothwing Cloak" | "Shade Cloak" | "Mantis Claw" | "Monarch Wings" | "Glowing Womb" | "Spore Shroom" | "Weaversong" | ("Mark of Pride" + HARD)</requirements>
+		<locales>
+			<locale>UI.INV_NAME_DASH</locale>
+			<locale>Prompts.GET_ITEM_INTRO1</locale>
+			<locale>Prompts.BUTTON_DESC_PRESS</locale>
+			<locale>Prompts.GET_DASH_1</locale>
+			<locale>Prompts.GET_DASH_2</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Mantis Claw</name>
+		<type>Ability</type>
+		<vars>
+			<bool>hasWalljump</bool>
+			<bool>canWallJump</bool>
+		</vars>
+		<requirements>"Mothwing Cloak" | "Shade Cloak" | "Monarch Wings" | "Mantis Claw" | "Isma's Tear" | (("Vengeful Spirit" | "Shade Soul") + HARD) | ("Crystal Heart" + ("Vengeful Spirit" | "Shade Soul" | "Grubberfly's Elegy" | "Glowing Womb" | "Spore Shroom" | "Desolate Dive" | "Descending Dark" | "Weaversong"))</requirements>
+		<locales>
+			<locale>UI.INV_NAME_WALLJUMP</locale>
+			<locale>Prompts.GET_ITEM_INTRO1</locale>
+			<locale>Prompts.BUTTON_DESC_PRESS</locale>
+			<locale>Prompts.GET_WALLJUMP_1</locale>
+			<locale>Prompts.GET_WALLJUMP_2</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Crystal Heart</name>
+		<type>Ability</type>
+		<vars>
+			<bool>hasSuperDash</bool>
+			<bool>canSuperDash</bool>
+		</vars>
+		<requirements>("Mantis Claw" + ("Mothwing Cloak" | "Shade Cloak" | "Crystal Heart" | "Monarch Wings" | (("Vengeful Spirit" | "Shade Soul") + HARD))) | ("Monarch Wings" + ("Mothwing Cloak" | "Shade Cloak" | "Vengeful Spirit" | "Shade Soul") + HARD + CLASSIC)</requirements>
+		<locales>
+			<locale>UI.INV_NAME_SUPERDASH</locale>
+			<locale>Prompts.GET_ITEM_INTRO2</locale>
+			<locale>Prompts.BUTTON_DESC_HOLD</locale>
+			<locale>Prompts.GET_SUPERDASH_1</locale>
+			<locale>Prompts.GET_SUPERDASH_2</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Monarch Wings</name>
+		<type>Ability</type>
+		<vars>
+			<bool>hasDoubleJump</bool>
+		</vars>
+		<requirements>("Monarch Wings" + HARD) | ("Mantis Claw" + ("Crystal Heart" | "Monarch Wings"))</requirements>
+		<locales>
+			<locale>UI.INV_NAME_DOUBLEJUMP</locale>
+			<locale>Prompts.GET_ITEM_INTRO2</locale>
+			<locale>Prompts.BUTTON_DESC_PRESS</locale>
+			<locale>Prompts.GET_DOUBLEJUMP_1</locale>
+			<locale>Prompts.GET_DOUBLEJUMP_2</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Shade Cloak</name>
+		<type>Ability</type>
+		<vars>
+			<bool>hasShadowDash</bool>
+			<bool>canShadowDash</bool>
+		</vars>
+		<requirements>("Mantis Claw" + ("Monarch Wings" | (("Mothwing Cloak" | "Shade Cloak" | "Crystal Heart") + HARD))) | ("Mothwing Cloak" + "Shade Cloak" + "Monarch Wings" + HARD)</requirements>
+		<locales>
+			<locale>UI.INV_NAME_SHADOWDASH</locale>
+			<locale>Prompts.GET_ITEM_INTRO7</locale>
+			<locale>Prompts.BUTTON_DESC_PRESS</locale>
+			<locale>Prompts.GET_SHADOWDASH_1</locale>
+			<locale>Prompts.GET_SHADOWDASH_2</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Isma's Tear</name>
+		<type>Ability</type>
+		<vars>
+			<bool>hasAcidArmour</bool>
+		</vars>
+		<requirements>"Crystal Heart" + ("Mantis Claw" | ("Monarch Wings" + "Isma's Tear"))</requirements>
+		<locales>
+			<locale>UI.INV_NAME_ACIDARMOUR</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Dream Nail</name>
+		<type>Ability</type>
+		<vars>
+			<bool>hasDreamNail</bool>
+		</vars>
+		<requirements>"Mantis Claw" | HARD</requirements>
+		<locales>
+			<locale>UI.INV_NAME_DREAMNAIL_A</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.1.1.4">
+		<name>Dream Gate</name>
+		<type>Ability</type>
+		<vars>
+			<bool>hasDreamGate</bool>
+		</vars>
+		<requirements>KEYITEMS</requirements>
+		<locales>
+			<locale>UI.INV_NAME_DREAMGATE</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Awoken Dream Nail</name>
+		<type>Ability</type>
+		<vars>
+			<bool>dreamNailUpgraded</bool>
+		</vars>
+		<requirements>KEYITEMS</requirements>
+		<locales>
+			<locale>UI.INV_NAME_DREAMNAIL_B</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Vengeful Spirit</name>
+		<type>Spell</type>
+		<vars>
+			<int value="1">fireballLevel</int>
+		</vars>
+		<requirements></requirements>
+		<locales>
+			<locale>UI.INV_NAME_SPELL_FIREBALL1</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Shade Soul</name>
+		<type>Spell</type>
+		<vars>
+			<int value="2">fireballLevel</int>
+		</vars>
+		<requirements>(("Mantis Claw" | "Monarch Wings") + HARD + CLASSIC) | ("Mantis Claw" + ("Mothwing Cloak" | "Shade Cloak" | "Crystal Heart" | "Monarch Wings" | "Isma's Tear"))</requirements>
+		<locales>
+			<locale>UI.INV_NAME_SPELL_FIREBALL2</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Desolate Dive</name>
+		<type>Spell</type>
+		<vars>
+			<int value="1">quakeLevel</int>
+		</vars>
+		<requirements>(("Mantis Claw" | "Monarch Wings") + HARD + CLASSIC) | ("Mantis Claw" + ("Mothwing Cloak" | "Shade Cloak" | "Crystal Heart" | "Monarch Wings" | "Isma's Tear"))</requirements>
+		<locales>
+			<locale>UI.INV_NAME_SPELL_QUAKE1</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Descending Dark</name>
+		<type>Spell</type>
+		<vars>
+			<int value="2">quakeLevel</int>
+		</vars>
+		<requirements>("Desolate Dive" | "Descending Dark") + (("Mantis Claw" + ("Crystal Heart" | ((("Mothwing Cloak" | "Shade Cloak") + ("Vengeful Spirit" | "Shade Soul")) + HARD))) | ("Monarch Wings" + ("Crystal Heart" | "Mothwing Cloak" | "Shade Cloak" | (("Vengeful Spirit" | "Shade Soul") + HARD))))</requirements>
+		<locales>
+			<locale>UI.INV_NAME_SPELL_QUAKE2</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Howling Wraiths</name>
+		<type>Spell</type>
+		<vars>
+			<int value="1">screamLevel</int>
+		</vars>
+		<requirements>"Mantis Claw" | "Monarch Wings"</requirements>
+		<locales>
+			<locale>UI.INV_NAME_SPELL_SCREAM1</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Abyss Shriek</name>
+		<type>Spell</type>
+		<vars>
+			<int value="2">screamLevel</int>
+		</vars>
+		<requirements>("Howling Wraiths" | "Abyss Shriek") + ((("Mantis Claw" | "Monarch Wings") + HARD) | ("Mantis Claw" + "Monarch Wings"))</requirements>
+		<locales>
+			<locale>UI.INV_NAME_SPELL_SCREAM2</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Gathering Swarm</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_1</bool>
+		</vars>
+		<requirements></requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_1</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Wayward Compass</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_2</bool>
+		</vars>
+		<requirements></requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_2</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Grubsong</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_3</bool>
+		</vars>
+		<requirements>KEYITEMS</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_3</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Stalwart Shell</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_4</bool>
+		</vars>
+		<requirements></requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_4</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Baldur Shell</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_5</bool>
+		</vars>
+		<requirements>("Mantis Claw" | "Mothwing Cloak" | "Shade Cloak" | "Monarch Wings" | "Crystal Heart") + ("Vengeful Spirit" | "Shade Soul" | "Desolate Dive" | "Descending Dark" | "Grubberfly's Elegy" | "Glowing Womb" | "Spore Shroom" | "Weaversong" | ("Mark of Pride" + HARD))</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_5</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Fury of the Fallen</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_6</bool>
+		</vars>
+		<requirements>"Mantis Claw"</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_6</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Quick Focus</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_7</bool>
+		</vars>
+		<requirements>KEYITEMS</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_7</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Lifeblood Heart</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_8</bool>
+		</vars>
+		<requirements>"Mantis Claw" | "Mothwing Cloak" | "Shade Cloak" | "Monarch Wings" | "Crystal Heart" | (("Vengeful Spirit" | "Shade Soul") + HARD) | (HARD + CLASSIC)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_8</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Lifeblood Core</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_9</bool>
+		</vars>
+		<requirements>KEYITEMS</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_9</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Defender's Crest</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_10</bool>
+		</vars>
+		<requirements>("Mantis Claw" + ("Crystal Heart" | "Mothwing Cloak" | "Shade Cloak" | "Monarch Wings" | HARD)) | ("Monarch Wings" + HARD)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_10</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Flukenest</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_11</bool>
+		</vars>
+		<requirements>("Desolate Dive" | "Descending Dark") + ("Mantis Claw" | HARD)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_11</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Thorns of Agony</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_12</bool>
+		</vars>
+		<requirements>"Mothwing Cloak" | "Shade Cloak" | ("Mantis Claw" + "Crystal Heart")</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_12</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Mark of Pride</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_13</bool>
+		</vars>
+		<requirements>"Mantis Claw" | ("Monarch Wings" + HARD)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_13</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Steady Body</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_14</bool>
+		</vars>
+		<requirements>"Mantis Claw" | "Mothwing Cloak" | "Shade Cloak" | "Monarch Wings" | "Crystal Heart" | (("Vengeful Spirit" | "Shade Soul") + HARD) | (HARD + CLASSIC)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_14</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Heavy Blow</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_15</bool>
+		</vars>
+		<requirements>"Mantis Claw" | ("Monarch Wings" + ("Vengeful Spirit" | "Shade Soul" | "Mothwing Cloak" | "Shade Cloak") + HARD)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_15</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Sharp Shadow</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_16</bool>
+		</vars>
+		<requirements>"Mothwing Cloak" + "Shade Cloak" + ("Mantis Claw" | "Isma's Tear" | ("Monarch Wings" + HARD + CLASSIC))</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_16</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Spore Shroom</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_17</bool>
+		</vars>
+		<requirements>("Mantis Claw" + ("Mothwing Cloak" | "Shade Cloak" | "Monarch Wings" | "Crystal Heart" | "Isma's Tear")) | ("Monarch Wings" + ("Mothwing Cloak" | "Shade Cloak" | "Isma's Tear") + HARD + CLASSIC)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_17</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Longnail</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_18</bool>
+		</vars>
+		<requirements>"Mantis Claw" | "Mothwing Cloak" | "Shade Cloak" | "Monarch Wings" | "Crystal Heart" | (("Vengeful Spirit" | "Shade Soul") + HARD) | (HARD + CLASSIC)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_18</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Shaman Stone</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_19</bool>
+		</vars>
+		<requirements>"Mantis Claw" | "Mothwing Cloak" | "Shade Cloak" | "Monarch Wings" | "Crystal Heart" | (("Vengeful Spirit" | "Shade Soul") + HARD) | (HARD + CLASSIC)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_19</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Soul Catcher</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_20</bool>
+		</vars>
+		<requirements></requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_20</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Soul Eater</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_21</bool>
+		</vars>
+		<requirements>("Desolate Dive" | "Descending Dark") + ("Mantis Claw" | "Monarch Wings")</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_21</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Glowing Womb</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_22</bool>
+		</vars>
+		<requirements>"Crystal Heart" + ("Mantis Claw" | "Monarch Wings")</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_22</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Fragile Heart</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_23</bool>
+		</vars>
+		<requirements>"Mantis Claw" | "Mothwing Cloak" | "Monarch Wings" | "Shade Cloak" | "Isma's Tear" | (("Vengeful Spirit" | "Shade Soul") + HARD) | ("Crystal Heart" + ("Vengeful Spirit" | "Shade Soul" | "Grubberfly's Elegy" | "Glowing Womb" | "Spore Shroom" | "Desolate Dive" | "Descending Dark" | "Weaversong" | ("Mark of Pride" + HARD)))</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_23</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Fragile Greed</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_24</bool>
+		</vars>
+		<requirements>"Mantis Claw" | "Mothwing Cloak" | "Monarch Wings" | "Shade Cloak" | "Isma's Tear" | (("Vengeful Spirit" | "Shade Soul") + HARD) | ("Crystal Heart" + ("Vengeful Spirit" | "Shade Soul" | "Grubberfly's Elegy" | "Glowing Womb" | "Spore Shroom" | "Desolate Dive" | "Descending Dark" | "Weaversong" | ("Mark of Pride" + HARD)))</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_24</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Fragile Strength</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_25</bool>
+		</vars>
+		<requirements>"Mantis Claw" | "Mothwing Cloak" | "Monarch Wings" | "Shade Cloak" | "Isma's Tear" | (("Vengeful Spirit" | "Shade Soul") + HARD) | ("Crystal Heart" + ("Vengeful Spirit" | "Shade Soul" | "Grubberfly's Elegy" | "Glowing Womb" | "Spore Shroom" | "Desolate Dive" | "Descending Dark" | "Weaversong" | ("Mark of Pride" + HARD)))</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_25</locale>
+		</locales>
+	</entry>
+	<!--Charm 26 Nailmaster's Glory-->
+	<entry minversion="1.0.0.5">
+		<name>Joni's Blessing</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_27</bool>
+		</vars>
+		<requirements>"Mantis Claw"</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_27</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Shape of Unn</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_28</bool>
+		</vars>
+		<requirements>"Isma's Tear" + ("Monarch Wings" | "Mantis Claw")</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_28</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Hiveblood</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_29</bool>
+		</vars>
+		<requirements>("Mantis Claw" + ("Monarch Wings" | HARD)) | ("Monarch Wings" + ("Mothwing Cloak" | "Shade Cloak") + HARD)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_29</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Dream Wielder</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_30</bool>
+		</vars>
+		<requirements>KEYITEMS</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_30</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Dashmaster</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_31</bool>
+		</vars>
+		<requirements>"Mothwing Cloak" | "Shade Cloak" | "Monarch Wings" | "Mantis Claw" | "Isma's Tear" | (("Vengeful Spirit" | "Shade Soul") + HARD) | ("Crystal Heart" + ("Vengeful Spirit" | "Shade Soul" | "Grubberfly's Elegy" | "Glowing Womb" | "Spore Shroom" | "Desolate Dive" | "Descending Dark" | "Weaversong"))</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_31</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Quick Slash</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_32</bool>
+		</vars>
+		<requirements>("Mothwing Cloak" | "Shade Cloak") + ("Desolate Dive" | "Descending Dark") + ("Mantis Claw" | ("Monarch Wings" + HARD))</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_32</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Spell Twister</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_33</bool>
+		</vars>
+		<requirements>(("Mantis Claw" | "Monarch Wings") + HARD + CLASSIC) | ("Mantis Claw" + ("Mothwing Cloak" | "Shade Cloak" | "Crystal Heart" | "Monarch Wings" | "Isma's Tear"))</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_33</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Deep Focus</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_34</bool>
+		</vars>
+		<requirements>("Crystal Heart" + ("Mantis Claw" | ("Monarch Wings" + ("Vengeful Spirit" | "Shade Soul") + HARD))) | ("Monarch Wings" + ("Mothwing Cloak" | "Shade Cloak") + HARD)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_34</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.0.0.5">
+		<name>Grubberfly's Elegy</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_35</bool>
+		</vars>
+		<requirements>KEYITEMS</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_35</locale>
+		</locales>
+	</entry>
+	<!--Charm 36 Kingsoul/Void Heart-->
+	<entry minversion="1.2.1.0">
+		<name>Sprintmaster</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_37</bool>
+		</vars>
+		<requirements>"Mantis Claw" | ("Monarch Wings" + ("Vengeful Spirit" | "Shade Soul" | "Mothwing Cloak" | "Shade Cloak") + HARD)</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_37</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.2.1.0">
+		<name>Dreamshield</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_38</bool>
+		</vars>
+		<requirements>"Mantis Claw" | HARD</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_38</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.2.1.0">
+		<name>Weaversong</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_39</bool>
+		</vars>
+		<requirements>"Mantis Claw"</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_39</locale>
+		</locales>
+	</entry>
+	<entry minversion="1.2.1.0">
+		<name>Grimmchild</name>
+		<type>Charm</type>
+		<vars>
+			<bool>gotCharm_40</bool>
+		</vars>
+		<requirements>"Mantis Claw" + ("Dream Nail" | "Dream Gate" | "Awoken Dream Nail")</requirements>
+		<locales>
+			<locale>UI.CHARM_NAME_40</locale>
+		</locales>
+	</entry>
+</randomizer>
