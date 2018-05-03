@@ -31,7 +31,6 @@ namespace RandomizerMod.Actions
                     {
                         shinyPrefab = Object.Instantiate(fsm.gameObject);
                         shinyPrefab.SetActive(false);
-                        Modding.Logger.Log(shinyPrefab.name);
                         shinyPrefab.name = "Randomizer Shiny";
                         Object.DontDestroyOnLoad(shinyPrefab);
                         break;

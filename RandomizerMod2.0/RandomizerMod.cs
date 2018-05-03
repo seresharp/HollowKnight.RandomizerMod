@@ -162,7 +162,7 @@ namespace RandomizerMod
             //Set instance for outside use
             instance = this;
 
-            BigItemPopup.Show();
+            ModHooks.Instance.AttackHook += (dir) => BigItemPopup.Show("Prompts.Dash.png", "GET_ITEM_INTRO1", "INV_NAME_DASH", "BUTTON_DESC_PRESS", "GET_DASH_1", "GET_DASH_2");
         }
 
         public override string GetVersion()
@@ -417,7 +417,7 @@ namespace RandomizerMod
             MenuButton back = (MenuButton)steel.FindSelectableOnDown();
 
             //Create new buttons
-            MenuButton startRandoBtn = classic.Clone("StartRando", MenuButton.MenuButtonType.Proceed, new Vector2(650, -480), "Start Game", "Randomizer v2", sprites["logo.png"]);
+            MenuButton startRandoBtn = classic.Clone("StartRando", MenuButton.MenuButtonType.Proceed, new Vector2(650, -480), "Start Game", "Randomizer v2", sprites["UI.logo.png"]);
             MenuButton startNormalBtn = classic.Clone("StartNormal", MenuButton.MenuButtonType.Proceed, new Vector2(-650, -480), "Start Game", "Non-Randomizer");
 
             startNormalBtn.transform.localScale = startRandoBtn.transform.localScale = new Vector2(0.75f, 0.75f);
@@ -635,54 +635,7 @@ namespace RandomizerMod
 
             if (randomizer)
             {
-                Settings.actions.Add(new ChangeShopContents("Fungus2_26", "Shop Menu", new ShopItemDef[]
-                {
-                    new ShopItemDef()
-                    {
-                        playerDataBoolName = "hasDash",
-                        nameConvo = "INV_NAME_DASH",
-                        descConvo = "INV_DESC_DASH",
-                        dungDiscount = true,
-                        cost = 1,
-                        spriteName = "ShopIcons.Dash.png"
-                    },
-                    new ShopItemDef()
-                    {
-                        playerDataBoolName = "hasWalljump",
-                        nameConvo = "INV_NAME_WALLJUMP",
-                        descConvo = "INV_DESC_WALLJUMP",
-                        dungDiscount = true,
-                        cost = 1,
-                        spriteName = "ShopIcons.Walljump.png"
-                    },
-                    new ShopItemDef()
-                    {
-                        playerDataBoolName = "hasSuperDash",
-                        nameConvo = "INV_NAME_SUPERDASH",
-                        descConvo = "INV_DESC_SUPERDASH",
-                        dungDiscount = true,
-                        cost = 1,
-                        spriteName = "ShopIcons.Superdash.png"
-                    },
-                    new ShopItemDef()
-                    {
-                        playerDataBoolName = "hasAcidArmour",
-                        nameConvo = "INV_NAME_ACIDARMOUR",
-                        descConvo = "INV_DESC_ACIDARMOUR",
-                        dungDiscount = true,
-                        cost = 1,
-                        spriteName = "ShopIcons.Isma.png"
-                    },
-                    new ShopItemDef()
-                    {
-                        playerDataBoolName = "hasDoubleJump",
-                        nameConvo = "INV_NAME_DOUBLEJUMP",
-                        descConvo = "INV_DESC_DOUBLEJUMP",
-                        dungDiscount = true,
-                        cost = 1,
-                        spriteName = "ShopIcons.Wings.png"
-                    }
-                }));
+                Settings.actions.Add(new ChangeShinyIntoBigItem("Tutorial_01", "Shiny Item (1)", "Shiny Control", "hasDash"));
             }
         }
     }

@@ -59,6 +59,7 @@
     <Compile Include="Actions\ChangeShopContents.cs" />
     <Compile Include="Actions\ChangeChestGeo.cs" />
     <Compile Include="BigItemPopup.cs" />
+    <Compile Include="Extensions\SpriteExtensions.cs" />
     <Compile Include="FsmStateActions\RandomizerAddGeo.cs" />
     <Compile Include="Extensions\MenuButtonExtensions.cs" />
     <Compile Include="FsmStateActions\RandomizerGiveTrinket.cs" />
@@ -72,9 +73,6 @@
     <Compile Include="SaveSettings.cs" />
     <Compile Include="ShinyGetter.cs" />
     <Compile Include="XmlLoader.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\logo.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\randomizer.xml" />
@@ -142,7 +140,18 @@
     <EmbeddedResource Include="Resources\Charms\40.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\language.xml" />
+    <EmbeddedResource Include="Resources\UI\logo.png" />
+    <EmbeddedResource Include="Resources\Anim\BigItemFleur\0.png" />
+    <EmbeddedResource Include="Resources\Anim\BigItemFleur\1.png" />
+    <EmbeddedResource Include="Resources\Anim\BigItemFleur\2.png" />
+    <EmbeddedResource Include="Resources\Anim\BigItemFleur\3.png" />
+    <EmbeddedResource Include="Resources\Anim\BigItemFleur\4.png" />
+    <EmbeddedResource Include="Resources\Anim\BigItemFleur\5.png" />
+    <EmbeddedResource Include="Resources\Anim\BigItemFleur\6.png" />
+    <EmbeddedResource Include="Resources\Anim\BigItemFleur\7.png" />
+    <EmbeddedResource Include="Resources\Anim\BigItemFleur\8.png" />
+    <EmbeddedResource Include="Resources\UI\egg.png" />
+    <EmbeddedResource Include="Resources\language.xml" />
     <EmbeddedResource Include="Resources\ShopIcons\Dash.png" />
     <EmbeddedResource Include="Resources\ShopIcons\Fireball1.png" />
     <EmbeddedResource Include="Resources\ShopIcons\Fireball2.png" />
