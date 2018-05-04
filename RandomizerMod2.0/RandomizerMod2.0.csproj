@@ -53,14 +53,15 @@
   <ItemGroup>
     <Compile Include="Actions\AddGeoToShiny.cs" />
     <Compile Include="Actions\AddShinyToChest.cs" />
+    <Compile Include="Actions\ChangeBoolTest.cs" />
     <Compile Include="Actions\ChangeShinyIntoBigItem.cs" />
     <Compile Include="Actions\ChangeShinyIntoCharm.cs" />
     <Compile Include="Actions\ChangeShinyIntoTrinket.cs" />
     <Compile Include="Actions\ChangeShopContents.cs" />
     <Compile Include="Actions\ChangeChestGeo.cs" />
-    <Compile Include="BigItemPopup.cs" />
+    <Compile Include="Components\BigItemPopup.cs" />
     <Compile Include="Extensions\SpriteExtensions.cs" />
-    <Compile Include="FsmStateActions\CallStaticMethod.cs" />
+    <Compile Include="FsmStateActions\RandomizerCallStaticMethod.cs" />
     <Compile Include="FsmStateActions\RandomizerAddGeo.cs" />
     <Compile Include="Extensions\MenuButtonExtensions.cs" />
     <Compile Include="FsmStateActions\RandomizerGiveTrinket.cs" />
@@ -72,7 +73,7 @@
     <Compile Include="RandomizerMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SaveSettings.cs" />
-    <Compile Include="ShinyGetter.cs" />
+    <Compile Include="Components\ShinyGetter.cs" />
     <Compile Include="XmlLoader.cs" />
   </ItemGroup>
   <ItemGroup>

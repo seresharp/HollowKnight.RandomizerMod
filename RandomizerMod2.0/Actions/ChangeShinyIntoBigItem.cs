@@ -1,40 +1,66 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
-
-using CallStaticMethod = RandomizerMod.FsmStateActions.CallStaticMethod;
+using RandomizerMod.Components;
 
 namespace RandomizerMod.Actions
 {
     [Serializable]
-    public class ChangeShinyIntoBigItem : RandomizerAction
+    public struct BigItemDef
+    {
+        [SerializeField] public string boolName;
+        [SerializeField] public string spriteKey;
+        [SerializeField] public string takeKey;
+        [SerializeField] public string nameKey;
+        [SerializeField] public string buttonKey;
+        [SerializeField] public string descOneKey;
+        [SerializeField] public string descTwoKey;
+    }
+
+    [Serializable]
+    public class ChangeShinyIntoBigItem : RandomizerAction, ISerializationCallbackReceiver
     {
         [SerializeField] private string sceneName;
         [SerializeField] private string objectName;
         [SerializeField] private string fsmName;
-        [SerializeField] private string boolName;
-        [SerializeField] private string spriteKey;
-        [SerializeField] private string takeKey;
-        [SerializeField] private string nameKey;
-        [SerializeField] private string buttonKey;
-        [SerializeField] private string descOneKey;
-        [SerializeField] private string descTwoKey;
+        private BigItemDef[] itemDefs;
 
-        public ChangeShinyIntoBigItem(string sceneName, string objectName, string fsmName, string boolName, string spriteKey, string takeKey, string nameKey, string buttonKey, string descOneKey, string descTwoKey)
+        //Serialization hack
+        [SerializeField] private List<string> itemDefStrings;
+
+        public void OnBeforeSerialize()
+        {
+            itemDefStrings = new List<string>();
+            foreach (BigItemDef item in itemDefs)
+            {
+                itemDefStrings.Add(JsonUtility.ToJson(item));
+            }
+        }
+
+        public void OnAfterDeserialize()
+        {
+            List<BigItemDef> itemDefList = new List<BigItemDef>();
+
+            foreach (string item in itemDefStrings)
+            {
+                itemDefList.Add(JsonUtility.FromJson<BigItemDef>(item));
+            }
+
+            itemDefs = itemDefList.ToArray();
+        }
+        
+        //BigItemDef array is meant to be for additive items
+        //For example, items[0] could be vengeful spirit and items[1] would be shade soul
+        public ChangeShinyIntoBigItem(string sceneName, string objectName, string fsmName, BigItemDef[] items)
         {
             this.sceneName = sceneName;
             this.objectName = objectName;
             this.fsmName = fsmName;
-            this.boolName = boolName;
-            this.spriteKey = spriteKey;
-            this.takeKey = takeKey;
-            this.nameKey = nameKey;
-            this.buttonKey = buttonKey;
-            this.descOneKey = descOneKey;
-            this.descTwoKey = descTwoKey;
+            itemDefs = items;
         }
 
         public override void Process()
@@ -50,26 +76,18 @@ namespace RandomizerMod.Actions
                         FsmState bigGetFlash = fsm.GetState("Big Get Flash");
 
                         //Remove actions that stop shiny from spawning
+                        //TODO: Add some check of my own to prevent duping the shiny and getting every possible item from it
                         pdBool.RemoveActionsOfType<PlayerDataBoolTest>();
                         pdBool.RemoveActionsOfType<StringCompare>();
-
-                        //Add action to potentially despawn the object
-                        pdBool.AddAction(new RandomizerBoolTest(boolName, null, "COLLECTED", true));
 
                         //Force the FSM to show the big item flash
                         charm.ClearTransitions();
                         charm.AddTransition("FINISHED", "Big Get Flash");
 
                         //Set bool and show the popup after the flash
-                        bigGetFlash.AddAction(new RandomizerSetBool(boolName, true, true));
-                        bigGetFlash.AddAction(new CallStaticMethod(typeof(BigItemPopup), "Show", new object[]
+                        bigGetFlash.AddAction(new RandomizerCallStaticMethod(typeof(BigItemPopup), "ShowAdditive", new object[]
                         {
-                            spriteKey,
-                            takeKey,
-                            nameKey,
-                            buttonKey,
-                            descOneKey,
-                            descTwoKey,
+                            itemDefs,
                             fsm.gameObject,
                             "GET ITEM MSG END"
                         }));

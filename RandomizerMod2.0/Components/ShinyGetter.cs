@@ -3,7 +3,7 @@ using UnityEngine;
 using RandomizerMod.Actions;
 using GlobalEnums;
 
-namespace RandomizerMod
+namespace RandomizerMod.Components
 {
     internal class ShinyGetter : MonoBehaviour
     {

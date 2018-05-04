@@ -3,9 +3,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Modding;
-using RandomizerMod.Extensions;
+using RandomizerMod.Actions;
 
-namespace RandomizerMod
+namespace RandomizerMod.Components
 {
     internal class BigItemPopup : MonoBehaviour
     {
@@ -48,7 +48,26 @@ namespace RandomizerMod
             };
         }
 
-        public static void Show(string spriteKey, string takeKey, string nameKey, string buttonKey, string descOneKey, string descTwoKey, GameObject fsmObj = null, string eventName = null)
+        public static GameObject ShowAdditive(BigItemDef[] items, GameObject fsmObj = null, string eventName = null)
+        {
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (!PlayerData.instance.GetBool(items[i].boolName))
+                {
+                    return Show(items[i], fsmObj, eventName);
+                }
+            }
+
+            return null;
+        }
+
+        public static GameObject Show(BigItemDef item, GameObject fsmObj = null, string eventName = null)
+        {
+            PlayerData.instance.SetBool(item.boolName, true);
+            return Show(item.spriteKey, item.takeKey, item.nameKey, item.buttonKey, item.descOneKey, item.descTwoKey, fsmObj, eventName);
+        }
+
+        public static GameObject Show(string spriteKey, string takeKey, string nameKey, string buttonKey, string descOneKey, string descTwoKey, GameObject fsmObj = null, string eventName = null)
         {
             //Create base canvas
             GameObject canvas = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
@@ -64,7 +83,7 @@ namespace RandomizerMod
             popup.fsmObj = fsmObj;
             popup.fsmEvent = eventName;
 
-            DontDestroyOnLoad(canvas);
+            return canvas;
         }
 
         public void Start()
@@ -88,8 +107,12 @@ namespace RandomizerMod
 
             yield return new WaitForSeconds(0.1f);
 
+            //Aim for 400 high prompt image
+            float scaler = imagePrompt.texture.height / 400f;
+            Vector2 size = new Vector2(imagePrompt.texture.width / scaler, imagePrompt.texture.height / scaler);
+
             //Begin fading in the top bits of the popup
-            GameObject topImage = CanvasUtil.CreateImagePanel(gameObject, imagePrompt, new CanvasUtil.RectData(imagePrompt.Size(), Vector2.zero, new Vector2(0.5f, 0.75f), new Vector2(0.5f, 0.8f)));
+            GameObject topImage = CanvasUtil.CreateImagePanel(gameObject, imagePrompt, new CanvasUtil.RectData(size, Vector2.zero, new Vector2(0.5f, 0.75f), new Vector2(0.5f, 0.8f)));
             GameObject topTextOne = CanvasUtil.CreateTextPanel(gameObject, takeText, 34, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.55f), new Vector2(0.5f, 0.55f)), perpetua);
             GameObject topTextTwo = CanvasUtil.CreateTextPanel(gameObject, nameText, 76, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 300), Vector2.zero, new Vector2(0.5f, 0.49f), new Vector2(0.5f, 0.49f)));
 

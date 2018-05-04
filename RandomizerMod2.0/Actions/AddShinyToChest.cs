@@ -3,6 +3,7 @@ using UnityEngine;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
+using RandomizerMod.Components;
 
 using Object = UnityEngine.Object;
 
@@ -55,6 +56,7 @@ namespace RandomizerMod.Actions
                         //Instantiate a new shiny and set the chest as its parent
                         GameObject item = fsm.gameObject.transform.Find("Item").gameObject;
                         GameObject shiny = Object.Instantiate(shinyPrefab);
+                        shiny.SetActive(false);
                         shiny.transform.SetParent(item.transform);
                         shiny.transform.position = item.transform.position;
                         shiny.name = newShinyName;

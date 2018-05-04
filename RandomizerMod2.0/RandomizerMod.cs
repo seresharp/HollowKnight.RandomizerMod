@@ -157,7 +157,8 @@ namespace RandomizerMod
             ModHooks.Instance.OnEnableEnemyHook += GetGeoPrefabs;
             ModHooks.Instance.LanguageGetHook += LanguageOverride;
             ModHooks.Instance.GetPlayerIntHook += IntOverride;
-            ModHooks.Instance.SetPlayerBoolHook += BoolOverride;
+            ModHooks.Instance.GetPlayerBoolHook += BoolGetOverride;
+            ModHooks.Instance.SetPlayerBoolHook += BoolSetOverride;
 
             //Set instance for outside use
             instance = this;
@@ -173,15 +174,45 @@ namespace RandomizerMod
             return ver;
         }
 
-        private void BoolOverride(string boolName, bool value)
+        private bool BoolGetOverride(string boolName)
         {
+            //Fake spell bools
+            if (boolName == "hasVengefulSpirit") return PlayerData.instance.fireballLevel > 0;
+            if (boolName == "hasShadeSoul") return PlayerData.instance.fireballLevel > 1;
+            if (boolName == "hasDesolateDive") return PlayerData.instance.quakeLevel > 0;
+            if (boolName == "hasDescendingDark") return PlayerData.instance.quakeLevel > 1;
+            if (boolName == "hasHowlingWraiths") return PlayerData.instance.screamLevel > 0;
+            if (boolName == "hasAbyssShriek") return PlayerData.instance.screamLevel > 1;
+
+            return PlayerData.instance.GetBoolInternal(boolName);
+        }
+
+        private void BoolSetOverride(string boolName, bool value)
+        {
+            //For some reason these all have two bools
             if (boolName == "hasDash") PlayerData.instance.canDash = value;
             else if (boolName == "hasShadowDash") PlayerData.instance.canShadowDash = value;
             else if (boolName == "hasSuperDash") PlayerData.instance.canSuperDash = value;
             else if (boolName == "hasWalljump") PlayerData.instance.canWallJump = value;
+            //Shade skips make these charms not viable, unbreakable is a nice fix for that
             else if (boolName == "gotCharm_23") PlayerData.instance.fragileHealth_unbreakable = value;
             else if (boolName == "gotCharm_24") PlayerData.instance.fragileGreed_unbreakable = value;
             else if (boolName == "gotCharm_25") PlayerData.instance.fragileStrength_unbreakable = value;
+            //Gotta update the acid pools after getting this
+            else if (boolName == "hasAcidArmour" && value) PlayMakerFSM.BroadcastEvent("GET ACID ARMOUR");
+            //It's just way easier if I can treat spells as bools
+            else if (boolName == "hasVengefulSpirit" && value && PlayerData.instance.fireballLevel <= 0) PlayerData.instance.fireballLevel = 1;
+            else if (boolName == "hasVengefulSpirit" && !value) PlayerData.instance.fireballLevel = 0;
+            else if (boolName == "hasShadeSoul" && value) PlayerData.instance.fireballLevel = 2;
+            else if (boolName == "hasShadeSoul" && !value && PlayerData.instance.fireballLevel >= 2) PlayerData.instance.fireballLevel = 1;
+            else if (boolName == "hasDesolateDive" && value && PlayerData.instance.quakeLevel <= 0) PlayerData.instance.quakeLevel = 1;
+            else if (boolName == "hasDesolateDive" && !value) PlayerData.instance.quakeLevel = 0;
+            else if (boolName == "hasDescendingDark" && value) PlayerData.instance.quakeLevel = 2;
+            else if (boolName == "hasDescendingDark" && !value && PlayerData.instance.quakeLevel >= 2) PlayerData.instance.quakeLevel = 1;
+            else if (boolName == "hasHowlingWraiths" && value && PlayerData.instance.screamLevel <= 0) PlayerData.instance.screamLevel = 1;
+            else if (boolName == "hasHowlingWraiths" && !value) PlayerData.instance.screamLevel = 0;
+            else if (boolName == "hasAbyssShriek" && value) PlayerData.instance.screamLevel = 2;
+            else if (boolName == "hasAbyssShriek" && !value && PlayerData.instance.screamLevel >= 2) PlayerData.instance.screamLevel = 1;
 
             PlayerData.instance.SetBoolInternal(boolName, value);
         }
@@ -633,7 +664,37 @@ namespace RandomizerMod
 
             if (randomizer)
             {
-                Settings.actions.Add(new ChangeShinyIntoBigItem("Tutorial_01", "Shiny Item (1)", "Shiny Control", "hasDash", "Prompts.Dash.png", "GET_ITEM_INTRO1", "INV_NAME_DASH", "BUTTON_DESC_PRESS", "GET_DASH_1", "GET_DASH_2"));
+                PlayerData.instance.screamLevel = 1;
+                Settings.actions.Add(new ChangeShinyIntoBigItem("Tutorial_01", "Shiny Item (1)", "Shiny Control", new BigItemDef[]
+                {
+                    new BigItemDef()
+                    {
+                        boolName = "hasHowlingWraiths",
+                        spriteKey = "Prompts.Scream1.png",
+                        takeKey = "GET_ITEM_INTRO3",
+                        nameKey = "INV_NAME_SPELL_SCREAM1",
+                        buttonKey = "RANDOMIZER_BUTTON_DESC",
+                        descOneKey = "GET_SCREAM_1",
+                        descTwoKey = "GET_SCREAM_2"
+                    },
+                    new BigItemDef()
+                    {
+                        boolName = "hasAbyssShriek",
+                        spriteKey = "Prompts.Scream2.png",
+                        takeKey = "GET_ITEM_INTRO3",
+                        nameKey = "INV_NAME_SPELL_SCREAM2",
+                        buttonKey = "RANDOMIZER_BUTTON_DESC",
+                        descOneKey = "GET_SCREAM2_1",
+                        descTwoKey = "GET_SCREAM2_2"
+                    }
+                }));
+
+                //Testing dream nail pillar
+                Settings.actions.Add(new ChangeBoolTest("RestingGrounds_04", "Binding Shield Activate", "FSM", "Check", "gotCharm_1"));
+                Settings.actions.Add(new ChangeBoolTest("RestingGrounds_04", "Dreamer Plaque Inspect", "Conversation Control", "End", "gotCharm_1"));
+                Settings.actions.Add(new ChangeBoolTest("RestingGrounds_04", "Dreamer Scene 2", "Control", "Init", "gotCharm_1"));
+                Settings.actions.Add(new ChangeBoolTest("RestingGrounds_04", "PreDreamnail", "FSM", "Check", "gotCharm_1"));
+                Settings.actions.Add(new ChangeBoolTest("RestingGrounds_04", "PostDreamnail", "FSM", "Check", "gotCharm_1"));
             }
         }
     }
