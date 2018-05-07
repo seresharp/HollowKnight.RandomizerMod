@@ -189,8 +189,6 @@ namespace RandomizerMod.Components
                 yield return new WaitForEndOfFrame();
             }
 
-            Modding.Logger.Log("Fading out popup");
-
             //Fade out the full popup
             yield return FadeOutCanvasGroup(gameObject.GetComponent<CanvasGroup>());
 

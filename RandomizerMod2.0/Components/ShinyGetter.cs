@@ -9,6 +9,7 @@ namespace RandomizerMod.Components
     {
         public void GetShinyPrefab()
         {
+            RandomizerMod.instance.Log("Getting shiny prefab from tutorial");
             StartCoroutine(LoadShiny());
         }
 
@@ -29,40 +30,21 @@ namespace RandomizerMod.Components
                 }
             }
 
-            //Load tutorial and tell RandomizerAction to grab shinies
-            //For some reason an invalid gate name is least prone to breaking
-            GameManager.instance.entryGateName = "";
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Tutorial_01");
+            //Load the tutorial
+            GameManager.instance.ChangeToScene("Tutorial_01", "right1", 0);
+
+            //Two frames is enough to guarantee the shiny has loaded
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
 
+            //Grab the shiny
             RandomizerAction.FetchFSMList(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
 
             //Head back to wherever we were
-            GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo()
-            {
-                SceneName = currentScene,
-                EntryGateName = lastGate,
-                HeroLeaveDirection = GetGatePosition(lastGate),
-                EntryDelay = 0f,
-                WaitForSceneTransitionCameraFade = true,
-                Visualization = GameManager.SceneLoadVisualizations.Default,
-                AlwaysUnloadUnusedAssets = false
-            });
+            GameManager.instance.ChangeToScene(currentScene, lastGate, 0);
 
             //No need for clutter
             Destroy(gameObject);
-        }
-
-        private GatePosition GetGatePosition(string name)
-        {
-            if (name.Contains("top")) return GatePosition.top;
-            if (name.Contains("bot")) return GatePosition.bottom;
-            if (name.Contains("left")) return GatePosition.left;
-            if (name.Contains("right")) return GatePosition.right;
-            if (name.Contains("door")) return GatePosition.door;
-
-            return GatePosition.unknown;
         }
     }
 }

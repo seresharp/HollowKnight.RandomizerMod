@@ -61,6 +61,15 @@ namespace RandomizerMod.Actions
                         shiny.transform.position = item.transform.position;
                         shiny.name = newShinyName;
 
+                        //Force the new shiny to fling out of the chest
+                        PlayMakerFSM shinyControl = FSMUtility.LocateFSM(shiny, "Shiny Control");
+                        FsmState shinyFling = shinyControl.GetState("Fling?");
+                        shinyFling.ClearTransitions();
+                        shinyFling.AddTransition("FINISHED", "Fling R");
+
+                        //Gotta put our new shiny into the fsm list
+                        fsmList.Add(FSMUtility.LocateFSM(shiny, "Shiny Control"));
+
                         //Changes have been made, stop looping
                         break;
                     }

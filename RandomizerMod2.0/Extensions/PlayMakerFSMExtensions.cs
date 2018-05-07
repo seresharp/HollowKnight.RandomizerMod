@@ -62,6 +62,21 @@ namespace RandomizerMod.Extensions
             self.Transitions = new FsmTransition[0];
         }
 
+        public static void RemoveTransitionsTo(this FsmState self, string toState)
+        {
+            List<FsmTransition> transitions = new List<FsmTransition>();
+
+            foreach (FsmTransition transition in self.Transitions)
+            {
+                if (transition.ToState != toState)
+                {
+                    transitions.Add(transition);
+                }
+            }
+
+            self.Transitions = transitions.ToArray();
+        }
+
         public static void AddTransition(this FsmState self, string eventName, string toState)
         {
             List<FsmTransition> transitions = self.Transitions.ToList();
@@ -81,6 +96,14 @@ namespace RandomizerMod.Extensions
             transitions.Add(trans);
 
             self.Transitions = transitions.ToArray();
+        }
+
+        public static void AddFirstAction(this FsmState self, FsmStateAction action)
+        {
+            List<FsmStateAction> actions = new List<FsmStateAction>();
+            actions.Add(action);
+            actions.AddRange(self.Actions);
+            self.Actions = actions.ToArray();
         }
 
         public static void AddAction(this FsmState self, FsmStateAction action)

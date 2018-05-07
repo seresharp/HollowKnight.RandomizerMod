@@ -35,7 +35,7 @@ namespace RandomizerMod.FsmStateActions
             }
             catch (Exception e)
             {
-                Modding.Logger.LogError("Error invoking static method from FSM:\n" + e);
+                RandomizerMod.instance.LogError("Error invoking static method from FSM:\n" + e);
             }
             Finish();
         }

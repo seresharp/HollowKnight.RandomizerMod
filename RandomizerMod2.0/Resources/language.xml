@@ -44,4 +44,5 @@
     <entry sheet="Prompts" key="RANDOMIZER_GET_CHARM_1_1">A swarm will follow the bearer and gather up any loose Geo.</entry>
     <entry sheet="Prompts" key="RANDOMIZER_GET_CHARM_1_2">Useful for those who can't bear to leave anything behind, no matter how insignificant.</entry>
     <entry sheet="Prompts" key="RANDOMIZER_BUTTON_DESC">You already know what to press</entry>
+    <entry sheet="Prompts" key="RANDOMIZER_EMPTY"></entry>
 </Language>

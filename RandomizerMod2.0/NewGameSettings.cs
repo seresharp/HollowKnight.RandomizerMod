@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace RandomizerMod
+﻿namespace RandomizerMod
 {
     internal struct NewGameSettings
     {
@@ -12,7 +7,10 @@ namespace RandomizerMod
         public bool acidSkips;
         public bool spikeTunnels;
         public bool miscSkips;
+        public bool fireballSkips;
         public bool magolorSkips;
+
+        public int seed;
 
         //Additional restrictions
         public bool allBosses;
@@ -36,6 +34,7 @@ namespace RandomizerMod
             acidSkips = false;
             spikeTunnels = false;
             miscSkips = false;
+            fireballSkips = false;
             magolorSkips = false;
         }
 
@@ -45,6 +44,7 @@ namespace RandomizerMod
             acidSkips = true;
             spikeTunnels = true;
             miscSkips = true;
+            fireballSkips = true;
             magolorSkips = false;
         }
 
@@ -54,6 +54,7 @@ namespace RandomizerMod
             acidSkips = true;
             spikeTunnels = true;
             miscSkips = true;
+            fireballSkips = true;
             magolorSkips = true;
         }
     }

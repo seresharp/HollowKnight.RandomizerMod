@@ -16,6 +16,9 @@ namespace RandomizerMod.Actions
         [SerializeField] private int charmNum;
         [SerializeField] private string boolName;
 
+        public ChangeShinyIntoCharm(string sceneName, string objectName, string fsmName, string boolName)
+            : this(sceneName, objectName, fsmName, Convert.ToInt32(boolName.Substring(9))) { }
+
         public ChangeShinyIntoCharm(string sceneName, string objectName, string fsmName, int charmNum)
         {
             this.sceneName = sceneName;
@@ -50,7 +53,7 @@ namespace RandomizerMod.Actions
                         charm.AddTransition("FINISHED", "Get Charm");
                         getCharm.RemoveActionsOfType<SetPlayerDataBool>();
                         getCharm.AddAction(new RandomizerSetBool(boolName, true, true));
-                        getCharm.GetActionsOfType<SetFsmInt>()[0].setValue = charmNum;
+                        fsm.GetState("Normal Msg").GetActionsOfType<SetFsmInt>()[0].setValue = charmNum;
 
                         //Changes have been made, stop looping
                         break;

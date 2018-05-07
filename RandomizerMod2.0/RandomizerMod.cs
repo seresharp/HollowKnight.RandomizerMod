@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.IO;
 using System.Xml;
@@ -14,6 +12,8 @@ using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.Actions;
+using RandomizerMod.FsmStateActions;
+using ModCommon;
 
 using Object = UnityEngine.Object;
 
@@ -35,8 +35,9 @@ namespace RandomizerMod
         private static Dictionary<string, string> bosses;
 
         private NewGameSettings newGameSettings;
-        
-        public static RandomizerMod instance;
+        private Requirements randomizeObj;
+
+        public static RandomizerMod instance { get; private set; }
 
         public override void Initialize()
         {
@@ -92,13 +93,6 @@ namespace RandomizerMod
                     {
                         LogError("Could not process language xml:\n" + e);
                     }
-                }
-                else if (res.EndsWith(".xml"))
-                {
-                    Stream xmlStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res);
-                    XmlLoader.LoadXml(xmlStream);
-                    xmlStream.Dispose();
-                    Log("Randomizer xml processed");
                 }
                 else
                 {
@@ -159,9 +153,49 @@ namespace RandomizerMod
             ModHooks.Instance.GetPlayerIntHook += IntOverride;
             ModHooks.Instance.GetPlayerBoolHook += BoolGetOverride;
             ModHooks.Instance.SetPlayerBoolHook += BoolSetOverride;
+            ModHooks.Instance.CharmUpdateHook += UpdateCharmNotches;
 
             //Set instance for outside use
             instance = this;
+        }
+
+        private void UpdateCharmNotches(PlayerData pd, HeroController controller)
+        {
+            //Update charm notches
+            if (Settings.charmNotch)
+            {
+                if (pd == null) return;
+
+                pd.CountCharms();
+                int charms = pd.charmsOwned;
+                int notches = pd.charmSlots;
+
+                if (!pd.salubraNotch1 && charms >= 5)
+                {
+                    pd.SetBool("salubraNotch1", true);
+                    notches++;
+                }
+
+                if (!pd.salubraNotch2 && charms >= 10)
+                {
+                    pd.SetBool("salubraNotch2", true);
+                    notches++;
+                }
+
+                if (!pd.salubraNotch3 && charms >= 18)
+                {
+                    pd.SetBool("salubraNotch3", true);
+                    notches++;
+                }
+
+                if (!pd.salubraNotch4 && charms >= 25)
+                {
+                    pd.SetBool("salubraNotch4", true);
+                    notches++;
+                }
+
+                pd.SetInt("charmSlots", notches);
+            }
         }
 
         public override string GetVersion()
@@ -183,6 +217,8 @@ namespace RandomizerMod
             if (boolName == "hasDescendingDark") return PlayerData.instance.quakeLevel > 1;
             if (boolName == "hasHowlingWraiths") return PlayerData.instance.screamLevel > 0;
             if (boolName == "hasAbyssShriek") return PlayerData.instance.screamLevel > 1;
+
+            if (boolName.StartsWith("RandomizerMod.")) return Settings.GetBool(false, boolName.Substring(14));
 
             return PlayerData.instance.GetBoolInternal(boolName);
         }
@@ -213,6 +249,16 @@ namespace RandomizerMod
             else if (boolName == "hasHowlingWraiths" && !value) PlayerData.instance.screamLevel = 0;
             else if (boolName == "hasAbyssShriek" && value) PlayerData.instance.screamLevel = 2;
             else if (boolName == "hasAbyssShriek" && !value && PlayerData.instance.screamLevel >= 2) PlayerData.instance.screamLevel = 1;
+            else if (boolName.StartsWith("RandomizerMod."))
+            {
+                boolName = boolName.Substring(14);
+                if (boolName.StartsWith("ShopFireball")) PlayerData.instance.fireballLevel++;
+                else if (boolName.StartsWith("ShopQuake")) PlayerData.instance.quakeLevel++;
+                else if (boolName.StartsWith("ShopScream")) PlayerData.instance.screamLevel++;
+                
+                Settings.SetBool(value, boolName);
+                return;
+            }
 
             PlayerData.instance.SetBoolInternal(boolName, value);
         }
@@ -253,24 +299,226 @@ namespace RandomizerMod
         private void HandleSceneChanges(Scene from, Scene to)
         {
             //TODO: Prevent player from skipping Radiance in all bosses randomizer
+            if (GameManager.instance.GetSceneNameString() == Constants.MENU_SCENE)
+            {
+                try
+                {
+                    EditUI();
+                }
+                catch (Exception e)
+                {
+                    LogError("Error editing menu:\n" + e);
+                }
+            }
+
+            if (GameManager.instance.IsGameplayScene())
+            {
+                try
+                {
+                    if (randomizeObj != null)
+                    {
+                        if (randomizeObj.randomizeDone)
+                        {
+                            Settings.actions = randomizeObj.actions;
+                            Object.Destroy(randomizeObj.gameObject);
+                            randomizeObj = null;
+                        }
+                        else
+                        {
+                            LogWarn("Gameplay starting before randomization completed");
+                        }
+                    }
+                    EditShinies(from, to);
+                }
+                catch (Exception e)
+                {
+                    LogError($"Error applying RandomizerActions to scene {to.name}:\n" + e);
+                }
+            }
+
             try
             {
-                if (GameManager.instance.GetSceneNameString() == Constants.MENU_SCENE) EditUI();
-                if (GameManager.instance.IsGameplayScene()) EditShinies(from, to);
-                if (GameManager.instance.GetSceneNameString() == "Room_temple") ProcessRestrictions();
-                if (GameManager.instance.GetSceneNameString() == "Cliffs_06" && Settings.allBosses)
+                //These changes should always be applied
+                switch (GameManager.instance.GetSceneNameString())
                 {
-                    GameObject brumm = GameObject.Find("Brumm Lantern NPV");
-                    if (brumm != null) Object.Destroy(brumm);
-                    else
+                    case "Room_temple":
+                        //Handle completion restrictions
+                        ProcessRestrictions();
+                        break;
+                    case "Cliffs_06":
+                        //Prevent banish ending in all bosses
+                        if (Settings.allBosses) Object.Destroy(GameObject.Find("Brumm Lantern NPV"));
+                        break;
+                    case "Ruins1_05b":
+                        //Lemm sell all
+                        if (Settings.lemm)
+                        {
+                            PlayMakerFSM lemm = FSMUtility.LocateFSM(GameObject.Find("Relic Dealer"), "npc_control");
+                            lemm.GetState("Convo End").AddAction(new RandomizerSellRelics());
+                        }
+                        break;
+                }
+
+                //These ones are randomizer specific
+                if (Settings.randomizer)
+                {
+                    switch (GameManager.instance.GetSceneNameString())
                     {
-                        LogWarn("Could not find Brumm. Maybe possible to soft lock?");
+                        case "Crossroads_ShamanTemple":
+                            //Remove gate in shaman hut
+                            //Will be unnecessary if I get around to patching spell FSMs
+                            Object.Destroy(GameObject.Find("Bone Gate"));
+
+                            //Stop baldur from closing
+                            PlayMakerFSM blocker = FSMUtility.LocateFSM(GameObject.Find("Blocker"), "Blocker Control");
+                            blocker.GetState("Idle").RemoveTransitionsTo("Close");
+                            blocker.GetState("Shot Anim End").RemoveTransitionsTo("Close");
+                            break;
+                        case "Abyss_10":
+                            //Something might be required here after properly processing shade cloak
+                            break;
+                        case "Ruins1_32":
+                            //Platform after soul master
+                            if (!PlayerData.instance.hasWalljump)
+                            {
+                                GameObject plat = Object.Instantiate(GameObject.Find("ruind_int_plat_float_02 (3)"));
+                                plat.SetActive(true);
+                                plat.transform.position = new Vector2(40.5f, 72f);
+                            }
+
+                            //Fall through because there's quake floors to remove here
+                            goto case "Ruins1_30";
+                        case "Ruins1_30":
+                        case "Ruins1_23":
+                            //Remove quake floors
+                            if (PlayerData.instance.quakeLevel <= 0 && PlayerData.instance.killedMageLord)
+                            {
+                                foreach (GameObject obj in to.GetRootGameObjects())
+                                {
+                                    if (obj.name.Contains("Quake Floor") || obj.name.Contains("Quake Window"))
+                                    {
+                                        Object.Destroy(obj);
+                                    }
+                                }
+                            }
+                            break;
+                        case "Fungus2_21":
+                            //Remove city crest gate
+                            if (PlayerData.instance.hasCityKey)
+                            {
+                                Object.Destroy(GameObject.Find("City Gate Control"));
+                                Object.Destroy(GameObject.Find("Ruins_front_gate"));
+                            }
+                            break;
+                        case "Abyss_18":
+                            //Remove bench in basin to prevent soft lock
+                            if (!PlayerData.instance.hasWalljump)
+                            {
+                                Object.Destroy(GameObject.Find("Toll Machine Bench"));
+                            }
+                            break;
+                        case "Waterways_02":
+                            //Remove bench above flukemarm to prevent soft lock
+                            if (!PlayerData.instance.hasWalljump && !PlayerData.instance.hasDoubleJump)
+                            {
+                                Object.Destroy(GameObject.Find("RestBench"));
+                            }
+                            break;
+                        case "Crossroads_11_alt":
+                        case "Fungus1_28":
+                            //Make baldurs always able to spit rollers
+                            foreach (GameObject obj in to.GetRootGameObjects())
+                            {
+                                if (obj.name.Contains("Blocker"))
+                                {
+                                    PlayMakerFSM fsm = FSMUtility.LocateFSM(obj, "Blocker Control");
+                                    if (fsm != null)
+                                    {
+                                        fsm.GetState("Can Roller?").RemoveTransitionsTo("Goop");
+                                    }
+                                }
+                            }
+                            break;
+                        case "Ruins1_01":
+                            //Add platform to stop quirrel bench soft lock
+                            if (!PlayerData.instance.hasWalljump)
+                            {
+                                GameObject plat2 = Object.Instantiate(GameObject.Find("ruind_int_plat_float_01"));
+                                plat2.SetActive(true);
+                                plat2.transform.position = new Vector2(116, 14);
+                            }
+                            break;
+                        case "Ruins1_02":
+                            //Add platform to stop quirrel bench soft lock
+                            if (!PlayerData.instance.hasWalljump)
+                            {
+                                GameObject plat3 = Object.Instantiate(GameObject.Find("ruind_int_plat_float_01"));
+                                plat3.SetActive(true);
+                                plat3.transform.position = new Vector2(2, 61.5f);
+                            }
+                            break;
+                        case "Ruins1_05":
+                            //Slight adjustment to breakable so wings is enough to progress, just like on old patches
+                            if (!PlayerData.instance.hasWalljump)
+                            {
+                                GameObject chandelier = GameObject.Find("ruind_dressing_light_02 (10)");
+                                chandelier.transform.SetPositionX(chandelier.transform.position.x - 2);
+                                chandelier.GetComponent<NonBouncer>().active = false;
+                            }
+                            break;
+                        case "Mines_33":
+                            //Make tolls always interactable
+                            GameObject[] tolls = new GameObject[] { GameObject.Find("Toll Gate Machine"), GameObject.Find("Toll Gate Machine (1)") };
+                            foreach (GameObject toll in tolls)
+                            {
+                                Object.Destroy(FSMUtility.LocateFSM(toll, "Disable if No Lantern"));
+                            }
+                            break;
+                        case "Ruins1_24":
+                            //Pickup (Quake Pickup) -> Idle -> GetPlayerDataInt (quakeLevel)
+                            //Quake (Quake Item) -> Get -> SetPlayerDataInt (quakeLevel)
+                            //Stop spell container from destroying itself
+                            PlayMakerFSM quakePickup = FSMUtility.LocateFSM(GameObject.Find("Quake Pickup"), "Pickup");
+                            quakePickup.GetState("Idle").RemoveActionsOfType<IntCompare>();
+
+                            foreach (PlayMakerFSM childFSM in quakePickup.gameObject.GetComponentsInChildren<PlayMakerFSM>(true))
+                            {
+                                if (childFSM.FsmName == "Shiny Control")
+                                {
+                                    //Make spell container spawn shiny instead
+                                    quakePickup.GetState("Appear").GetActionsOfType<ActivateGameObject>()[1].gameObject.GameObject.Value = childFSM.gameObject;
+
+                                    //Make shiny open gates on pickup/destroy
+                                    SendEvent openGate = new SendEvent
+                                    {
+                                        eventTarget = new FsmEventTarget()
+                                        {
+                                            target = FsmEventTarget.EventTarget.BroadcastAll,
+                                            excludeSelf = true
+                                        },
+                                        sendEvent = FsmEvent.FindEvent("BG OPEN"),
+                                        delay = 0,
+                                        everyFrame = false
+                                    };
+                                    childFSM.GetState("Destroy").AddFirstAction(openGate);
+                                    childFSM.GetState("Finish").AddFirstAction(openGate);
+
+                                    //TODO: Hard save
+
+                                    break;
+                                }
+                            }
+                            break;
+                        case "Dream_Nailcollection":
+                            //Make picking up shiny load new scene
+                            FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerChangeScene("RestingGrounds_07", "right1"));
+                            break;
                     }
                 }
             }
             catch (Exception e)
             {
-                LogError("Error applying changes to scene " + to.name + ":\n" + e);
+                LogError($"Error applying changes to scene {to.name}:\n" + e);
             }
         }
 
@@ -465,12 +713,59 @@ namespace RandomizerMod
             MenuButton acidSkipsBtn = back.Clone("AcidSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 570), "Acid Skips: False");
             MenuButton spikeTunnelsBtn = back.Clone("SpikeTunnelSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 480), "Spike Tunnels: False");
             MenuButton miscSkipsBtn = back.Clone("MiscSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 390), "Misc Skips: False");
-            MenuButton magolorBtn = back.Clone("MagolorSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 300), "Mag Skips: False");
+            MenuButton fireballSkipsBtn = back.Clone("FireballSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 300), "Fireball Skips: False");
+            MenuButton magolorBtn = back.Clone("MagolorSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 210), "Mag Skips: False");
+
+            #region seed
+            GameObject seedGameObject = back.Clone("Seed", MenuButton.MenuButtonType.Activate, new Vector2(0, 1130), "Click to type a custom seed").gameObject;
+            Object.DestroyImmediate(seedGameObject.GetComponent<MenuButton>());
+            Object.DestroyImmediate(seedGameObject.GetComponent<EventTrigger>());
+            Object.DestroyImmediate(seedGameObject.transform.Find("Text").GetComponent<AutoLocalizeTextUI>());
+            Object.DestroyImmediate(seedGameObject.transform.Find("Text").GetComponent<FixVerticalAlign>());
+            Object.DestroyImmediate(seedGameObject.transform.Find("Text").GetComponent<ContentSizeFitter>());
+
+            RectTransform seedRect = seedGameObject.transform.Find("Text").GetComponent<RectTransform>();
+            seedRect.anchorMin = seedRect.anchorMax = new Vector2(0.5f, 0.5f);
+            seedRect.sizeDelta = new Vector2(337, 63.2f);
+
+            InputField customSeedInput = seedGameObject.AddComponent<InputField>();
+            customSeedInput.textComponent = seedGameObject.transform.Find("Text").GetComponent<Text>();
+
+            newGameSettings.seed = new System.Random().Next(999999999);
+            customSeedInput.text = newGameSettings.seed.ToString();
+
+            /*Text t = Object.Instantiate(customSeedInput.textComponent) as Text;
+            t.transform.SetParent(customSeedInput.transform.Find("Text"));
+            customSeedInput.placeholder = t;
+            t.horizontalOverflow = HorizontalWrapMode.Overflow;
+            t.text = "Mouse over to type a custom seed";
+            //t.fontSize = 1;
+            //t.transform.Translate(new Vector3(500f, 0f, 0f));*/
+            
+            customSeedInput.caretColor = Color.white;
+            customSeedInput.contentType = InputField.ContentType.IntegerNumber;
+            customSeedInput.onEndEdit.AddListener(data => newGameSettings.seed = Convert.ToInt32(data));
+            customSeedInput.navigation = Navigation.defaultNavigation;
+            customSeedInput.caretWidth = 8;
+            customSeedInput.characterLimit = 9;
+            
+            ColorBlock cb = new ColorBlock
+            {
+                highlightedColor = Color.yellow,
+                pressedColor = Color.red,
+                disabledColor = Color.black,
+                normalColor = Color.white,
+                colorMultiplier = 2f
+            };
+            
+            customSeedInput.colors = cb;
+            #endregion
 
             //Dirty way of making labels
             Object.Destroy(back.Clone("ModeLabel", MenuButton.MenuButtonType.Activate, new Vector2(-900, 860), "Required Skips"));
             Object.Destroy(back.Clone("RestrictionsLabel", MenuButton.MenuButtonType.Activate, new Vector2(0, 860), "Restrictions"));
             Object.Destroy(back.Clone("QoLLabel", MenuButton.MenuButtonType.Activate, new Vector2(900, 860), "Quality of Life"));
+            Object.Destroy(back.Clone("SeedLabel", MenuButton.MenuButtonType.Activate, new Vector2(0, 1200), "Seed:"));
 
             //We don't need these old buttons anymore
             Object.Destroy(classic.gameObject);
@@ -493,8 +788,9 @@ namespace RandomizerMod
             shadeSkipsBtn.SetNavigation(presetBtn, allSkillsBtn, acidSkipsBtn, lemmBtn);
             acidSkipsBtn.SetNavigation(shadeSkipsBtn, allCharmsBtn, spikeTunnelsBtn, lemmBtn);
             spikeTunnelsBtn.SetNavigation(acidSkipsBtn, allCharmsBtn, miscSkipsBtn, lemmBtn);
-            miscSkipsBtn.SetNavigation(spikeTunnelsBtn, allCharmsBtn, magolorBtn, lemmBtn);
-            magolorBtn.SetNavigation(miscSkipsBtn, allCharmsBtn, startNormalBtn, lemmBtn);
+            miscSkipsBtn.SetNavigation(spikeTunnelsBtn, allCharmsBtn, fireballSkipsBtn, lemmBtn);
+            fireballSkipsBtn.SetNavigation(miscSkipsBtn, allCharmsBtn, magolorBtn, lemmBtn);
+            magolorBtn.SetNavigation(fireballSkipsBtn, allCharmsBtn, startNormalBtn, lemmBtn);
 
             //Clear out all the events we don't need anymore
             allBossesBtn.ClearEvents();
@@ -507,6 +803,7 @@ namespace RandomizerMod
             acidSkipsBtn.ClearEvents();
             spikeTunnelsBtn.ClearEvents();
             miscSkipsBtn.ClearEvents();
+            fireballSkipsBtn.ClearEvents();
             magolorBtn.ClearEvents();
 
             //Fetch text objects for use in events
@@ -520,6 +817,7 @@ namespace RandomizerMod
             Text acidSkipsText = acidSkipsBtn.transform.Find("Text").GetComponent<Text>();
             Text spikeTunnelsText = spikeTunnelsBtn.transform.Find("Text").GetComponent<Text>();
             Text miscSkipsText = miscSkipsBtn.transform.Find("Text").GetComponent<Text>();
+            Text fireballSkipsText = fireballSkipsBtn.transform.Find("Text").GetComponent<Text>();
             Text magolorText = magolorBtn.transform.Find("Text").GetComponent<Text>();
 
             //Create dictionary to pass into events
@@ -534,6 +832,7 @@ namespace RandomizerMod
             dict.Add("Acid Skips", acidSkipsText);
             dict.Add("Spike Tunnels", spikeTunnelsText);
             dict.Add("Misc Skips", miscSkipsText);
+            dict.Add("Fireball Skips", fireballSkipsText);
             dict.Add("Mag Skips", magolorText);
 
             //Add useful events
@@ -549,6 +848,7 @@ namespace RandomizerMod
             acidSkipsBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Acid Skips", dict));
             spikeTunnelsBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Spike Tunnels", dict));
             miscSkipsBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Misc Skips", dict));
+            fireballSkipsBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Fireball Skips", dict));
             magolorBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Mag Skips", dict));
         }
 
@@ -603,6 +903,7 @@ namespace RandomizerMod
                     dict["Acid Skips"].text = dict["Acid Skips"].text.Replace((!newGameSettings.acidSkips).ToString(), newGameSettings.acidSkips.ToString());
                     dict["Spike Tunnels"].text = dict["Spike Tunnels"].text.Replace((!newGameSettings.spikeTunnels).ToString(), newGameSettings.spikeTunnels.ToString());
                     dict["Misc Skips"].text = dict["Misc Skips"].text.Replace((!newGameSettings.miscSkips).ToString(), newGameSettings.miscSkips.ToString());
+                    dict["Fireball Skips"].text = dict["Fireball Skips"].text.Replace((!newGameSettings.fireballSkips).ToString(), newGameSettings.fireballSkips.ToString());
                     dict["Mag Skips"].text = dict["Mag Skips"].text.Replace((!newGameSettings.magolorSkips).ToString(), newGameSettings.magolorSkips.ToString());
 
                     break;
@@ -622,6 +923,10 @@ namespace RandomizerMod
                     newGameSettings.miscSkips = !newGameSettings.miscSkips;
                     text.text = text.text.Replace((!newGameSettings.miscSkips).ToString(), newGameSettings.miscSkips.ToString());
                     break;
+                case "Fireball Skips":
+                    newGameSettings.fireballSkips = !newGameSettings.fireballSkips;
+                    text.text = text.text.Replace((!newGameSettings.fireballSkips).ToString(), newGameSettings.fireballSkips.ToString());
+                    break;
                 case "Mag Skips":
                     newGameSettings.magolorSkips = !newGameSettings.magolorSkips;
                     text.text = text.text.Replace((!newGameSettings.magolorSkips).ToString(), newGameSettings.magolorSkips.ToString());
@@ -635,6 +940,7 @@ namespace RandomizerMod
                 case "Acid Skips":
                 case "Spike Tunnels":
                 case "Misc Skips":
+                case "Fireball Skips":
                 case "Mag Skips":
                     dict["Preset"].text = dict["Preset"].text.Replace(dict["Preset"].text.Substring(8), "Custom");
                     break;
@@ -643,13 +949,6 @@ namespace RandomizerMod
 
         private void StartNewGame(bool randomizer)
         {
-            //TODO: Remove this before release
-            PlayerData.instance.infiniteAirJump = true;
-
-            //TODO: Think of a better way to handle Zote
-            PlayerData.instance.zoteRescuedBuzzer = true;
-            PlayerData.instance.zoteRescuedDeepnest = true;
-
             Settings = new SaveSettings();
 
             //No reason to limit these to only when randomizer is enabled
@@ -662,39 +961,21 @@ namespace RandomizerMod
             //Charm tutorial popup is annoying, get rid of it
             PlayerData.instance.hasCharm = true;
 
+            if (Settings.allBosses)
+            {
+                //TODO: Think of a better way to handle Zote
+                PlayerData.instance.zoteRescuedBuzzer = true;
+                PlayerData.instance.zoteRescuedDeepnest = true;
+            }
+
             if (randomizer)
             {
-                PlayerData.instance.screamLevel = 1;
-                Settings.actions.Add(new ChangeShinyIntoBigItem("Tutorial_01", "Shiny Item (1)", "Shiny Control", new BigItemDef[]
-                {
-                    new BigItemDef()
-                    {
-                        boolName = "hasHowlingWraiths",
-                        spriteKey = "Prompts.Scream1.png",
-                        takeKey = "GET_ITEM_INTRO3",
-                        nameKey = "INV_NAME_SPELL_SCREAM1",
-                        buttonKey = "RANDOMIZER_BUTTON_DESC",
-                        descOneKey = "GET_SCREAM_1",
-                        descTwoKey = "GET_SCREAM_2"
-                    },
-                    new BigItemDef()
-                    {
-                        boolName = "hasAbyssShriek",
-                        spriteKey = "Prompts.Scream2.png",
-                        takeKey = "GET_ITEM_INTRO3",
-                        nameKey = "INV_NAME_SPELL_SCREAM2",
-                        buttonKey = "RANDOMIZER_BUTTON_DESC",
-                        descOneKey = "GET_SCREAM2_1",
-                        descTwoKey = "GET_SCREAM2_2"
-                    }
-                }));
-
-                //Testing dream nail pillar
-                Settings.actions.Add(new ChangeBoolTest("RestingGrounds_04", "Binding Shield Activate", "FSM", "Check", "gotCharm_1"));
-                Settings.actions.Add(new ChangeBoolTest("RestingGrounds_04", "Dreamer Plaque Inspect", "Conversation Control", "End", "gotCharm_1"));
-                Settings.actions.Add(new ChangeBoolTest("RestingGrounds_04", "Dreamer Scene 2", "Control", "Init", "gotCharm_1"));
-                Settings.actions.Add(new ChangeBoolTest("RestingGrounds_04", "PreDreamnail", "FSM", "Check", "gotCharm_1"));
-                Settings.actions.Add(new ChangeBoolTest("RestingGrounds_04", "PostDreamnail", "FSM", "Check", "gotCharm_1"));
+                Settings.randomizer = true;
+                
+                GameObject obj = new GameObject();
+                Object.DontDestroyOnLoad(obj);
+                randomizeObj = obj.AddComponent<Requirements>();
+                randomizeObj.settings = newGameSettings;
             }
         }
     }
