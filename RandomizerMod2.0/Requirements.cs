@@ -1125,10 +1125,10 @@ namespace RandomizerMod
                         actions.Add(new ChangeShopContents("Room_mapper", "Shop Menu", newShopItemStats.ToArray()));
                         break;
                     case "Salubra":
-                        actions.Add(new ChangeShopContents("Room_mapper", "Shop Menu", newShopItemStats.ToArray()));
+                        actions.Add(new ChangeShopContents("Room_Charm_Shop", "Shop Menu", newShopItemStats.ToArray()));
                         break;
                     case "LegEater":
-                        actions.Add(new ChangeShopContents("Room_Charm_Shop", "Shop Menu", newShopItemStats.ToArray()));
+                        actions.Add(new ChangeShopContents("Fungus2_26", "Shop Menu", newShopItemStats.ToArray()));
                         break;
                     case "Lemm":
                         actions.Add(new ChangeShopContents("Ruins1_05b", "Shop Menu", newShopItemStats.ToArray()));
