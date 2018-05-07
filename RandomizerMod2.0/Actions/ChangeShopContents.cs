@@ -74,15 +74,6 @@ namespace RandomizerMod.Actions
                 
                 //Remove all charm type items from the store
                 List<GameObject> newStock = new List<GameObject>();
-                foreach (GameObject item in shop.stock)
-                {
-                    //It would be cleaner to destroy the unused objects, but that breaks the shop on subsequent loads
-                    //TC must be reusing the shop items rather than destroying them on load
-                    if (item.GetComponent<ShopItemStats>().specialType != 2)
-                    {
-                        newStock.Add(item);
-                    }
-                }
                 
                 foreach (ShopItemDef itemDef in items)
                 {
@@ -112,8 +103,37 @@ namespace RandomizerMod.Actions
 
                     newStock.Add(newItemObj);
                 }
-                
+
+                //Save unchanged list for potential alt stock
+                List<GameObject> altStock = new List<GameObject>();
+                altStock.AddRange(newStock);
+
+                //Update normal stock
+                foreach (GameObject item in shop.stock)
+                {
+                    //It would be cleaner to destroy the unused objects, but that breaks the shop on subsequent loads
+                    //TC must be reusing the shop items rather than destroying them on load
+                    if (item.GetComponent<ShopItemStats>().specialType != 2)
+                    {
+                        newStock.Add(item);
+                    }
+                }
+
                 shop.stock = newStock.ToArray();
+
+                //Update alt stock
+                if (shop.stockAlt != null)
+                {
+                    foreach (GameObject item in shop.stockAlt)
+                    {
+                        if (item.GetComponent<ShopItemStats>().specialType != 2)
+                        {
+                            altStock.Add(item);
+                        }
+                    }
+
+                    shop.stockAlt = altStock.ToArray();
+                }
             }
         }
     }
