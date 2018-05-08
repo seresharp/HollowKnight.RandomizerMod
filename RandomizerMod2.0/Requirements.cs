@@ -130,7 +130,7 @@ namespace RandomizerMod
             //Shade Cloak
             new ReqDef()
             {
-                boolName = "hasShadeCloak",
+                boolName = "hasShadowDash",
                 sceneName = "Abyss_10",
                 objectName = "Dish Plat",
                 replace = true,
