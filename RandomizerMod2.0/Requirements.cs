@@ -993,19 +993,51 @@ namespace RandomizerMod
                                 actions.Add(new ChangeShinyIntoCharm(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItem.boolName));
                                 break;
                             case ItemType.Big:
-                                actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, new BigItemDef[]
+                                if (newItem.boolName == "hasDash" || newItem.boolName == "hasShadowDash")
                                 {
-                                    new BigItemDef()
+                                    ReqDef dash = items.Where(item => item.boolName == "hasVengefulSpirit").First();
+                                    ReqDef shadowDash = items.Where(item => item.boolName == "hasVengefulSpirit").First();
+
+                                    actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, new BigItemDef[]
                                     {
-                                        boolName = newItem.boolName,
-                                        spriteKey = newItem.bigSpriteKey,
-                                        takeKey = newItem.takeKey,
-                                        nameKey = newItem.nameKey,
-                                        buttonKey = newItem.buttonKey,
-                                        descOneKey = newItem.descOneKey,
-                                        descTwoKey = newItem.descTwoKey
-                                    }
-                                }));
+                                        new BigItemDef()
+                                        {
+                                            boolName = dash.boolName,
+                                            spriteKey = dash.bigSpriteKey,
+                                            takeKey = dash.takeKey,
+                                            nameKey = dash.nameKey,
+                                            buttonKey = dash.buttonKey,
+                                            descOneKey = dash.descOneKey,
+                                            descTwoKey = dash.descTwoKey
+                                        },
+                                        new BigItemDef()
+                                        {
+                                            boolName = shadowDash.boolName,
+                                            spriteKey = shadowDash.bigSpriteKey,
+                                            takeKey = shadowDash.takeKey,
+                                            nameKey = shadowDash.nameKey,
+                                            buttonKey = shadowDash.buttonKey,
+                                            descOneKey = shadowDash.descOneKey,
+                                            descTwoKey = shadowDash.descTwoKey
+                                        }
+                                    }));
+                                }
+                                else
+                                {
+                                    actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, new BigItemDef[]
+                                    {
+                                        new BigItemDef()
+                                        {
+                                            boolName = newItem.boolName,
+                                            spriteKey = newItem.bigSpriteKey,
+                                            takeKey = newItem.takeKey,
+                                            nameKey = newItem.nameKey,
+                                            buttonKey = newItem.buttonKey,
+                                            descOneKey = newItem.descOneKey,
+                                            descTwoKey = newItem.descTwoKey
+                                        }
+                                    }));
+                                }
                                 break;
                             case ItemType.Spell:
                                 ReqDef spell1;
@@ -1064,7 +1096,7 @@ namespace RandomizerMod
                 }
             }
 
-            int shopSpells = 0;
+            int shopAdditiveItems = 0;
             List<ShopItemDef> slyItems = new List<ShopItemDef>();
 
             foreach (KeyValuePair<string, List<string>> kvp in shopItems)
@@ -1086,19 +1118,23 @@ namespace RandomizerMod
                         {
                             case "hasVengefulSpirit":
                             case "hasShadeSoul":
-                                newItem.boolName = "RandomizerMod.ShopFireball" + shopSpells++;
+                                newItem.boolName = "RandomizerMod.ShopFireball" + shopAdditiveItems++;
                                 break;
                             case "hasDesolateDive":
                             case "hasDescendingDark":
-                                newItem.boolName = "RandomizerMod.ShopQuake" + shopSpells++;
+                                newItem.boolName = "RandomizerMod.ShopQuake" + shopAdditiveItems++;
                                 break;
                             case "hasHowlingWraiths":
                             case "hasAbyssShriek":
-                                newItem.boolName = "RandomizerMod.ShopScream" + shopSpells++;
+                                newItem.boolName = "RandomizerMod.ShopScream" + shopAdditiveItems++;
                                 break;
                             default:
                                 throw new Exception("Unknown spell name: " + newItem.boolName);
                         }
+                    }
+                    else if (newItem.boolName == "hasDash" || newItem.boolName == "hasShadowDash")
+                    {
+                        newItem.boolName = "RandomizerMod.ShopDash" + shopAdditiveItems++;
                     }
 
                     newShopItemStats.Add(new ShopItemDef()

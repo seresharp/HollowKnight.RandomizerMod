@@ -199,7 +199,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2a.2";
+            string ver = "2a.3";
             int minAPI = 41;
 
             if (Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI) ver += " (Some features may not work, update API)";
@@ -254,6 +254,17 @@ namespace RandomizerMod
                 if (boolName.StartsWith("ShopFireball")) PlayerData.instance.fireballLevel++;
                 else if (boolName.StartsWith("ShopQuake")) PlayerData.instance.quakeLevel++;
                 else if (boolName.StartsWith("ShopScream")) PlayerData.instance.screamLevel++;
+                else if (boolName.StartsWith("ShopDash"))
+                {
+                    if (PlayerData.instance.hasDash)
+                    {
+                        PlayerData.instance.SetBool("hasShadowDash", true);
+                    }
+                    else
+                    {
+                        PlayerData.instance.SetBool("hasDash", true);
+                    }
+                }
                 
                 Settings.SetBool(value, boolName);
                 return;
@@ -472,6 +483,37 @@ namespace RandomizerMod
                             {
                                 Object.Destroy(FSMUtility.LocateFSM(toll, "Disable if No Lantern"));
                             }
+                            break;
+                        case "Fungus1_04":
+                            //Open gates after Hornet fight
+                            foreach (PlayMakerFSM childFSM in GameObject.Find("Cloak Corpse").GetComponentsInChildren<PlayMakerFSM>(true))
+                            {
+                                if (childFSM.FsmName == "Shiny Control")
+                                {
+                                    SendEvent openGate = new SendEvent
+                                    {
+                                        eventTarget = new FsmEventTarget()
+                                        {
+                                            target = FsmEventTarget.EventTarget.BroadcastAll,
+                                            excludeSelf = true
+                                        },
+                                        sendEvent = FsmEvent.FindEvent("BG OPEN"),
+                                        delay = 0,
+                                        everyFrame = false
+                                    };
+                                    childFSM.GetState("Destroy").AddFirstAction(openGate);
+                                    childFSM.GetState("Finish").AddFirstAction(openGate);
+
+                                    break;
+                                }
+                            }
+
+                            //Destroy everything relating to the dreamer cutscene
+                            Components.ObjectDestroyer.Destroy("Dreamer Scene 1");
+                            Components.ObjectDestroyer.Destroy("Hornet Saver");
+                            Components.ObjectDestroyer.Destroy("Cutscene Dreamer");
+                            Components.ObjectDestroyer.Destroy("Dream Scene Activate");
+
                             break;
                         case "Ruins1_24":
                             //Pickup (Quake Pickup) -> Idle -> GetPlayerDataInt (quakeLevel)

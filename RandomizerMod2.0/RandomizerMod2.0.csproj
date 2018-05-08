@@ -65,6 +65,7 @@
     <Compile Include="Actions\RandomizerSellRelics.cs" />
     <Compile Include="Actions\ReplaceObjectWithShiny.cs" />
     <Compile Include="Components\BigItemPopup.cs" />
+    <Compile Include="Components\ObjectDestroyer.cs" />
     <Compile Include="Extensions\SpriteExtensions.cs" />
     <Compile Include="FsmStateActions\RandomizerCallStaticMethod.cs" />
     <Compile Include="FsmStateActions\RandomizerAddGeo.cs" />
