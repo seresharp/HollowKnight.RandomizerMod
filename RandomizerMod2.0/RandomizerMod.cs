@@ -13,7 +13,6 @@ using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.Actions;
 using RandomizerMod.FsmStateActions;
-using ModCommon;
 
 using Object = UnityEngine.Object;
 
@@ -200,7 +199,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2a.1";
+            string ver = "2a.2";
             int minAPI = 41;
 
             if (Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI) ver += " (Some features may not work, update API)";
@@ -506,6 +505,13 @@ namespace RandomizerMod
                                     //TODO: Hard save
 
                                     break;
+                                }
+
+                                //Stop the weird invisible floor from appearing if dive has been obtained
+                                //I don't think it really serves any purpose, so destroying it should be fine
+                                if (PlayerData.instance.quakeLevel > 0)
+                                {
+                                    Object.Destroy(GameObject.Find("Roof Collider Battle"));
                                 }
                             }
                             break;

@@ -53,6 +53,7 @@ namespace RandomizerMod.Actions
                     shiny.name = newShinyName;
                     if (obj.transform.parent != null) shiny.transform.SetParent(obj.transform.parent);
                     shiny.transform.position = obj.transform.position;
+                    shiny.transform.localPosition = obj.transform.localPosition;
                     shiny.SetActive(obj.activeSelf);
 
                     //Force the new shiny to fall straight downwards
@@ -62,6 +63,9 @@ namespace RandomizerMod.Actions
                     fling.AddTransition("FINISHED", "Fling R");
                     FlingObject flingObj = fsm.GetState("Fling R").GetActionsOfType<FlingObject>()[0];
                     flingObj.angleMin = flingObj.angleMax = 270;
+
+                    //For some reason not setting speed manually messes with the object position
+                    flingObj.speedMin = flingObj.speedMax = 0.1f;
 
                     //Gotta put our new shiny into the fsm list
                     fsmList.Add(fsm);
