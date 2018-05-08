@@ -426,7 +426,7 @@ namespace RandomizerMod
                         case "Crossroads_11_alt":
                         case "Fungus1_28":
                             //Make baldurs always able to spit rollers
-                            foreach (GameObject obj in to.GetRootGameObjects())
+                            foreach (GameObject obj in Object.FindObjectsOfType<GameObject>())
                             {
                                 if (obj.name.Contains("Blocker"))
                                 {
