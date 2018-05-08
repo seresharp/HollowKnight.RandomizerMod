@@ -75,11 +75,11 @@ namespace RandomizerMod.Components
             //Add popup component, set values
             BigItemPopup popup = canvas.AddComponent<BigItemPopup>();
             popup.imagePrompt = RandomizerMod.sprites[spriteKey];
-            popup.takeText = Language.Language.Get(takeKey, "Prompts");
-            popup.nameText = Language.Language.Get(nameKey, "UI");
-            popup.buttonText = Language.Language.Get(buttonKey, "Prompts");
-            popup.descOneText = Language.Language.Get(descOneKey, "Prompts");
-            popup.descTwoText = Language.Language.Get(descTwoKey, "Prompts");
+            popup.takeText = Language.Language.Get(takeKey, "Prompts").Replace("<br>", " ");
+            popup.nameText = Language.Language.Get(nameKey, "UI").Replace("<br>", " ");
+            popup.buttonText = Language.Language.Get(buttonKey, "Prompts").Replace("<br>", " ");
+            popup.descOneText = Language.Language.Get(descOneKey, "Prompts").Replace("<br>", " ");
+            popup.descTwoText = Language.Language.Get(descTwoKey, "Prompts").Replace("<br>", " ");
             popup.fsmObj = fsmObj;
             popup.fsmEvent = eventName;
 
