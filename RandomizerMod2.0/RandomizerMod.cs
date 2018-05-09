@@ -200,7 +200,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2a.4";
+            string ver = "2a.5";
             int minAPI = 41;
 
             if (Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI) ver += " (Some features may not work, update API)";

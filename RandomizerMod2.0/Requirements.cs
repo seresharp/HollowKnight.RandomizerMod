@@ -44,6 +44,9 @@ namespace RandomizerMod
         public string notchCost;
 
         public string shopName;
+
+        //Progression item flag
+        public bool progression;
     }
 
     //Processing XML sucks, this is much easier
@@ -51,6 +54,7 @@ namespace RandomizerMod
     //Can let it be GC'd if it's a normal class
     internal class Requirements : MonoBehaviour
     {
+        //TODO: Turn this into a dict and fix everything that breaks
         private ReqDef[] items = new ReqDef[]
         {
             //Mothwing Cloak
@@ -70,7 +74,8 @@ namespace RandomizerMod
                 descOneKey = "GET_DASH_1",
                 descTwoKey = "GET_DASH_1",
                 shopDescKey = "INV_DESC_DASH",
-                shopSpriteKey = "ShopIcons.Dash.png"
+                shopSpriteKey = "ShopIcons.Dash.png",
+                progression = true
             },
             //Mantis Claw
             new ReqDef()
@@ -89,7 +94,8 @@ namespace RandomizerMod
                 descOneKey = "GET_WALLJUMP_1",
                 descTwoKey = "GET_WALLJUMP_2",
                 shopDescKey = "INV_DESC_WALLJUMP",
-                shopSpriteKey = "ShopIcons.Walljump.png"
+                shopSpriteKey = "ShopIcons.Walljump.png",
+                progression = true
             },
             //Crystal Heart
             new ReqDef()
@@ -107,7 +113,8 @@ namespace RandomizerMod
                 descOneKey = "GET_SUPERDASH_1",
                 descTwoKey = "GET_SUPERDASH_2",
                 shopDescKey = "INV_DESC_SUPERDASH",
-                shopSpriteKey = "ShopIcons.Superdash.png"
+                shopSpriteKey = "ShopIcons.Superdash.png",
+                progression = true
             },
             //Monarch Wings
             new ReqDef()
@@ -125,7 +132,8 @@ namespace RandomizerMod
                 descOneKey = "GET_DOUBLEJUMP_1",
                 descTwoKey = "GET_DOUBLEJUMP_2",
                 shopDescKey = "INV_DESC_DOUBLEJUMP",
-                shopSpriteKey = "ShopIcons.Wings.png"
+                shopSpriteKey = "ShopIcons.Wings.png",
+                progression = true
             },
             //Shade Cloak
             new ReqDef()
@@ -143,7 +151,8 @@ namespace RandomizerMod
                 descOneKey = "GET_SHADOWDASH_1",
                 descTwoKey = "GET_SHADOWDASH_2",
                 shopDescKey = "INV_DESC_SHADOWDASH",
-                shopSpriteKey = "ShopIcons.Shadowdash.png"
+                shopSpriteKey = "ShopIcons.Shadowdash.png",
+                progression = true
             },
             //Isma's Tear
             new ReqDef()
@@ -161,7 +170,8 @@ namespace RandomizerMod
                 descOneKey = "GET_ACIDARMOUR_1",
                 descTwoKey = "GET_ACIDARMOUR_2",
                 shopDescKey = "INV_DESC_ACIDARMOUR",
-                shopSpriteKey = "ShopIcons.Isma.png"
+                shopSpriteKey = "ShopIcons.Isma.png",
+                progression = true
             },
             //Dream Nail
             new ReqDef()
@@ -199,7 +209,8 @@ namespace RandomizerMod
                 descOneKey = "GET_FIREBALL_1",
                 descTwoKey = "GET_FIREBALL_2",
                 shopDescKey = "INV_DESC_SPELL_FIREBALL1",
-                shopSpriteKey = "ShopIcons.Fireball1.png"
+                shopSpriteKey = "ShopIcons.Fireball1.png",
+                progression = true
             },
             //Shade Soul
             new ReqDef()
@@ -217,7 +228,8 @@ namespace RandomizerMod
                 descOneKey = "GET_FIREBALL2_1",
                 descTwoKey = "GET_FIREBALL2_2",
                 shopDescKey = "INV_DESC_SPELL_FIREBALL2",
-                shopSpriteKey = "ShopIcons.Fireball2.png"
+                shopSpriteKey = "ShopIcons.Fireball2.png",
+                progression = true
             },
             //Desolate Dive
             new ReqDef()
@@ -235,7 +247,8 @@ namespace RandomizerMod
                 descOneKey = "GET_QUAKE_1",
                 descTwoKey = "GET_QUAKE_2",
                 shopDescKey = "INV_DESC_SPELL_QUAKE1",
-                shopSpriteKey = "ShopIcons.Quake1.png"
+                shopSpriteKey = "ShopIcons.Quake1.png",
+                progression = true
             },
             //Descending Dark
             new ReqDef()
@@ -253,7 +266,8 @@ namespace RandomizerMod
                 descOneKey = "GET_QUAKE2_1",
                 descTwoKey = "GET_QUAKE2_2",
                 shopDescKey = "INV_DESC_SPELL_QUAKE2",
-                shopSpriteKey = "ShopIcons.Quake2.png"
+                shopSpriteKey = "ShopIcons.Quake2.png",
+                progression = true
             },
             //Howling Wraiths
             new ReqDef()
@@ -271,7 +285,8 @@ namespace RandomizerMod
                 descOneKey = "GET_SCREAM_1",
                 descTwoKey = "GET_SCREAM_2",
                 shopDescKey = "INV_DESC_SPELL_SCREAM1",
-                shopSpriteKey = "ShopIcons.Scream1.png"
+                shopSpriteKey = "ShopIcons.Scream1.png",
+                progression = true
             },
             //Abyss Shriek TODO: Require wraiths for this pickup
             new ReqDef()
@@ -289,7 +304,8 @@ namespace RandomizerMod
                 descOneKey = "GET_SCREAM2_1",
                 descTwoKey = "GET_SCREAM2_2",
                 shopDescKey = "INV_DESC_SPELL_SCREAM2",
-                shopSpriteKey = "ShopIcons.Scream2.png"
+                shopSpriteKey = "ShopIcons.Scream2.png",
+                progression = true
             },
             //Gathering Swarm (Sly no key)
             new ReqDef()
@@ -359,7 +375,7 @@ namespace RandomizerMod
                 objectName = "Shiny Item",
                 fsmName = "Shiny Control",
                 replace = false,
-                logic = "BALDURS + (CLAW | DASH | WINGS | SUPERDASH | SHADESKIPS)",
+                logic = "BALDURS + (CLAW | DASH | WINGS | SUPERDASH | SHADESKIPS | (FIREBALL + FIREBALLSKIPS))",
                 type = ItemType.Charm,
                 nameKey = "CHARM_NAME_5",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_5",
@@ -471,7 +487,8 @@ namespace RandomizerMod
                 nameKey = "CHARM_NAME_13",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_13",
                 shopSpriteKey = "Charms.13.png",
-                notchCost = "charmCost_13"
+                notchCost = "charmCost_13",
+                progression = true
             },
             //Steady Body (Salubra)
             new ReqDef()
@@ -531,7 +548,8 @@ namespace RandomizerMod
                 nameKey = "CHARM_NAME_17",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_17",
                 shopSpriteKey = "Charms.17.png",
-                notchCost = "charmCost_17"
+                notchCost = "charmCost_17",
+                progression = true
             },
             //Longnail (Salubra)
             new ReqDef()
@@ -545,7 +563,8 @@ namespace RandomizerMod
                 nameKey = "CHARM_NAME_18",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_18",
                 shopSpriteKey = "Charms.18.png",
-                notchCost = "charmCost_18"
+                notchCost = "charmCost_18",
+                progression = true
             },
             //Shaman Stone (Salubra)
             new ReqDef()
@@ -605,7 +624,8 @@ namespace RandomizerMod
                 nameKey = "CHARM_NAME_22",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_22",
                 shopSpriteKey = "Charms.22.png",
-                notchCost = "charmCost_22"
+                notchCost = "charmCost_22",
+                progression = true
             },
             //Fragile Heart (Leg Eater)
             new ReqDef()
@@ -773,7 +793,8 @@ namespace RandomizerMod
                 nameKey = "CHARM_NAME_35",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_35",
                 shopSpriteKey = "Charms.35.png",
-                notchCost = "charmCost_35"
+                notchCost = "charmCost_35",
+                progression = true
             },
             //TODO: Kingsoul/Void Heart
             //Sprintmaster (Sly with key)
@@ -819,7 +840,8 @@ namespace RandomizerMod
                 nameKey = "CHARM_NAME_39",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_39",
                 shopSpriteKey = "Charms.39.png",
-                notchCost = "charmCost_39"
+                notchCost = "charmCost_39",
+                progression = true
             }
             //TODO: Grimmchild
             //TODO: Geo Chests
@@ -860,31 +882,49 @@ namespace RandomizerMod
             StartCoroutine(Randomize());
         }
 
+        //You don't have to write good code if you spam "yield return new WaitForEndOfFrame()" everywhere
+        //Insert man tapping head
         public IEnumerator Randomize()
         {
             randomizeDone = false;
-
             RandomizerMod.instance.Log("Randomizing with seed: " + settings.seed);
-
             Random rand = new Random(settings.seed);
+
+            //For use in weighting item placement
+            Dictionary<string, int> locationDepths = new Dictionary<string, int>();
+            int currentDepth = 1;
 
             //Choose where to place progression items
             while (true)
             {
                 yield return new WaitForEndOfFrame();
 
+                //Get currently reachable locations
                 List<string> reachableLocations = new List<string>();
+                int reachableCount = 0;
 
                 for (int i = 0; i < unobtainedLocations.Count; i++)
                 {
                     yield return new WaitForEndOfFrame();
                     if (IsReachable(unobtainedLocations[i]))
                     {
-                        reachableLocations.Add(unobtainedLocations[i]);
+                        if (!locationDepths.ContainsKey(unobtainedLocations[i]))
+                        {
+                            locationDepths[unobtainedLocations[i]] = currentDepth;
+                        }
+
+                        //This way further locations will be more likely to be picked
+                        for (int j = 0; j < currentDepth; j++)
+                        {
+                            yield return new WaitForEndOfFrame();
+                            reachableLocations.Add(unobtainedLocations[i]);
+                        }
+
+                        reachableCount++;
                     }
                 }
                 
-                List<string> progressionItems = GetProgressionItems(reachableLocations);
+                List<string> progressionItems = GetProgressionItems(reachableCount);
 
                 //We only need complex randomization until all progression items are placed
                 //After that everything can just be placed completely randomly
@@ -901,6 +941,61 @@ namespace RandomizerMod
                 obtainedItems.Add(placeItem);
 
                 RandomizerMod.instance.Log($"Putting progression item {placeItem} at {placeLocation}");
+
+                if (shopItems.ContainsKey(placeLocation))
+                {
+                    shopItems[placeLocation].Add(placeItem);
+                }
+                else
+                {
+                    otherItems.Add(placeLocation, placeItem);
+                }
+
+                currentDepth++;
+            }
+
+            //Place remaining potential progression items
+            List<string> unusedProgressionItems = new List<string>();
+
+            foreach (string str in unobtainedItems)
+            {
+                yield return new WaitForEndOfFrame();
+                if (items.Where(item => item.boolName == str).First().progression)
+                {
+                    unusedProgressionItems.Add(str);
+                }
+            }
+
+            while (unusedProgressionItems.Count > 0)
+            {
+                yield return new WaitForEndOfFrame();
+
+                //TODO: Make extension to remove all of a string from a list so I don't have to recalculate this every time
+                List<string> weightedLocations = new List<string>();
+                foreach (string str in unobtainedLocations)
+                {
+                    yield return new WaitForEndOfFrame();
+                    //Items tagged as requiring "EVERYTHING" will not be in this dict
+                    if (locationDepths.ContainsKey(str))
+                    {
+                        //Using weight^2 to heavily bias towards late locations
+                        for (int i = 0; i < locationDepths[str] * locationDepths[str]; i++)
+                        {
+                            yield return new WaitForEndOfFrame();
+                            weightedLocations.Add(str);
+                        }
+                    }
+                }
+
+                string placeLocation = weightedLocations[rand.Next(weightedLocations.Count)];
+                string placeItem = unusedProgressionItems[rand.Next(unusedProgressionItems.Count)];
+
+                unobtainedLocations.Remove(placeLocation);
+                unusedProgressionItems.Remove(placeItem);
+                unobtainedItems.Remove(placeItem);
+                obtainedItems.Add(placeItem);
+
+                RandomizerMod.instance.Log($"Putting unused progression item {placeItem} at {placeLocation}");
 
                 if (shopItems.ContainsKey(placeLocation))
                 {
@@ -1178,14 +1273,17 @@ namespace RandomizerMod
             randomizeDone = true;
         }
 
-        private List<string> GetProgressionItems(List<string> reachable)
+        private List<string> GetProgressionItems(int reachableCount)
         {
             List<string> progression = new List<string>();
 
             foreach (string str in unobtainedItems)
             {
-                List<string> hypothetical = unobtainedLocations.Where(item => IsReachable(item, str)).ToList();
-                if (hypothetical.Count > reachable.Count) progression.Add(str);
+                if (items.Where(item => item.boolName == str).First().progression)
+                {
+                    List<string> hypothetical = unobtainedLocations.Where(item => IsReachable(item, str)).ToList();
+                    if (hypothetical.Count > reachableCount) progression.Add(str);
+                }
             }
 
             return progression;
