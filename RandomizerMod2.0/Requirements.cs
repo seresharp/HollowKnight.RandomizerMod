@@ -850,7 +850,7 @@ namespace RandomizerMod
             shopItems.Add("Iselda", new List<string>());
             shopItems.Add("Salubra", new List<string>());
             shopItems.Add("LegEater", new List<string>());
-            shopItems.Add("Lemm", new List<string>());
+            //shopItems.Add("Lemm", new List<string>()); TODO: Custom shop component to handle lemm
 
             unobtainedLocations = items.Where(item => item.type != ItemType.Shop).Select(item => item.boolName).ToList();
             unobtainedLocations.AddRange(shopItems.Keys);

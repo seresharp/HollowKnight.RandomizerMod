@@ -13,6 +13,7 @@ using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.Actions;
 using RandomizerMod.FsmStateActions;
+using ModCommon;
 
 using Object = UnityEngine.Object;
 
@@ -199,7 +200,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2a.3";
+            string ver = "2a.4";
             int minAPI = 41;
 
             if (Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI) ver += " (Some features may not work, update API)";
@@ -514,6 +515,13 @@ namespace RandomizerMod
                             Components.ObjectDestroyer.Destroy("Cutscene Dreamer");
                             Components.ObjectDestroyer.Destroy("Dream Scene Activate");
 
+                            break;
+                        case "Room_Slug_Shrine":
+                            //Remove bench before unn
+                            if (!PlayerData.instance.hasDash && !PlayerData.instance.hasAcidArmour && !PlayerData.instance.hasDoubleJump)
+                            {
+                                Object.Destroy(GameObject.Find("RestBench"));
+                            }
                             break;
                         case "Ruins1_24":
                             //Pickup (Quake Pickup) -> Idle -> GetPlayerDataInt (quakeLevel)

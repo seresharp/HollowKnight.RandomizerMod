@@ -25,8 +25,6 @@ namespace RandomizerMod.Components
                 yield return new WaitForEndOfFrame();
             }
 
-            RandomizerMod.instance.Log("Blammo");
-
             Destroy(GameObject.Find(objectName));
             Destroy(gameObject);
         }

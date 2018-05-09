@@ -97,6 +97,8 @@ namespace RandomizerMod.Actions
                     stats.specialType = 2;
                     stats.charmsRequired = 0;
                     stats.relic = false;
+                    stats.relicNumber = 0;
+                    stats.relicPDInt = "";
 
                     //Apply the sprite for the UI
                     stats.transform.Find("Item Sprite").gameObject.GetComponent<SpriteRenderer>().sprite = RandomizerMod.sprites[itemDef.spriteName];
