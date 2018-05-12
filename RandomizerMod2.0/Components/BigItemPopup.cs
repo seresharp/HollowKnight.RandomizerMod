@@ -58,6 +58,12 @@ namespace RandomizerMod.Components
                 }
             }
 
+            //In case of failure to give item, prevent soft lock
+            if (fsmObj != null && eventName != null)
+            {
+                FSMUtility.SendEventToGameObject(fsmObj, eventName);
+            }
+
             return null;
         }
 

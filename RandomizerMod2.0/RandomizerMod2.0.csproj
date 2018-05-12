@@ -85,9 +85,6 @@
     <Compile Include="Components\ShinyGetter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\randomizer.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Prompts\Dash.png" />
     <EmbeddedResource Include="Resources\Prompts\Dream Gate.png" />
     <EmbeddedResource Include="Resources\Prompts\Dreamnail.png" />

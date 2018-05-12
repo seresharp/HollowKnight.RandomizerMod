@@ -1091,8 +1091,8 @@ namespace RandomizerMod
                             case ItemType.Big:
                                 if (newItem.boolName == "hasDash" || newItem.boolName == "hasShadowDash")
                                 {
-                                    ReqDef dash = items.Where(item => item.boolName == "hasVengefulSpirit").First();
-                                    ReqDef shadowDash = items.Where(item => item.boolName == "hasVengefulSpirit").First();
+                                    ReqDef dash = items.Where(item => item.boolName == "hasDash").First();
+                                    ReqDef shadowDash = items.Where(item => item.boolName == "hasShadowDash").First();
 
                                     actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, new BigItemDef[]
                                     {
