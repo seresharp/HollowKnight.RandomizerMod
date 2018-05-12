@@ -45,8 +45,9 @@ namespace RandomizerMod
 
         public string shopName;
 
-        //Progression item flag
+        //Item tier flags
         public bool progression;
+        public bool isGoodItem;
     }
 
     //Processing XML sucks, this is much easier
@@ -161,7 +162,7 @@ namespace RandomizerMod
                 sceneName = "Waterways_13",
                 objectName = "Shiny Item Acid",
                 replace = true,
-                logic = "(SUPERDASH | (DASH + (FIREBALL | SCREAM) + SPIKETUNNELS)) + (CLAW | (WINGS + ACID))",
+                logic = "(SUPERDASH | (DASH + (FIREBALL | SCREAM | DASHMASTER) + SPIKETUNNELS)) + ((CLAW + (SUPERDASH | ACID)) | (WINGS + ACID))",
                 type = ItemType.Big,
                 bigSpriteKey = "Prompts.Isma.png",
                 takeKey = "GET_ITEM_INTRO8",
@@ -458,7 +459,8 @@ namespace RandomizerMod
                 nameKey = "CHARM_NAME_11",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_11",
                 shopSpriteKey = "Charms.11.png",
-                notchCost = "charmCost_11"
+                notchCost = "charmCost_11",
+                isGoodItem = true
             },
             //Thorns of Agony
             new ReqDef()
@@ -580,7 +582,8 @@ namespace RandomizerMod
                 shopDescKey = "RANDOMIZER_CHARM_DESC_19",
                 shopSpriteKey = "Charms.19.png",
                 notchCost = "charmCost_19",
-                shopName = "Salubra"
+                shopName = "Salubra",
+                isGoodItem = true
             },
             //Soul Catcher
             new ReqDef()
@@ -595,7 +598,8 @@ namespace RandomizerMod
                 nameKey = "CHARM_NAME_20",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_20",
                 shopSpriteKey = "Charms.20.png",
-                notchCost = "charmCost_20"
+                notchCost = "charmCost_20",
+                isGoodItem = true
             },
             //Soul Eater
             new ReqDef()
@@ -610,7 +614,8 @@ namespace RandomizerMod
                 nameKey = "CHARM_NAME_21",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_21",
                 shopSpriteKey = "Charms.21.png",
-                notchCost = "charmCost_21"
+                notchCost = "charmCost_21",
+                isGoodItem = true
             },
             //Glowing Womb
             new ReqDef()
@@ -620,7 +625,7 @@ namespace RandomizerMod
                 objectName = "Shiny Item",
                 fsmName = "Shiny Control",
                 replace = false,
-                logic = "(SUPERDASH | ((FIREBALL | SCREAM) + DASH + SPIKETUNNELS)) + (CLAW | WINGS)",
+                logic = "(SUPERDASH | ((FIREBALL | SCREAM | DASHMASTER) + DASH + SPIKETUNNELS)) + (CLAW | WINGS)",
                 type = ItemType.Charm,
                 nameKey = "CHARM_NAME_22",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_22",
@@ -641,7 +646,8 @@ namespace RandomizerMod
                 shopDescKey = "RANDOMIZER_CHARM_DESC_23",
                 shopSpriteKey = "Charms.23.png",
                 notchCost = "charmCost_23",
-                shopName = "LegEater"
+                shopName = "LegEater",
+                isGoodItem = true
             },
             //Fragile Greed (Leg Eater)
             new ReqDef()
@@ -671,7 +677,8 @@ namespace RandomizerMod
                 shopDescKey = "RANDOMIZER_CHARM_DESC_25",
                 shopSpriteKey = "Charms.25.png",
                 notchCost = "charmCost_25",
-                shopName = "LegEater"
+                shopName = "LegEater",
+                isGoodItem = true
             },
             //TODO: Nailmaster's Glory
             //Joni's Blessing
@@ -734,7 +741,8 @@ namespace RandomizerMod
                 nameKey = "CHARM_NAME_31",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_31",
                 shopSpriteKey = "Charms.31.png",
-                notchCost = "charmCost_31"
+                notchCost = "charmCost_31",
+                progression = true
             },
             //Quick Slash
             new ReqDef()
@@ -764,7 +772,8 @@ namespace RandomizerMod
                 nameKey = "CHARM_NAME_33",
                 shopDescKey = "RANDOMIZER_CHARM_DESC_33",
                 shopSpriteKey = "Charms.33.png",
-                notchCost = "charmCost_33"
+                notchCost = "charmCost_33",
+                isGoodItem = true
             },
             //Deep Focus
             new ReqDef()
@@ -887,6 +896,8 @@ namespace RandomizerMod
         //Insert man tapping head
         public IEnumerator Randomize()
         {
+            float startTime = Time.realtimeSinceStartup;
+
             randomizeDone = false;
             RandomizerMod.instance.Log("Randomizing with seed: " + settings.seed);
             Random rand = new Random(settings.seed);
@@ -917,7 +928,6 @@ namespace RandomizerMod
                         //This way further locations will be more likely to be picked
                         for (int j = 0; j < currentDepth; j++)
                         {
-                            yield return new WaitForEndOfFrame();
                             reachableLocations.Add(unobtainedLocations[i]);
                         }
 
@@ -982,7 +992,6 @@ namespace RandomizerMod
                         //Using weight^2 to heavily bias towards late locations
                         for (int i = 0; i < locationDepths[str] * locationDepths[str]; i++)
                         {
-                            yield return new WaitForEndOfFrame();
                             weightedLocations.Add(str);
                         }
                     }
@@ -1005,6 +1014,34 @@ namespace RandomizerMod
                 else
                 {
                     otherItems.Add(placeLocation, placeItem);
+                }
+            }
+
+            //Place good items into shops that lack progression items
+            List<string> goodItems = new List<string>();
+            foreach (string str in unobtainedItems)
+            {
+                if (items.Where(item => item.boolName == str).First().isGoodItem)
+                {
+                    goodItems.Add(str);
+                }
+            }
+            
+            foreach (string shopName in shopItems.Keys.ToList())
+            {
+                if (shopItems[shopName].Count == 0)
+                {
+                    yield return new WaitForEndOfFrame();
+                    
+                    string placeItem = goodItems[rand.Next(goodItems.Count)];
+
+                    unobtainedItems.Remove(placeItem);
+                    goodItems.Remove(placeItem);
+                    obtainedItems.Add(placeItem);
+
+                    RandomizerMod.instance.Log($"Putting good item {placeItem} into shop {shopName}");
+
+                    shopItems[shopName].Add(placeItem);
                 }
             }
 
@@ -1272,6 +1309,10 @@ namespace RandomizerMod
 
             actions.Add(new ChangeShopContents("Room_shop", "Shop Menu", slyItems.ToArray()));
             randomizeDone = true;
+
+            float endTime = Time.realtimeSinceStartup;
+
+            RandomizerMod.instance.Log($"Randomization done in {endTime - startTime} seconds");
         }
 
         private List<string> GetProgressionItems(int reachableCount)
@@ -1441,6 +1482,9 @@ namespace RandomizerMod
                         else goto case "false";
                     case "MAGSKIPS":
                         if (settings.magolorSkips) goto case "true";
+                        else goto case "false";
+                    case "DASHMASTER":
+                        if (obtainedItems.Contains("gotCharm_31")) goto case "true";
                         else goto case "false";
                     case "EVERYTHING":
                         goto case "false";
