@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using HutongGames.PlayMaker;
 
 using Object = UnityEngine.Object;
 
@@ -11,6 +13,8 @@ namespace RandomizerMod.Actions
     [Serializable]
     public abstract class RandomizerAction
     {
+        private static FieldInfo fsmStartState = typeof(Fsm).GetField("startState", BindingFlags.NonPublic | BindingFlags.Instance);
+
         protected static List<PlayMakerFSM> fsmList;
         protected static GameObject shinyPrefab;
 
@@ -37,6 +41,11 @@ namespace RandomizerMod.Actions
                     }
                 }
             }
+        }
+
+        protected static void ResetFSM(PlayMakerFSM fsm)
+        {
+            fsm.SetState((string)fsmStartState.GetValue(fsm.Fsm));
         }
     }
 }

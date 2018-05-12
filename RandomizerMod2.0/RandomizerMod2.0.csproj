@@ -62,9 +62,10 @@
     <Compile Include="Actions\ChangeShinyIntoTrinket.cs" />
     <Compile Include="Actions\ChangeShopContents.cs" />
     <Compile Include="Actions\ChangeChestGeo.cs" />
-    <Compile Include="Actions\RandomizerSellRelics.cs" />
+    <Compile Include="FsmStateActions\RandomizerSellRelics.cs" />
     <Compile Include="Actions\ReplaceObjectWithShiny.cs" />
     <Compile Include="Components\BigItemPopup.cs" />
+    <Compile Include="Components\FrameWaiter.cs" />
     <Compile Include="Components\ObjectDestroyer.cs" />
     <Compile Include="Extensions\SpriteExtensions.cs" />
     <Compile Include="FsmStateActions\RandomizerCallStaticMethod.cs" />

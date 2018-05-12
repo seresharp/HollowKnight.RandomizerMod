@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 using System.Xml;
+using System.Linq;
 using Modding;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -203,7 +204,12 @@ namespace RandomizerMod
             string ver = "2a.5";
             int minAPI = 41;
 
-            if (Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI) ver += " (Some features may not work, update API)";
+            bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
+            bool noModCommon = !(from assembly in AppDomain.CurrentDomain.GetAssemblies() from type in assembly.GetTypes() where type.Namespace == "ModCommon" select type).Any();
+
+            if (apiTooLow && noModCommon) ver += " (Update API and install ModCommon)";
+            else if (apiTooLow) ver += " (Update API)";
+            else if (noModCommon) ver += " (Install ModCommon)";
 
             return ver;
         }
@@ -226,35 +232,35 @@ namespace RandomizerMod
         private void BoolSetOverride(string boolName, bool value)
         {
             //For some reason these all have two bools
-            if (boolName == "hasDash") PlayerData.instance.canDash = value;
-            else if (boolName == "hasShadowDash") PlayerData.instance.canShadowDash = value;
-            else if (boolName == "hasSuperDash") PlayerData.instance.canSuperDash = value;
-            else if (boolName == "hasWalljump") PlayerData.instance.canWallJump = value;
+            if (boolName == "hasDash") PlayerData.instance.SetBool("canDash", value);
+            else if (boolName == "hasShadowDash") PlayerData.instance.SetBool("canShadowDash", value);
+            else if (boolName == "hasSuperDash") PlayerData.instance.SetBool("canSuperDash", value);
+            else if (boolName == "hasWalljump") PlayerData.instance.SetBool("canWallJump", value);
             //Shade skips make these charms not viable, unbreakable is a nice fix for that
-            else if (boolName == "gotCharm_23") PlayerData.instance.fragileHealth_unbreakable = value;
-            else if (boolName == "gotCharm_24") PlayerData.instance.fragileGreed_unbreakable = value;
-            else if (boolName == "gotCharm_25") PlayerData.instance.fragileStrength_unbreakable = value;
+            else if (boolName == "gotCharm_23") PlayerData.instance.SetBool("fragileHealth_unbreakable", value);
+            else if (boolName == "gotCharm_24") PlayerData.instance.SetBool("fragileGreed_unbreakable", value);
+            else if (boolName == "gotCharm_25") PlayerData.instance.SetBool("fragileStrength_unbreakable", value);
             //Gotta update the acid pools after getting this
             else if (boolName == "hasAcidArmour" && value) PlayMakerFSM.BroadcastEvent("GET ACID ARMOUR");
             //It's just way easier if I can treat spells as bools
-            else if (boolName == "hasVengefulSpirit" && value && PlayerData.instance.fireballLevel <= 0) PlayerData.instance.fireballLevel = 1;
-            else if (boolName == "hasVengefulSpirit" && !value) PlayerData.instance.fireballLevel = 0;
-            else if (boolName == "hasShadeSoul" && value) PlayerData.instance.fireballLevel = 2;
-            else if (boolName == "hasShadeSoul" && !value && PlayerData.instance.fireballLevel >= 2) PlayerData.instance.fireballLevel = 1;
-            else if (boolName == "hasDesolateDive" && value && PlayerData.instance.quakeLevel <= 0) PlayerData.instance.quakeLevel = 1;
-            else if (boolName == "hasDesolateDive" && !value) PlayerData.instance.quakeLevel = 0;
-            else if (boolName == "hasDescendingDark" && value) PlayerData.instance.quakeLevel = 2;
-            else if (boolName == "hasDescendingDark" && !value && PlayerData.instance.quakeLevel >= 2) PlayerData.instance.quakeLevel = 1;
-            else if (boolName == "hasHowlingWraiths" && value && PlayerData.instance.screamLevel <= 0) PlayerData.instance.screamLevel = 1;
-            else if (boolName == "hasHowlingWraiths" && !value) PlayerData.instance.screamLevel = 0;
-            else if (boolName == "hasAbyssShriek" && value) PlayerData.instance.screamLevel = 2;
-            else if (boolName == "hasAbyssShriek" && !value && PlayerData.instance.screamLevel >= 2) PlayerData.instance.screamLevel = 1;
+            else if (boolName == "hasVengefulSpirit" && value && PlayerData.instance.fireballLevel <= 0) PlayerData.instance.SetInt("fireballLevel", 1);
+            else if (boolName == "hasVengefulSpirit" && !value) PlayerData.instance.SetInt("fireballLevel", 0);
+            else if (boolName == "hasShadeSoul" && value) PlayerData.instance.SetInt("fireballLevel", 2);
+            else if (boolName == "hasShadeSoul" && !value && PlayerData.instance.fireballLevel >= 2) PlayerData.instance.SetInt("fireballLevel", 1);
+            else if (boolName == "hasDesolateDive" && value && PlayerData.instance.quakeLevel <= 0) PlayerData.instance.SetInt("quakeLevel", 1);
+            else if (boolName == "hasDesolateDive" && !value) PlayerData.instance.SetInt("quakeLevel", 0);
+            else if (boolName == "hasDescendingDark" && value) PlayerData.instance.SetInt("quakeLevel", 2);
+            else if (boolName == "hasDescendingDark" && !value && PlayerData.instance.quakeLevel >= 2) PlayerData.instance.SetInt("quakeLevel", 1);
+            else if (boolName == "hasHowlingWraiths" && value && PlayerData.instance.screamLevel <= 0) PlayerData.instance.SetInt("screamLevel", 1);
+            else if (boolName == "hasHowlingWraiths" && !value) PlayerData.instance.SetInt("screamLevel", 0);
+            else if (boolName == "hasAbyssShriek" && value) PlayerData.instance.SetInt("screamLevel", 2);
+            else if (boolName == "hasAbyssShriek" && !value && PlayerData.instance.screamLevel >= 2) PlayerData.instance.SetInt("screamLevel", 1);
             else if (boolName.StartsWith("RandomizerMod."))
             {
                 boolName = boolName.Substring(14);
-                if (boolName.StartsWith("ShopFireball")) PlayerData.instance.fireballLevel++;
-                else if (boolName.StartsWith("ShopQuake")) PlayerData.instance.quakeLevel++;
-                else if (boolName.StartsWith("ShopScream")) PlayerData.instance.screamLevel++;
+                if (boolName.StartsWith("ShopFireball")) PlayerData.instance.IncrementInt("fireballLevel");
+                else if (boolName.StartsWith("ShopQuake")) PlayerData.instance.IncrementInt("quakeLevel");
+                else if (boolName.StartsWith("ShopScream")) PlayerData.instance.IncrementInt("screamLevel");
                 else if (boolName.StartsWith("ShopDash"))
                 {
                     if (PlayerData.instance.hasDash)

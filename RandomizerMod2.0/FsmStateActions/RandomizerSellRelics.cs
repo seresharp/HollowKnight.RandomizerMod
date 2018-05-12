@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using HutongGames.PlayMaker;
 
-namespace RandomizerMod.Actions
+namespace RandomizerMod.FsmStateActions
 {
     internal class RandomizerSellRelics : FsmStateAction
     {

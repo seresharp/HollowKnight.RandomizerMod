@@ -189,7 +189,8 @@ namespace RandomizerMod
                 descOneKey = "GET_DREAMNAIL_1",
                 descTwoKey = "GET_DREAMNAIL_2",
                 shopDescKey = "INV_DESC_DREAMNAIL_A",
-                shopSpriteKey = "ShopIcons.Dreamnail.png"
+                shopSpriteKey = "ShopIcons.Dreamnail.png",
+                progression = true //Not technically a progression item yet, but this stops it from being at elegy
             },
             //TODO: Dream Gate
             //TODO: Awoken Dream Nail
