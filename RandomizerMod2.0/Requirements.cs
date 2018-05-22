@@ -1275,7 +1275,7 @@ namespace RandomizerMod
                         playerDataBoolName = newItem.boolName,
                         nameConvo = newItem.nameKey,
                         descConvo = newItem.shopDescKey,
-                        requiredPlayerDataBool = shopName == "SlyKey" ? "hasSlyKey" : "",
+                        requiredPlayerDataBool = shopName == "SlyKey" ? "gaveSlykey" : "",
                         removalPlayerDataBool = "",
                         dungDiscount = shopName == "LegEater",
                         notchCostBool = newItem.notchCost,

@@ -45,4 +45,6 @@
     <entry sheet="Prompts" key="RANDOMIZER_GET_CHARM_1_2">Useful for those who can't bear to leave anything behind, no matter how insignificant.</entry>
     <entry sheet="Prompts" key="RANDOMIZER_BUTTON_DESC">You already know what to press</entry>
     <entry sheet="Prompts" key="RANDOMIZER_EMPTY"></entry>
+    <entry sheet="Prompts" key="JIJI_DOOR_KEY">This key may be required to enter waterways. Think hard before opening! Use simple key?</entry>
+    <entry sheet="Prompts" key="BATH_HOUSE_KEY">This key may be required to enter waterways. Think hard before opening! Use simple key?</entry>
 </Language>

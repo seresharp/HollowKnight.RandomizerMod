@@ -85,7 +85,7 @@ namespace RandomizerMod
                                 languageStrings[sheet] = new Dictionary<string, string>();
                             }
 
-                            languageStrings[sheet][key] = node.InnerText;
+                            languageStrings[sheet][key] = node.InnerText.Replace("\\n", "\n");
                         }
 
                         Log("Language xml processed");
@@ -201,7 +201,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2a.7";
+            string ver = "2a.8";
             int minAPI = 41;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
