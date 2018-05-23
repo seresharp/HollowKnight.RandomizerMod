@@ -201,7 +201,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2a.8";
+            string ver = "2a.9";
             int minAPI = 41;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
@@ -315,6 +315,11 @@ namespace RandomizerMod
 
         private void HandleSceneChanges(Scene from, Scene to)
         {
+            //In rare cases, this is called before the previous scene has unloaded
+            //Deleting old randomizer shinies to prevent issues
+            GameObject oldShiny = GameObject.Find("Randomizer Shiny");
+            if (oldShiny != null) Object.DestroyImmediate(oldShiny);
+
             //TODO: Prevent player from skipping Radiance in all bosses randomizer
             if (GameManager.instance.GetSceneNameString() == Constants.MENU_SCENE)
             {
