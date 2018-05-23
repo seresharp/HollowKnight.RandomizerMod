@@ -22,6 +22,8 @@ namespace RandomizerMod
 {
     public class RandomizerMod : Mod<SaveSettings>
     {
+        private static List<string> sceneNames;
+
         private static FieldInfo smallGeoPrefabField = typeof(HealthManager).GetField("smallGeoPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
         private static FieldInfo mediumGeoPrefabField = typeof(HealthManager).GetField("mediumGeoPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
         private static FieldInfo largeGeoPrefabField = typeof(HealthManager).GetField("largeGeoPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -315,11 +317,6 @@ namespace RandomizerMod
 
         private void HandleSceneChanges(Scene from, Scene to)
         {
-            //In rare cases, this is called before the previous scene has unloaded
-            //Deleting old randomizer shinies to prevent issues
-            GameObject oldShiny = GameObject.Find("Randomizer Shiny");
-            if (oldShiny != null) Object.DestroyImmediate(oldShiny);
-
             //TODO: Prevent player from skipping Radiance in all bosses randomizer
             if (GameManager.instance.GetSceneNameString() == Constants.MENU_SCENE)
             {
@@ -350,6 +347,21 @@ namespace RandomizerMod
                             LogWarn("Gameplay starting before randomization completed");
                         }
                     }
+
+                    //This is called too late when unloading scenes with preloads
+                    //Reload to fix this
+                    if (SceneHasPreload(from.name) && WorldInfo.NameLooksLikeGameplayScene(to.name))
+                    {
+                        Log($"Detected preload scene {from.name}, reloading {to.name}");
+                        GameManager.instance.ChangeToScene(to.name, GameManager.instance.entryGateName, 0);
+                        return;
+                    }
+
+                    //In rare cases, this is called before the previous scene has unloaded
+                    //Deleting old randomizer shinies to prevent issues
+                    GameObject oldShiny = GameObject.Find("Randomizer Shiny");
+                    if (oldShiny != null) Object.DestroyImmediate(oldShiny);
+
                     EditShinies(from, to);
                 }
                 catch (Exception e)
@@ -1044,6 +1056,41 @@ namespace RandomizerMod
                 randomizeObj = obj.AddComponent<Requirements>();
                 randomizeObj.settings = newGameSettings;
             }
+        }
+
+        private bool SceneHasPreload(string sceneName)
+        {
+            if (string.IsNullOrEmpty(sceneName))
+            {
+                return false;
+            }
+
+            sceneName = sceneName.ToLowerInvariant();
+
+            //Build scene list if necessary
+            if (sceneNames == null)
+            {
+                sceneNames = new List<string>();
+
+                for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings; i++)
+                {
+                    sceneNames.Add(Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i)).ToLowerInvariant());
+                }
+            }
+
+            //Check if scene has preload attached to it
+            if (sceneNames.Contains($"{sceneName}_preload") || sceneNames.Contains($"{sceneName}_boss") || sceneNames.Contains($"{sceneName}_boss_defeated"))
+            {
+                return true;
+            }
+
+            //Also check if the scene is a preload since this is also passed to activeSceneChanged sometimes
+            if (sceneName.EndsWith("_preload") || sceneName.EndsWith("_boss") || sceneName.EndsWith("_boss_defeated"))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
