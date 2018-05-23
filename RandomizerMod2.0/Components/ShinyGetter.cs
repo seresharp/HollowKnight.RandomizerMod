@@ -31,7 +31,7 @@ namespace RandomizerMod.Components
             }
 
             //Load the tutorial
-            GameManager.instance.ChangeToScene("Tutorial_01", "right1", 0);
+            RandomizerMod.instance.ChangeToScene("Tutorial_01", "right1", 0);
 
             //Two frames is enough to guarantee the shiny has loaded
             yield return new WaitForEndOfFrame();
@@ -41,7 +41,7 @@ namespace RandomizerMod.Components
             RandomizerAction.FetchFSMList(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
 
             //Head back to wherever we were
-            GameManager.instance.ChangeToScene(currentScene, lastGate, 0);
+            RandomizerMod.instance.ChangeToScene(currentScene, lastGate, 0);
 
             //No need for clutter
             Destroy(gameObject);

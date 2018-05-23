@@ -28,6 +28,9 @@ namespace RandomizerMod
         private static FieldInfo mediumGeoPrefabField = typeof(HealthManager).GetField("mediumGeoPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
         private static FieldInfo largeGeoPrefabField = typeof(HealthManager).GetField("largeGeoPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
 
+        private static FieldInfo sceneLoad = typeof(GameManager).GetField("sceneLoad", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static FieldInfo sceneLoadRunner = typeof(SceneLoad).GetField("runner", BindingFlags.NonPublic | BindingFlags.Instance);
+
         public static GameObject smallGeoPrefab;
         public static GameObject mediumGeoPrefab;
         public static GameObject largeGeoPrefab;
@@ -203,7 +206,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2a.9";
+            string ver = "2a.10";
             int minAPI = 41;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
@@ -352,8 +355,8 @@ namespace RandomizerMod
                     //Reload to fix this
                     if (SceneHasPreload(from.name) && WorldInfo.NameLooksLikeGameplayScene(to.name))
                     {
-                        Log($"Detected preload scene {from.name}, reloading {to.name}");
-                        GameManager.instance.ChangeToScene(to.name, GameManager.instance.entryGateName, 0);
+                        Log($"Detected preload scene {from.name}, reloading {to.name} ({GameManager.instance.entryGateName})");
+                        RandomizerMod.instance.ChangeToScene(to.name, GameManager.instance.entryGateName, 0);
                         return;
                     }
 
@@ -1091,6 +1094,22 @@ namespace RandomizerMod
             }
 
             return false;
+        }
+
+        public void ChangeToScene(string sceneName, string gateName, float delay = 0f)
+        {
+            SceneLoad load = (SceneLoad)sceneLoad.GetValue(GameManager.instance);
+            if (load != null)
+            {
+                load.Finish += () =>
+                {
+                    GameManager.instance.ChangeToScene(sceneName, gateName, delay);
+                };
+            }
+            else
+            {
+                GameManager.instance.ChangeToScene(sceneName, gateName, delay);
+            }
         }
     }
 }
