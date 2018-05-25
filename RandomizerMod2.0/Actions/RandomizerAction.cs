@@ -31,7 +31,7 @@ namespace RandomizerMod.Actions
             {
                 foreach (PlayMakerFSM fsm in fsmList)
                 {
-                    if (fsm.FsmName == "Shiny Control" && fsm.gameObject.GetComponent<Rigidbody2D>() != null)
+                    if (fsm.FsmName == "Shiny Control" && (fsm.gameObject.name == "Shiny Item" || fsm.gameObject.name == "Shiny Item (1)") && fsm.gameObject.GetComponent<Rigidbody2D>() != null)
                     {
                         shinyPrefab = Object.Instantiate(fsm.gameObject);
                         shinyPrefab.SetActive(false);
