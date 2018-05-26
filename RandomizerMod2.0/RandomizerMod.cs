@@ -206,7 +206,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2a.11";
+            string ver = "2a.12";
             int minAPI = 41;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
@@ -353,10 +353,10 @@ namespace RandomizerMod
 
                     //This is called too late when unloading scenes with preloads
                     //Reload to fix this
-                    if (SceneHasPreload(from.name) && WorldInfo.NameLooksLikeGameplayScene(to.name))
+                    if (SceneHasPreload(from.name) && WorldInfo.NameLooksLikeGameplayScene(to.name) && !string.IsNullOrEmpty(GameManager.instance.entryGateName))
                     {
                         Log($"Detected preload scene {from.name}, reloading {to.name} ({GameManager.instance.entryGateName})");
-                        RandomizerMod.instance.ChangeToScene(to.name, GameManager.instance.entryGateName, 0);
+                        ChangeToScene(to.name, GameManager.instance.entryGateName, 0);
                         return;
                     }
 
@@ -1098,6 +1098,12 @@ namespace RandomizerMod
 
         public void ChangeToScene(string sceneName, string gateName, float delay = 0f)
         {
+            if (string.IsNullOrEmpty(sceneName) || string.IsNullOrEmpty(gateName))
+            {
+                Log("Empty string passed into ChangeToScene, ignoring");
+                return;
+            }
+
             SceneLoad load = (SceneLoad)sceneLoad.GetValue(GameManager.instance);
             if (load != null)
             {
