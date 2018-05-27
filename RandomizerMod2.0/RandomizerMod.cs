@@ -206,12 +206,30 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2a.12";
+            string ver = "2a.13";
             int minAPI = 41;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
-            bool noModCommon = !(from assembly in AppDomain.CurrentDomain.GetAssemblies() from type in assembly.GetTypes() where type.Namespace == "ModCommon" select type).Any();
 
+            bool noModCommon = true;
+
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (Assembly assembly in assemblies)
+            {
+                try
+                {
+                    if (assembly.GetTypes().Where(type => type.Namespace == "ModCommon").Any())
+                    {
+                        noModCommon = false;
+                        break;
+                    }
+                }
+                catch
+                {
+                    Log(assembly.FullName + " is broken, too bad");
+                }
+            }
+            
             if (apiTooLow && noModCommon) ver += " (Update API and install ModCommon)";
             else if (apiTooLow) ver += " (Update API)";
             else if (noModCommon) ver += " (Install ModCommon)";
