@@ -206,7 +206,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2a.13";
+            string ver = "2b.1";
             int minAPI = 41;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
@@ -841,14 +841,14 @@ namespace RandomizerMod
             t.text = "Mouse over to type a custom seed";
             //t.fontSize = 1;
             //t.transform.Translate(new Vector3(500f, 0f, 0f));*/
-            
+
             customSeedInput.caretColor = Color.white;
             customSeedInput.contentType = InputField.ContentType.IntegerNumber;
             customSeedInput.onEndEdit.AddListener(data => newGameSettings.seed = Convert.ToInt32(data));
             customSeedInput.navigation = Navigation.defaultNavigation;
             customSeedInput.caretWidth = 8;
             customSeedInput.characterLimit = 9;
-            
+
             ColorBlock cb = new ColorBlock
             {
                 highlightedColor = Color.yellow,
@@ -857,15 +857,25 @@ namespace RandomizerMod
                 normalColor = Color.white,
                 colorMultiplier = 2f
             };
-            
+
             customSeedInput.colors = cb;
             #endregion
 
             //Dirty way of making labels
-            Object.Destroy(back.Clone("ModeLabel", MenuButton.MenuButtonType.Activate, new Vector2(-900, 860), "Required Skips"));
-            Object.Destroy(back.Clone("RestrictionsLabel", MenuButton.MenuButtonType.Activate, new Vector2(0, 860), "Restrictions"));
-            Object.Destroy(back.Clone("QoLLabel", MenuButton.MenuButtonType.Activate, new Vector2(900, 860), "Quality of Life"));
-            Object.Destroy(back.Clone("SeedLabel", MenuButton.MenuButtonType.Activate, new Vector2(0, 1200), "Seed:"));
+            GameObject modeLabel = back.Clone("ModeLabel", MenuButton.MenuButtonType.Activate, new Vector2(-900, 860), "Required Skips").gameObject;
+            GameObject restrictionsLabel = back.Clone("RestrictionsLabel", MenuButton.MenuButtonType.Activate, new Vector2(0, 860), "Restrictions").gameObject;
+            GameObject qolLabel = back.Clone("QoLLabel", MenuButton.MenuButtonType.Activate, new Vector2(900, 860), "Quality of Life").gameObject;
+            GameObject seedLabel = back.Clone("SeedLabel", MenuButton.MenuButtonType.Activate, new Vector2(0, 1200), "Seed:").gameObject;
+
+            Object.Destroy(modeLabel.GetComponent<EventTrigger>());
+            Object.Destroy(restrictionsLabel.GetComponent<EventTrigger>());
+            Object.Destroy(qolLabel.GetComponent<EventTrigger>());
+            Object.Destroy(seedLabel.GetComponent<EventTrigger>());
+
+            Object.Destroy(modeLabel.GetComponent<MenuButton>());
+            Object.Destroy(restrictionsLabel.GetComponent<MenuButton>());
+            Object.Destroy(qolLabel.GetComponent<MenuButton>());
+            Object.Destroy(seedLabel.GetComponent<MenuButton>());
 
             //We don't need these old buttons anymore
             Object.Destroy(classic.gameObject);
@@ -920,6 +930,20 @@ namespace RandomizerMod
             Text fireballSkipsText = fireballSkipsBtn.transform.Find("Text").GetComponent<Text>();
             Text magolorText = magolorBtn.transform.Find("Text").GetComponent<Text>();
 
+            //Also for use in events
+            FixVerticalAlign allBossesAlign = allBossesBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+            FixVerticalAlign allSkillsAlign = allSkillsBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+            FixVerticalAlign allCharmsAlign = allCharmsBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+            FixVerticalAlign charmNotchAlign = charmNotchBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+            FixVerticalAlign lemmAlign = lemmBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+            FixVerticalAlign presetAlign = presetBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+            FixVerticalAlign shadeSkipsAlign = shadeSkipsBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+            FixVerticalAlign acidSkipsAlign = acidSkipsBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+            FixVerticalAlign spikeTunnelsAlign = spikeTunnelsBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+            FixVerticalAlign miscSkipsAlign = miscSkipsBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+            FixVerticalAlign fireballSkipsAlign = fireballSkipsBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+            FixVerticalAlign magolorAlign = magolorBtn.gameObject.GetComponentInChildren<FixVerticalAlign>(true);
+
             //Create dictionary to pass into events
             Dictionary<string, Text> dict = new Dictionary<string, Text>();
             dict.Add("All Bosses", allBossesText);
@@ -938,113 +962,123 @@ namespace RandomizerMod
             //Add useful events
             startNormalBtn.AddEvent(EventTriggerType.Submit, data => StartNewGame(false));
             startRandoBtn.AddEvent(EventTriggerType.Submit, data => StartNewGame(true));
-            allBossesBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("All Bosses", dict));
-            allSkillsBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("All Skills", dict));
-            allCharmsBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("All Charms", dict));
-            charmNotchBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Salubra Notches", dict));
-            lemmBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Lemm Sell All", dict));
-            presetBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Preset", dict));
-            shadeSkipsBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Shade Skips", dict));
-            acidSkipsBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Acid Skips", dict));
-            spikeTunnelsBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Spike Tunnels", dict));
-            miscSkipsBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Misc Skips", dict));
-            fireballSkipsBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Fireball Skips", dict));
-            magolorBtn.AddEvent(EventTriggerType.Submit, data => MenuButtonClicked("Mag Skips", dict));
-        }
-
-        //Don't look at this
-        private void MenuButtonClicked(string baseName, Dictionary<string, Text> dict)
-        {
-            Text text = dict[baseName];
-
-            //This is awful because for some reason creating a new string moves the text position
-            switch (baseName)
+            allBossesBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                case "All Bosses":
-                    newGameSettings.allBosses = !newGameSettings.allBosses;
-                    text.text = text.text.Replace((!newGameSettings.allBosses).ToString(), newGameSettings.allBosses.ToString());
-                    break;
-                case "All Skills":
-                    newGameSettings.allSkills = !newGameSettings.allSkills;
-                    text.text = text.text.Replace((!newGameSettings.allSkills).ToString(), newGameSettings.allSkills.ToString());
-                    break;
-                case "All Charms":
-                    newGameSettings.allCharms = !newGameSettings.allCharms;
-                    text.text = text.text.Replace((!newGameSettings.allCharms).ToString(), newGameSettings.allCharms.ToString());
-                    break;
-                case "Salubra Notches":
-                    newGameSettings.charmNotch = !newGameSettings.charmNotch;
-                    text.text = text.text.Replace((!newGameSettings.charmNotch).ToString(), newGameSettings.charmNotch.ToString());
-                    break;
-                case "Lemm Sell All":
-                    newGameSettings.lemm = !newGameSettings.lemm;
-                    text.text = text.text.Replace((!newGameSettings.lemm).ToString(), newGameSettings.lemm.ToString());
-                    break;
-                case "Preset":
-                    if (text.text.Contains("Easy"))
-                    {
-                        text.text = text.text.Replace("Easy", "Hard");
-                        newGameSettings.SetHard();
-                    }
-                    else if (text.text.Contains("Hard"))
-                    {
-                        text.text = text.text.Replace("Hard", "Moglar");
-                        newGameSettings.SetMagolor();
-                    }
-                    else
-                    {
-                        //Could be "Moglar" or "Custom"
-                        text.text = text.text.Replace(text.text.Substring(8), "Easy");
-                        newGameSettings.SetEasy();
-                    }
-
-                    //Future me is gonna hate this
-                    dict["Shade Skips"].text = dict["Shade Skips"].text.Replace((!newGameSettings.shadeSkips).ToString(), newGameSettings.shadeSkips.ToString());
-                    dict["Acid Skips"].text = dict["Acid Skips"].text.Replace((!newGameSettings.acidSkips).ToString(), newGameSettings.acidSkips.ToString());
-                    dict["Spike Tunnels"].text = dict["Spike Tunnels"].text.Replace((!newGameSettings.spikeTunnels).ToString(), newGameSettings.spikeTunnels.ToString());
-                    dict["Misc Skips"].text = dict["Misc Skips"].text.Replace((!newGameSettings.miscSkips).ToString(), newGameSettings.miscSkips.ToString());
-                    dict["Fireball Skips"].text = dict["Fireball Skips"].text.Replace((!newGameSettings.fireballSkips).ToString(), newGameSettings.fireballSkips.ToString());
-                    dict["Mag Skips"].text = dict["Mag Skips"].text.Replace((!newGameSettings.magolorSkips).ToString(), newGameSettings.magolorSkips.ToString());
-
-                    break;
-                case "Shade Skips":
-                    newGameSettings.shadeSkips = !newGameSettings.shadeSkips;
-                    text.text = text.text.Replace((!newGameSettings.shadeSkips).ToString(), newGameSettings.shadeSkips.ToString());
-                    break;
-                case "Acid Skips":
-                    newGameSettings.acidSkips = !newGameSettings.acidSkips;
-                    text.text = text.text.Replace((!newGameSettings.acidSkips).ToString(), newGameSettings.acidSkips.ToString());
-                    break;
-                case "Spike Tunnels":
-                    newGameSettings.spikeTunnels = !newGameSettings.spikeTunnels;
-                    text.text = text.text.Replace((!newGameSettings.spikeTunnels).ToString(), newGameSettings.spikeTunnels.ToString());
-                    break;
-                case "Misc Skips":
-                    newGameSettings.miscSkips = !newGameSettings.miscSkips;
-                    text.text = text.text.Replace((!newGameSettings.miscSkips).ToString(), newGameSettings.miscSkips.ToString());
-                    break;
-                case "Fireball Skips":
-                    newGameSettings.fireballSkips = !newGameSettings.fireballSkips;
-                    text.text = text.text.Replace((!newGameSettings.fireballSkips).ToString(), newGameSettings.fireballSkips.ToString());
-                    break;
-                case "Mag Skips":
-                    newGameSettings.magolorSkips = !newGameSettings.magolorSkips;
-                    text.text = text.text.Replace((!newGameSettings.magolorSkips).ToString(), newGameSettings.magolorSkips.ToString());
-                    break;
-            }
-
-            //Two switches on the same variable is good code
-            switch (baseName)
+                newGameSettings.allBosses = !newGameSettings.allBosses;
+                allBossesText.text = "All Bosses: " + newGameSettings.allBosses;
+                allBossesAlign.AlignText();
+            });
+            allSkillsBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                case "Shade Skips":
-                case "Acid Skips":
-                case "Spike Tunnels":
-                case "Misc Skips":
-                case "Fireball Skips":
-                case "Mag Skips":
-                    dict["Preset"].text = dict["Preset"].text.Replace(dict["Preset"].text.Substring(8), "Custom");
-                    break;
-            }
+                newGameSettings.allSkills = !newGameSettings.allSkills;
+                allSkillsText.text = "All Skills: " + newGameSettings.allSkills;
+                allSkillsAlign.AlignText();
+            });
+            allCharmsBtn.AddEvent(EventTriggerType.Submit, data =>
+            {
+                newGameSettings.allCharms = !newGameSettings.allCharms;
+                allCharmsText.text = "All Charms: " + newGameSettings.allCharms;
+                allCharmsAlign.AlignText();
+            });
+            charmNotchBtn.AddEvent(EventTriggerType.Submit, data =>
+            {
+                newGameSettings.charmNotch = !newGameSettings.charmNotch;
+                charmNotchText.text = "Salubra Notches: " + newGameSettings.charmNotch;
+                charmNotchAlign.AlignText();
+            });
+            lemmBtn.AddEvent(EventTriggerType.Submit, data =>
+            {
+                newGameSettings.lemm = !newGameSettings.lemm;
+                lemmText.text = "Lemm Sell All: " + newGameSettings.lemm;
+                lemmAlign.AlignText();
+            });
+            presetBtn.AddEvent(EventTriggerType.Submit, data =>
+            {
+                if (presetText.text.Contains("Easy"))
+                {
+                    presetText.text = "Preset: Hard";
+                    newGameSettings.SetHard();
+                }
+                else if (presetText.text.Contains("Hard"))
+                {
+                    presetText.text = "Preset: Moglar";
+                    newGameSettings.SetMagolor();
+                }
+                else
+                {
+                    presetText.text = "Preset: Easy";
+                    newGameSettings.SetEasy();
+                }
+
+                shadeSkipsText.text = "Shade Skips: " + newGameSettings.shadeSkips;
+                acidSkipsText.text = "Acid Skips: " + newGameSettings.acidSkips;
+                spikeTunnelsText.text = "Spike Tunnels: " + newGameSettings.spikeTunnels;
+                miscSkipsText.text = "Misc Skips: " + newGameSettings.miscSkips;
+                fireballSkipsText.text = "Fireball Skips: " + newGameSettings.fireballSkips;
+                magolorText.text = "Mag Skips: " + newGameSettings.magolorSkips;
+
+                presetAlign.AlignText();
+                shadeSkipsAlign.AlignText();
+                acidSkipsAlign.AlignText();
+                spikeTunnelsAlign.AlignText();
+                miscSkipsAlign.AlignText();
+                fireballSkipsAlign.AlignText();
+                magolorAlign.AlignText();
+            });
+            shadeSkipsBtn.AddEvent(EventTriggerType.Submit, data =>
+            {
+                newGameSettings.shadeSkips = !newGameSettings.shadeSkips;
+                shadeSkipsText.text = "Shade Skips: " + newGameSettings.shadeSkips;
+                shadeSkipsAlign.AlignText();
+
+                presetText.text = "Preset: Custom";
+                presetAlign.AlignText();
+            });
+            acidSkipsBtn.AddEvent(EventTriggerType.Submit, data =>
+            {
+                newGameSettings.acidSkips = !newGameSettings.acidSkips;
+                acidSkipsText.text = "Acid Skips: " + newGameSettings.acidSkips;
+                acidSkipsAlign.AlignText();
+
+                presetText.text = "Preset: Custom";
+                presetAlign.AlignText();
+            });
+            spikeTunnelsBtn.AddEvent(EventTriggerType.Submit, data =>
+            {
+                newGameSettings.spikeTunnels = !newGameSettings.spikeTunnels;
+                spikeTunnelsText.text = "Spike Tunnels: " + newGameSettings.spikeTunnels;
+                spikeTunnelsAlign.AlignText();
+
+                presetText.text = "Preset: Custom";
+                presetAlign.AlignText();
+            });
+            miscSkipsBtn.AddEvent(EventTriggerType.Submit, data =>
+            {
+                newGameSettings.miscSkips = !newGameSettings.miscSkips;
+                miscSkipsText.text = "Misc Skips: " + newGameSettings.miscSkips;
+                miscSkipsAlign.AlignText();
+
+                presetText.text = "Preset: Custom";
+                presetAlign.AlignText();
+            });
+            fireballSkipsBtn.AddEvent(EventTriggerType.Submit, data =>
+            {
+                newGameSettings.fireballSkips = !newGameSettings.fireballSkips;
+                fireballSkipsText.text = "Fireball Skips: " + newGameSettings.fireballSkips;
+                fireballSkipsAlign.AlignText();
+
+                presetText.text = "Preset: Custom";
+                presetAlign.AlignText();
+            });
+            magolorBtn.AddEvent(EventTriggerType.Submit, data =>
+            {
+                newGameSettings.magolorSkips = !newGameSettings.magolorSkips;
+                magolorText.text = "Mag Skips: " + newGameSettings.magolorSkips;
+                magolorAlign.AlignText();
+
+                presetText.text = "Preset: Custom";
+                presetAlign.AlignText();
+            });
         }
 
         private void StartNewGame(bool randomizer)

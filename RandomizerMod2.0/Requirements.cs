@@ -73,7 +73,7 @@ namespace RandomizerMod
                 nameKey = "INV_NAME_DASH",
                 buttonKey = "RANDOMIZER_BUTTON_DESC",
                 descOneKey = "GET_DASH_1",
-                descTwoKey = "GET_DASH_1",
+                descTwoKey = "GET_DASH_2",
                 shopDescKey = "INV_DESC_DASH",
                 shopSpriteKey = "ShopIcons.Dash.png",
                 progression = true
