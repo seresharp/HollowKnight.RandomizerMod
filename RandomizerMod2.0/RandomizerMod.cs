@@ -357,6 +357,8 @@ namespace RandomizerMod
                 {
                     if (randomizeObj != null)
                     {
+                        randomizeObj.ForceFinish();
+
                         if (randomizeObj.randomizeDone)
                         {
                             Settings.actions = randomizeObj.actions;

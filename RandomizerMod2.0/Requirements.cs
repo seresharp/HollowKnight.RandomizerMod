@@ -55,803 +55,850 @@ namespace RandomizerMod
     //Can let it be GC'd if it's a normal class
     internal class Requirements : MonoBehaviour
     {
-        //TODO: Turn this into a dict and fix everything that breaks
-        private ReqDef[] items = new ReqDef[]
+        private Dictionary<string, ReqDef> items = new Dictionary<string, ReqDef>
         {
             //Mothwing Cloak
-            new ReqDef()
-            {
-                boolName = "hasDash",
-                sceneName = "Fungus1_04",
-                objectName = "Shiny Item",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "BALDURS | ACID | DASH | CLAW | WINGS",
-                type = ItemType.Big,
-                bigSpriteKey = "Prompts.Dash.png",
-                takeKey = "GET_ITEM_INTRO1",
-                nameKey = "INV_NAME_DASH",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_DASH_1",
-                descTwoKey = "GET_DASH_2",
-                shopDescKey = "INV_DESC_DASH",
-                shopSpriteKey = "ShopIcons.Dash.png",
-                progression = true
+            { "hasDash", new ReqDef()
+                {
+                    boolName = "hasDash",
+                    sceneName = "Fungus1_04",
+                    objectName = "Shiny Item",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "BALDURS | ACID | DASH | CLAW | WINGS",
+                    type = ItemType.Big,
+                    bigSpriteKey = "Prompts.Dash.png",
+                    takeKey = "GET_ITEM_INTRO1",
+                    nameKey = "INV_NAME_DASH",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_DASH_1",
+                    descTwoKey = "GET_DASH_2",
+                    shopDescKey = "INV_DESC_DASH",
+                    shopSpriteKey = "ShopIcons.Dash.png",
+                    progression = true
+                }
             },
             //Mantis Claw
-            new ReqDef()
-            {
-                boolName = "hasWalljump",
-                sceneName = "Fungus2_14",
-                objectName = "Shiny Item Stand",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "DASH | WINGS | CLAW | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS + SHADESKIPS) | (SUPERDASH + BALDURS + SHADESKIPS)",
-                type = ItemType.Big,
-                bigSpriteKey = "Prompts.Walljump.png",
-                takeKey = "GET_ITEM_INTRO1",
-                nameKey = "INV_NAME_WALLJUMP",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_WALLJUMP_1",
-                descTwoKey = "GET_WALLJUMP_2",
-                shopDescKey = "INV_DESC_WALLJUMP",
-                shopSpriteKey = "ShopIcons.Walljump.png",
-                progression = true
+            { "hasWalljump", new ReqDef()
+                {
+                    boolName = "hasWalljump",
+                    sceneName = "Fungus2_14",
+                    objectName = "Shiny Item Stand",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "DASH | WINGS | CLAW | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS + SHADESKIPS) | (SUPERDASH + BALDURS + SHADESKIPS)",
+                    type = ItemType.Big,
+                    bigSpriteKey = "Prompts.Walljump.png",
+                    takeKey = "GET_ITEM_INTRO1",
+                    nameKey = "INV_NAME_WALLJUMP",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_WALLJUMP_1",
+                    descTwoKey = "GET_WALLJUMP_2",
+                    shopDescKey = "INV_DESC_WALLJUMP",
+                    shopSpriteKey = "ShopIcons.Walljump.png",
+                    progression = true
+                }
             },
             //Crystal Heart
-            new ReqDef()
-            {
-                boolName = "hasSuperDash",
-                sceneName = "Mines_31",
-                objectName = "Super Dash Get",
-                replace = true,
-                logic = "(CLAW + (DASH | SUPERDASH | WINGS | ((FIREBALL | SCREAM) + FIREBALLSKIPS))) | (WINGS + (DASH | ((FIREBALL | SCREAM) + FIREBALLSKIPS)) + SPIKETUNNELS + SHADESKIPS)",
-                type = ItemType.Big,
-                bigSpriteKey = "Prompts.Superdash.png",
-                takeKey = "GET_ITEM_INTRO2",
-                nameKey = "INV_NAME_SUPERDASH",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_SUPERDASH_1",
-                descTwoKey = "GET_SUPERDASH_2",
-                shopDescKey = "INV_DESC_SUPERDASH",
-                shopSpriteKey = "ShopIcons.Superdash.png",
-                progression = true
+            { "hasSuperDash", new ReqDef()
+                {
+                    boolName = "hasSuperDash",
+                    sceneName = "Mines_31",
+                    objectName = "Super Dash Get",
+                    replace = true,
+                    logic = "(CLAW + (DASH | SUPERDASH | WINGS | ((FIREBALL | SCREAM) + FIREBALLSKIPS))) | (WINGS + (DASH | ((FIREBALL | SCREAM) + FIREBALLSKIPS)) + SPIKETUNNELS + SHADESKIPS)",
+                    type = ItemType.Big,
+                    bigSpriteKey = "Prompts.Superdash.png",
+                    takeKey = "GET_ITEM_INTRO2",
+                    nameKey = "INV_NAME_SUPERDASH",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_SUPERDASH_1",
+                    descTwoKey = "GET_SUPERDASH_2",
+                    shopDescKey = "INV_DESC_SUPERDASH",
+                    shopSpriteKey = "ShopIcons.Superdash.png",
+                    progression = true
+                }
             },
             //Monarch Wings
-            new ReqDef()
-            {
-                boolName = "hasDoubleJump",
-                sceneName = "Abyss_21",
-                objectName = "Shiny Item DJ",
-                replace = true,
-                logic = "(WINGS + MISCSKIPS) | (CLAW + (SUPERDASH | WINGS))",
-                type = ItemType.Big,
-                bigSpriteKey = "Prompts.Wings.png",
-                takeKey = "GET_ITEM_INTRO5",
-                nameKey = "INV_NAME_DOUBLEJUMP",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_DOUBLEJUMP_1",
-                descTwoKey = "GET_DOUBLEJUMP_2",
-                shopDescKey = "INV_DESC_DOUBLEJUMP",
-                shopSpriteKey = "ShopIcons.Wings.png",
-                progression = true
+            { "hasDoubleJump", new ReqDef()
+                {
+                    boolName = "hasDoubleJump",
+                    sceneName = "Abyss_21",
+                    objectName = "Shiny Item DJ",
+                    replace = true,
+                    logic = "(WINGS + MISCSKIPS) | (CLAW + (SUPERDASH | WINGS))",
+                    type = ItemType.Big,
+                    bigSpriteKey = "Prompts.Wings.png",
+                    takeKey = "GET_ITEM_INTRO5",
+                    nameKey = "INV_NAME_DOUBLEJUMP",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_DOUBLEJUMP_1",
+                    descTwoKey = "GET_DOUBLEJUMP_2",
+                    shopDescKey = "INV_DESC_DOUBLEJUMP",
+                    shopSpriteKey = "ShopIcons.Wings.png",
+                    progression = true
+                }
             },
             //Shade Cloak
-            new ReqDef()
-            {
-                boolName = "hasShadowDash",
-                sceneName = "Abyss_10",
-                objectName = "Dish Plat",
-                replace = true,
-                logic = "(CLAW + (WINGS | ((DASH | SUPERDASH) + MISCSKIPS))) | (WINGS + SHADOWDASH + MISCSKIPS)",
-                type = ItemType.Big,
-                bigSpriteKey = "Prompts.Shadowdash.png",
-                takeKey = "GET_ITEM_INTRO7",
-                nameKey = "INV_NAME_SHADOWDASH",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_SHADOWDASH_1",
-                descTwoKey = "GET_SHADOWDASH_2",
-                shopDescKey = "INV_DESC_SHADOWDASH",
-                shopSpriteKey = "ShopIcons.Shadowdash.png",
-                progression = true
+            { "hasShadowDash", new ReqDef()
+                {
+                    boolName = "hasShadowDash",
+                    sceneName = "Abyss_10",
+                    objectName = "Dish Plat",
+                    replace = true,
+                    logic = "(CLAW + (WINGS | ((DASH | SUPERDASH) + MISCSKIPS))) | (WINGS + SHADOWDASH + MISCSKIPS)",
+                    type = ItemType.Big,
+                    bigSpriteKey = "Prompts.Shadowdash.png",
+                    takeKey = "GET_ITEM_INTRO7",
+                    nameKey = "INV_NAME_SHADOWDASH",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_SHADOWDASH_1",
+                    descTwoKey = "GET_SHADOWDASH_2",
+                    shopDescKey = "INV_DESC_SHADOWDASH",
+                    shopSpriteKey = "ShopIcons.Shadowdash.png",
+                    progression = true
+                }
             },
             //Isma's Tear
-            new ReqDef()
-            {
-                boolName = "hasAcidArmour",
-                sceneName = "Waterways_13",
-                objectName = "Shiny Item Acid",
-                replace = true,
-                logic = "(SUPERDASH | (DASH + (FIREBALL | SCREAM | DASHMASTER) + SPIKETUNNELS)) + ((CLAW + (SUPERDASH | ACID)) | (WINGS + ACID))",
-                type = ItemType.Big,
-                bigSpriteKey = "Prompts.Isma.png",
-                takeKey = "GET_ITEM_INTRO8",
-                nameKey = "INV_NAME_ACIDARMOUR",
-                buttonKey = "RANDOMIZER_EMPTY",
-                descOneKey = "GET_ACIDARMOUR_1",
-                descTwoKey = "GET_ACIDARMOUR_2",
-                shopDescKey = "INV_DESC_ACIDARMOUR",
-                shopSpriteKey = "ShopIcons.Isma.png",
-                progression = true
+            { "hasAcidArmour", new ReqDef()
+                {
+                    boolName = "hasAcidArmour",
+                    sceneName = "Waterways_13",
+                    objectName = "Shiny Item Acid",
+                    replace = true,
+                    logic = "(SUPERDASH | (DASH + (FIREBALL | SCREAM | DASHMASTER) + SPIKETUNNELS)) + ((CLAW + (SUPERDASH | ACID)) | (WINGS + ACID))",
+                    type = ItemType.Big,
+                    bigSpriteKey = "Prompts.Isma.png",
+                    takeKey = "GET_ITEM_INTRO8",
+                    nameKey = "INV_NAME_ACIDARMOUR",
+                    buttonKey = "RANDOMIZER_EMPTY",
+                    descOneKey = "GET_ACIDARMOUR_1",
+                    descTwoKey = "GET_ACIDARMOUR_2",
+                    shopDescKey = "INV_DESC_ACIDARMOUR",
+                    shopSpriteKey = "ShopIcons.Isma.png",
+                    progression = true
+                }
             },
             //Dream Nail
-            new ReqDef()
-            {
-                boolName = "hasDreamNail",
-                sceneName = "Dream_Nailcollection",
-                objectName = "Moth NPC",
-                replace = true,
-                logic = "MISCSKIPS | CLAW",
-                type = ItemType.Big,
-                bigSpriteKey = "Prompts.Dreamnail.png",
-                takeKey = "GET_ITEM_INTRO5",
-                nameKey = "INV_NAME_DREAMNAIL_A",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_DREAMNAIL_1",
-                descTwoKey = "GET_DREAMNAIL_2",
-                shopDescKey = "INV_DESC_DREAMNAIL_A",
-                shopSpriteKey = "ShopIcons.Dreamnail.png",
-                progression = true //Not technically a progression item yet, but this stops it from being at elegy
+            { "hasDreamNail", new ReqDef()
+                {
+                    boolName = "hasDreamNail",
+                    sceneName = "Dream_Nailcollection",
+                    objectName = "Moth NPC",
+                    replace = true,
+                    logic = "MISCSKIPS | CLAW",
+                    type = ItemType.Big,
+                    bigSpriteKey = "Prompts.Dreamnail.png",
+                    takeKey = "GET_ITEM_INTRO5",
+                    nameKey = "INV_NAME_DREAMNAIL_A",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_DREAMNAIL_1",
+                    descTwoKey = "GET_DREAMNAIL_2",
+                    shopDescKey = "INV_DESC_DREAMNAIL_A",
+                    shopSpriteKey = "ShopIcons.Dreamnail.png",
+                    progression = true //Not technically a progression item yet, but this stops it from being at elegy
+                }
             },
             //TODO: Dream Gate
             //TODO: Awoken Dream Nail
             //Vengeful Spirit
-            new ReqDef()
-            {
-                boolName = "hasVengefulSpirit",
-                sceneName = "Crossroads_ShamanTemple",
-                objectName = "Shaman Meeting",
-                replace = true,
-                logic = "",
-                type = ItemType.Spell,
-                bigSpriteKey = "Prompts.Fireball1.png",
-                takeKey = "GET_ITEM_INTRO3",
-                nameKey = "INV_NAME_SPELL_FIREBALL1",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_FIREBALL_1",
-                descTwoKey = "GET_FIREBALL_2",
-                shopDescKey = "INV_DESC_SPELL_FIREBALL1",
-                shopSpriteKey = "ShopIcons.Fireball1.png",
-                progression = true
+            { "hasVengefulSpirit", new ReqDef()
+                {
+                    boolName = "hasVengefulSpirit",
+                    sceneName = "Crossroads_ShamanTemple",
+                    objectName = "Shaman Meeting",
+                    replace = true,
+                    logic = "",
+                    type = ItemType.Spell,
+                    bigSpriteKey = "Prompts.Fireball1.png",
+                    takeKey = "GET_ITEM_INTRO3",
+                    nameKey = "INV_NAME_SPELL_FIREBALL1",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_FIREBALL_1",
+                    descTwoKey = "GET_FIREBALL_2",
+                    shopDescKey = "INV_DESC_SPELL_FIREBALL1",
+                    shopSpriteKey = "ShopIcons.Fireball1.png",
+                    progression = true
+                }
             },
             //Shade Soul
-            new ReqDef()
-            {
-                boolName = "hasShadeSoul",
-                sceneName = "Ruins1_31b",
-                objectName = "Ruins Shaman",
-                replace = true,
-                logic = "((CLAW | WINGS) + SHADESKIPS) | (CLAW + (DASH | SUPERDASH | WINGS | ACID))",
-                type = ItemType.Spell,
-                bigSpriteKey = "Prompts.Fireball2.png",
-                takeKey = "GET_ITEM_INTRO3",
-                nameKey = "INV_NAME_SPELL_FIREBALL2",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_FIREBALL2_1",
-                descTwoKey = "GET_FIREBALL2_2",
-                shopDescKey = "INV_DESC_SPELL_FIREBALL2",
-                shopSpriteKey = "ShopIcons.Fireball2.png",
-                progression = true
+            { "hasShadeSoul", new ReqDef()
+                {
+                    boolName = "hasShadeSoul",
+                    sceneName = "Ruins1_31b",
+                    objectName = "Ruins Shaman",
+                    replace = true,
+                    logic = "((CLAW | WINGS) + SHADESKIPS) | (CLAW + (DASH | SUPERDASH | WINGS | ACID))",
+                    type = ItemType.Spell,
+                    bigSpriteKey = "Prompts.Fireball2.png",
+                    takeKey = "GET_ITEM_INTRO3",
+                    nameKey = "INV_NAME_SPELL_FIREBALL2",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_FIREBALL2_1",
+                    descTwoKey = "GET_FIREBALL2_2",
+                    shopDescKey = "INV_DESC_SPELL_FIREBALL2",
+                    shopSpriteKey = "ShopIcons.Fireball2.png",
+                    progression = true
+                }
             },
             //Desolate Dive
-            new ReqDef()
-            {
-                boolName = "hasDesolateDive",
-                sceneName = "Ruins1_24",
-                objectName = "Quake Item",
-                replace = true,
-                logic = "((CLAW | WINGS) + SHADESKIPS) | (CLAW + (DASH | SUPERDASH | WINGS | ACID))",
-                type = ItemType.Spell,
-                bigSpriteKey = "Prompts.Quake1.png",
-                takeKey = "GET_ITEM_INTRO3",
-                nameKey = "INV_NAME_SPELL_QUAKE1",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_QUAKE_1",
-                descTwoKey = "GET_QUAKE_2",
-                shopDescKey = "INV_DESC_SPELL_QUAKE1",
-                shopSpriteKey = "ShopIcons.Quake1.png",
-                progression = true
+            { "hasDesolateDive", new ReqDef()
+                {
+                    boolName = "hasDesolateDive",
+                    sceneName = "Ruins1_24",
+                    objectName = "Quake Item",
+                    replace = true,
+                    logic = "((CLAW | WINGS) + SHADESKIPS) | (CLAW + (DASH | SUPERDASH | WINGS | ACID))",
+                    type = ItemType.Spell,
+                    bigSpriteKey = "Prompts.Quake1.png",
+                    takeKey = "GET_ITEM_INTRO3",
+                    nameKey = "INV_NAME_SPELL_QUAKE1",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_QUAKE_1",
+                    descTwoKey = "GET_QUAKE_2",
+                    shopDescKey = "INV_DESC_SPELL_QUAKE1",
+                    shopSpriteKey = "ShopIcons.Quake1.png",
+                    progression = true
+                }
             },
             //Descending Dark
-            new ReqDef()
-            {
-                boolName = "hasDescendingDark",
-                sceneName = "Mines_35",
-                objectName = "Crystal Shaman",
-                replace = true,
-                logic = "QUAKE + ((CLAW + (SUPERDASH | (DASH + (FIREBALL | SCREAM) + FIREBALLSKIPS))) | (WINGS + (SUPERDASH | DASH | ((FIREBALL | SCREAM) + FIREBALLSKIPS))))",
-                type = ItemType.Spell,
-                bigSpriteKey = "Prompts.Quake2.png",
-                takeKey = "GET_ITEM_INTRO3",
-                nameKey = "INV_NAME_SPELL_QUAKE2",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_QUAKE2_1",
-                descTwoKey = "GET_QUAKE2_2",
-                shopDescKey = "INV_DESC_SPELL_QUAKE2",
-                shopSpriteKey = "ShopIcons.Quake2.png",
-                progression = true
+            { "hasDescendingDark", new ReqDef()
+                {
+                    boolName = "hasDescendingDark",
+                    sceneName = "Mines_35",
+                    objectName = "Crystal Shaman",
+                    replace = true,
+                    logic = "QUAKE + ((CLAW + (SUPERDASH | (DASH + (FIREBALL | SCREAM) + FIREBALLSKIPS))) | (WINGS + (SUPERDASH | DASH | ((FIREBALL | SCREAM) + FIREBALLSKIPS))))",
+                    type = ItemType.Spell,
+                    bigSpriteKey = "Prompts.Quake2.png",
+                    takeKey = "GET_ITEM_INTRO3",
+                    nameKey = "INV_NAME_SPELL_QUAKE2",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_QUAKE2_1",
+                    descTwoKey = "GET_QUAKE2_2",
+                    shopDescKey = "INV_DESC_SPELL_QUAKE2",
+                    shopSpriteKey = "ShopIcons.Quake2.png",
+                    progression = true
+                }
             },
             //Howling Wraiths
-            new ReqDef()
-            {
-                boolName = "hasHowlingWraiths",
-                sceneName = "Room_Fungus_Shaman",
-                objectName = "Scream Item",
-                replace = true,
-                logic = "CLAW | WINGS",
-                type = ItemType.Spell,
-                bigSpriteKey = "Prompts.Scream1.png",
-                takeKey = "GET_ITEM_INTRO3",
-                nameKey = "INV_NAME_SPELL_SCREAM1",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_SCREAM_1",
-                descTwoKey = "GET_SCREAM_2",
-                shopDescKey = "INV_DESC_SPELL_SCREAM1",
-                shopSpriteKey = "ShopIcons.Scream1.png",
-                progression = true
+            { "hasHowlingWraiths", new ReqDef()
+                {
+                    boolName = "hasHowlingWraiths",
+                    sceneName = "Room_Fungus_Shaman",
+                    objectName = "Scream Item",
+                    replace = true,
+                    logic = "CLAW | WINGS",
+                    type = ItemType.Spell,
+                    bigSpriteKey = "Prompts.Scream1.png",
+                    takeKey = "GET_ITEM_INTRO3",
+                    nameKey = "INV_NAME_SPELL_SCREAM1",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_SCREAM_1",
+                    descTwoKey = "GET_SCREAM_2",
+                    shopDescKey = "INV_DESC_SPELL_SCREAM1",
+                    shopSpriteKey = "ShopIcons.Scream1.png",
+                    progression = true
+                }
             },
             //Abyss Shriek TODO: Require wraiths for this pickup
-            new ReqDef()
-            {
-                boolName = "hasAbyssShriek",
-                sceneName = "Abyss_12",
-                objectName = "Scream 2 Get",
-                replace = true,
-                logic = "SCREAM + ((CLAW + WINGS) | ((CLAW | WINGS) + MISCSKIPS))",
-                type = ItemType.Spell,
-                bigSpriteKey = "Prompts.Scream2.png",
-                takeKey = "GET_ITEM_INTRO3",
-                nameKey = "INV_NAME_SPELL_SCREAM2",
-                buttonKey = "RANDOMIZER_BUTTON_DESC",
-                descOneKey = "GET_SCREAM2_1",
-                descTwoKey = "GET_SCREAM2_2",
-                shopDescKey = "INV_DESC_SPELL_SCREAM2",
-                shopSpriteKey = "ShopIcons.Scream2.png",
-                progression = true
+            { "hasAbyssShriek", new ReqDef()
+                {
+                    boolName = "hasAbyssShriek",
+                    sceneName = "Abyss_12",
+                    objectName = "Scream 2 Get",
+                    replace = true,
+                    logic = "SCREAM + ((CLAW + WINGS) | ((CLAW | WINGS) + MISCSKIPS))",
+                    type = ItemType.Spell,
+                    bigSpriteKey = "Prompts.Scream2.png",
+                    takeKey = "GET_ITEM_INTRO3",
+                    nameKey = "INV_NAME_SPELL_SCREAM2",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_SCREAM2_1",
+                    descTwoKey = "GET_SCREAM2_2",
+                    shopDescKey = "INV_DESC_SPELL_SCREAM2",
+                    shopSpriteKey = "ShopIcons.Scream2.png",
+                    progression = true
+                }
             },
             //Gathering Swarm (Sly no key)
-            new ReqDef()
-            {
-                boolName = "gotCharm_1",
-                sceneName = "Room_shop",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_1",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_1",
-                shopSpriteKey = "Charms.1.png",
-                notchCost = "charmCost_1",
-                shopName = "Sly"
+            { "gotCharm_1", new ReqDef()
+                {
+                    boolName = "gotCharm_1",
+                    sceneName = "Room_shop",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_1",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_1",
+                    shopSpriteKey = "Charms.1.png",
+                    notchCost = "charmCost_1",
+                    shopName = "Sly"
+                }
             },
             //Wayward Compass (Iselda)
-            new ReqDef()
-            {
-                boolName = "gotCharm_2",
-                sceneName = "Room_mapper",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_2",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_2",
-                shopSpriteKey = "Charms.2.png",
-                notchCost = "charmCost_2",
-                shopName = "Iselda"
+            { "gotCharm_2", new ReqDef()
+                {
+                    boolName = "gotCharm_2",
+                    sceneName = "Room_mapper",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_2",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_2",
+                    shopSpriteKey = "Charms.2.png",
+                    notchCost = "charmCost_2",
+                    shopName = "Iselda"
+                }
             },
             //Grubsong
-            new ReqDef()
-            {
-                boolName = "gotCharm_3",
-                sceneName = "Crossroads_38",
-                objectName = "Shiny Item Grubsong",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "CLAW",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_3",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_3",
-                shopSpriteKey = "Charms.3.png",
-                notchCost = "charmCost_3"
+            { "gotCharm_3", new ReqDef()
+                {
+                    boolName = "gotCharm_3",
+                    sceneName = "Crossroads_38",
+                    objectName = "Shiny Item Grubsong",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "CLAW",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_3",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_3",
+                    shopSpriteKey = "Charms.3.png",
+                    notchCost = "charmCost_3"
+                }
             },
             //Stalwart Shell (Sly no key)
-            new ReqDef()
-            {
-                boolName = "gotCharm_4",
-                sceneName = "Room_shop",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_4",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_4",
-                shopSpriteKey = "Charms.4.png",
-                notchCost = "charmCost_4",
-                shopName = "Sly"
+            { "gotCharm_4", new ReqDef()
+                {
+                    boolName = "gotCharm_4",
+                    sceneName = "Room_shop",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_4",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_4",
+                    shopSpriteKey = "Charms.4.png",
+                    notchCost = "charmCost_4",
+                    shopName = "Sly"
+                }
             },
             //Baldur Shell
-            new ReqDef()
-            {
-                boolName = "gotCharm_5",
-                sceneName = "Fungus1_28",
-                objectName = "Shiny Item",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "BALDURS + (CLAW | DASH | WINGS | SUPERDASH | SHADESKIPS | (FIREBALL + FIREBALLSKIPS))",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_5",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_5",
-                shopSpriteKey = "Charms.5.png",
-                notchCost = "charmCost_5"
+            { "gotCharm_5", new ReqDef()
+                {
+                    boolName = "gotCharm_5",
+                    sceneName = "Fungus1_28",
+                    objectName = "Shiny Item",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "BALDURS + (CLAW | DASH | WINGS | SUPERDASH | SHADESKIPS | (FIREBALL + FIREBALLSKIPS))",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_5",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_5",
+                    shopSpriteKey = "Charms.5.png",
+                    notchCost = "charmCost_5"
+                }
             },
             //Fury of the Fallen
-            new ReqDef()
-            {
-                boolName = "gotCharm_6",
-                sceneName = "Tutorial_01",
-                objectName = "Shiny Item (1)",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "CLAW",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_6",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_6",
-                shopSpriteKey = "Charms.6.png",
-                notchCost = "charmCost_6"
+            { "gotCharm_6", new ReqDef()
+                {
+                    boolName = "gotCharm_6",
+                    sceneName = "Tutorial_01",
+                    objectName = "Shiny Item (1)",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "CLAW",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_6",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_6",
+                    shopSpriteKey = "Charms.6.png",
+                    notchCost = "charmCost_6"
+                }
             },
             //Quick Focus (Salubra)
-            new ReqDef()
-            {
-                boolName = "gotCharm_7",
-                sceneName = "Room_Charm_Shop",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "CLAW | DASH | WINGS | SUPERDASH | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_7",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_7",
-                shopSpriteKey = "Charms.7.png",
-                notchCost = "charmCost_7",
-                shopName = "Salubra"
+            { "gotCharm_7", new ReqDef()
+                {
+                    boolName = "gotCharm_7",
+                    sceneName = "Room_Charm_Shop",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "CLAW | DASH | WINGS | SUPERDASH | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_7",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_7",
+                    shopSpriteKey = "Charms.7.png",
+                    notchCost = "charmCost_7",
+                    shopName = "Salubra"
+                }
             },
             //Lifeblood Heart (Salubra)
-            new ReqDef()
-            {
-                boolName = "gotCharm_8",
-                sceneName = "Room_Charm_Shop",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "CLAW | DASH | WINGS | SUPERDASH | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_8",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_8",
-                shopSpriteKey = "Charms.8.png",
-                notchCost = "charmCost_8",
-                shopName = "Salubra"
+            { "gotCharm_8", new ReqDef()
+                {
+                    boolName = "gotCharm_8",
+                    sceneName = "Room_Charm_Shop",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "CLAW | DASH | WINGS | SUPERDASH | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_8",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_8",
+                    shopSpriteKey = "Charms.8.png",
+                    notchCost = "charmCost_8",
+                    shopName = "Salubra"
+                }
             },
             //TODO: Lifeblood Core
             //Defender's Crest
-            new ReqDef()
-            {
-                boolName = "gotCharm_10",
-                sceneName = "Waterways_05",
-                objectName = "Shiny Item",
-                altObjectName = "Shiny Item R",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "(CLAW + (SUPERDASH | DASH | WINGS | MISCSKIPS)) | (WINGS + MISCSKIPS)",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_10",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_10",
-                shopSpriteKey = "Charms.10.png",
-                notchCost = "charmCost_10"
+            { "gotCharm_10", new ReqDef()
+                {
+                    boolName = "gotCharm_10",
+                    sceneName = "Waterways_05",
+                    objectName = "Shiny Item",
+                    altObjectName = "Shiny Item R",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "(CLAW + (SUPERDASH | DASH | WINGS | MISCSKIPS)) | (WINGS + MISCSKIPS)",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_10",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_10",
+                    shopSpriteKey = "Charms.10.png",
+                    notchCost = "charmCost_10"
+                }
             },
             //Flukenest
-            new ReqDef()
-            {
-                boolName = "gotCharm_11",
-                sceneName = "Waterways_12",
-                objectName = "Shiny Item",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "QUAKE + (CLAW | MISCSKIPS)",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_11",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_11",
-                shopSpriteKey = "Charms.11.png",
-                notchCost = "charmCost_11",
-                isGoodItem = true
+            { "gotCharm_11", new ReqDef()
+                {
+                    boolName = "gotCharm_11",
+                    sceneName = "Waterways_12",
+                    objectName = "Shiny Item",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "QUAKE + (CLAW | MISCSKIPS)",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_11",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_11",
+                    shopSpriteKey = "Charms.11.png",
+                    notchCost = "charmCost_11",
+                    isGoodItem = true
+                }
             },
             //Thorns of Agony
-            new ReqDef()
-            {
-                boolName = "gotCharm_12",
-                sceneName = "Fungus1_14",
-                objectName = "Shiny Item",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "DASH | (CLAW + SUPERDASH) | (FIREBALL + MAGSKIPS)",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_12",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_12",
-                shopSpriteKey = "Charms.12.png",
-                notchCost = "charmCost_12"
+            { "gotCharm_12", new ReqDef()
+                {
+                    boolName = "gotCharm_12",
+                    sceneName = "Fungus1_14",
+                    objectName = "Shiny Item",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "DASH | (CLAW + SUPERDASH) | (FIREBALL + MAGSKIPS)",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_12",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_12",
+                    shopSpriteKey = "Charms.12.png",
+                    notchCost = "charmCost_12"
+                }
             },
             //Mark of Pride
-            new ReqDef()
-            {
-                boolName = "gotCharm_13",
-                sceneName = "Fungus2_31",
-                objectName = "Shiny Item Charm",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "CLAW | (WINGS + MISCSKIPS)",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_13",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_13",
-                shopSpriteKey = "Charms.13.png",
-                notchCost = "charmCost_13",
-                progression = true
+            { "gotCharm_13", new ReqDef()
+                {
+                    boolName = "gotCharm_13",
+                    sceneName = "Fungus2_31",
+                    objectName = "Shiny Item Charm",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "CLAW | (WINGS + MISCSKIPS)",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_13",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_13",
+                    shopSpriteKey = "Charms.13.png",
+                    notchCost = "charmCost_13",
+                    progression = true
+                }
             },
             //Steady Body (Salubra)
-            new ReqDef()
-            {
-                boolName = "gotCharm_14",
-                sceneName = "Room_Charm_Shop",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "CLAW | DASH | WINGS | SUPERDASH | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_14",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_14",
-                shopSpriteKey = "Charms.14.png",
-                notchCost = "charmCost_14",
-                shopName = "Salubra"
+            { "gotCharm_14", new ReqDef()
+                {
+                    boolName = "gotCharm_14",
+                    sceneName = "Room_Charm_Shop",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "CLAW | DASH | WINGS | SUPERDASH | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_14",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_14",
+                    shopSpriteKey = "Charms.14.png",
+                    notchCost = "charmCost_14",
+                    shopName = "Salubra"
+                }
             },
             //Heavy Blow (Sly with key)
-            new ReqDef()
-            {
-                boolName = "gotCharm_15",
-                sceneName = "Room_shop",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "CLAW | (WINGS + (DASH | ((FIREBALL | SCREAM) + FIREBALLSKIPS)))",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_15",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_15",
-                shopSpriteKey = "Charms.15.png",
-                notchCost = "charmCost_15",
-                shopName = "SlyKey"
+            { "gotCharm_15", new ReqDef()
+                {
+                    boolName = "gotCharm_15",
+                    sceneName = "Room_shop",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "CLAW | (WINGS + (DASH | ((FIREBALL | SCREAM) + FIREBALLSKIPS)))",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_15",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_15",
+                    shopSpriteKey = "Charms.15.png",
+                    notchCost = "charmCost_15",
+                    shopName = "SlyKey"
+                }
             },
             //Sharp Shadow
-            new ReqDef()
-            {
-                boolName = "gotCharm_16",
-                sceneName = "Deepnest_44",
-                objectName = "Shiny Item Stand",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "SHADOWDASH + (CLAW | ACID | (WINGS + SHADESKIPS))",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_16",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_16",
-                shopSpriteKey = "Charms.16.png",
-                notchCost = "charmCost_16"
+            { "gotCharm_16", new ReqDef()
+                {
+                    boolName = "gotCharm_16",
+                    sceneName = "Deepnest_44",
+                    objectName = "Shiny Item Stand",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "SHADOWDASH + (CLAW | ACID | (WINGS + SHADESKIPS))",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_16",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_16",
+                    shopSpriteKey = "Charms.16.png",
+                    notchCost = "charmCost_16"
+                }
             },
             //Spore Shroom
-            new ReqDef()
-            {
-                boolName = "gotCharm_17",
-                sceneName = "Fungus2_20",
-                objectName = "Shiny Item Stand",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "(CLAW + (DASH | WINGS | SUPERDASH | ACID)) | (WINGS + (DASH | ACID) + SHADESKIPS)",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_17",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_17",
-                shopSpriteKey = "Charms.17.png",
-                notchCost = "charmCost_17",
-                progression = true
+            { "gotCharm_17", new ReqDef()
+                {
+                    boolName = "gotCharm_17",
+                    sceneName = "Fungus2_20",
+                    objectName = "Shiny Item Stand",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "(CLAW + (DASH | WINGS | SUPERDASH | ACID)) | (WINGS + (DASH | ACID) + SHADESKIPS)",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_17",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_17",
+                    shopSpriteKey = "Charms.17.png",
+                    notchCost = "charmCost_17",
+                    progression = true
+                }
             },
             //Longnail (Salubra)
-            new ReqDef()
-            {
-                boolName = "gotCharm_18",
-                sceneName = "Room_Charm_Shop",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "CLAW | DASH | WINGS | SUPERDASH | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_18",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_18",
-                shopSpriteKey = "Charms.18.png",
-                notchCost = "charmCost_18",
-                progression = true
+            { "gotCharm_18", new ReqDef()
+                {
+                    boolName = "gotCharm_18",
+                    sceneName = "Room_Charm_Shop",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "CLAW | DASH | WINGS | SUPERDASH | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_18",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_18",
+                    shopSpriteKey = "Charms.18.png",
+                    notchCost = "charmCost_18",
+                    progression = true
+                }
             },
             //Shaman Stone (Salubra)
-            new ReqDef()
-            {
-                boolName = "gotCharm_19",
-                sceneName = "Room_Charm_Shop",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "CLAW | DASH | WINGS | SUPERDASH | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_19",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_19",
-                shopSpriteKey = "Charms.19.png",
-                notchCost = "charmCost_19",
-                shopName = "Salubra",
-                isGoodItem = true
+            { "gotCharm_19", new ReqDef()
+                {
+                    boolName = "gotCharm_19",
+                    sceneName = "Room_Charm_Shop",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "CLAW | DASH | WINGS | SUPERDASH | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_19",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_19",
+                    shopSpriteKey = "Charms.19.png",
+                    notchCost = "charmCost_19",
+                    shopName = "Salubra",
+                    isGoodItem = true
+                }
             },
             //Soul Catcher
-            new ReqDef()
-            {
-                boolName = "gotCharm_20",
-                sceneName = "Crossroads_ShamanTemple",
-                objectName = "Shiny Item",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_20",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_20",
-                shopSpriteKey = "Charms.20.png",
-                notchCost = "charmCost_20",
-                isGoodItem = true
+            { "gotCharm_20", new ReqDef()
+                {
+                    boolName = "gotCharm_20",
+                    sceneName = "Crossroads_ShamanTemple",
+                    objectName = "Shiny Item",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_20",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_20",
+                    shopSpriteKey = "Charms.20.png",
+                    notchCost = "charmCost_20",
+                    isGoodItem = true
+                }
             },
             //Soul Eater
-            new ReqDef()
-            {
-                boolName = "gotCharm_21",
-                sceneName = "RestingGrounds_10",
-                objectName = "Shiny Item Stand",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "QUAKE + (CLAW | WINGS)",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_21",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_21",
-                shopSpriteKey = "Charms.21.png",
-                notchCost = "charmCost_21",
-                isGoodItem = true
+            { "gotCharm_21", new ReqDef()
+                {
+                    boolName = "gotCharm_21",
+                    sceneName = "RestingGrounds_10",
+                    objectName = "Shiny Item Stand",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "QUAKE + (CLAW | WINGS)",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_21",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_21",
+                    shopSpriteKey = "Charms.21.png",
+                    notchCost = "charmCost_21",
+                    isGoodItem = true
+                }
             },
             //Glowing Womb
-            new ReqDef()
-            {
-                boolName = "gotCharm_22",
-                sceneName = "Crossroads_22",
-                objectName = "Shiny Item",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "(SUPERDASH | ((FIREBALL | SCREAM | DASHMASTER) + DASH + SPIKETUNNELS)) + (CLAW | WINGS)",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_22",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_22",
-                shopSpriteKey = "Charms.22.png",
-                notchCost = "charmCost_22",
-                progression = true
+            { "gotCharm_22", new ReqDef()
+                {
+                    boolName = "gotCharm_22",
+                    sceneName = "Crossroads_22",
+                    objectName = "Shiny Item",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "(SUPERDASH | ((FIREBALL | SCREAM | DASHMASTER) + DASH + SPIKETUNNELS)) + (CLAW | WINGS)",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_22",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_22",
+                    shopSpriteKey = "Charms.22.png",
+                    notchCost = "charmCost_22",
+                    progression = true
+                }
             },
             //Fragile Heart (Leg Eater)
-            new ReqDef()
-            {
-                boolName = "gotCharm_23",
-                sceneName = "Fungus2_26",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_23",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_23",
-                shopSpriteKey = "Charms.23.png",
-                notchCost = "charmCost_23",
-                shopName = "LegEater",
-                isGoodItem = true
+            { "gotCharm_23", new ReqDef()
+                {
+                    boolName = "gotCharm_23",
+                    sceneName = "Fungus2_26",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_23",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_23",
+                    shopSpriteKey = "Charms.23.png",
+                    notchCost = "charmCost_23",
+                    shopName = "LegEater",
+                    isGoodItem = true
+                }
             },
             //Fragile Greed (Leg Eater)
-            new ReqDef()
-            {
-                boolName = "gotCharm_24",
-                sceneName = "Fungus2_26",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_24",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_24",
-                shopSpriteKey = "Charms.24.png",
-                notchCost = "charmCost_24",
-                shopName = "LegEater"
+            { "gotCharm_24", new ReqDef()
+                {
+                    boolName = "gotCharm_24",
+                    sceneName = "Fungus2_26",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_24",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_24",
+                    shopSpriteKey = "Charms.24.png",
+                    notchCost = "charmCost_24",
+                    shopName = "LegEater"
+                }
             },
             //Fragile Strength (Leg Eater)
-            new ReqDef()
-            {
-                boolName = "gotCharm_25",
-                sceneName = "Fungus2_26",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_25",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_25",
-                shopSpriteKey = "Charms.25.png",
-                notchCost = "charmCost_25",
-                shopName = "LegEater",
-                isGoodItem = true
+            { "gotCharm_25", new ReqDef()
+                {
+                    boolName = "gotCharm_25",
+                    sceneName = "Fungus2_26",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_25",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_25",
+                    shopSpriteKey = "Charms.25.png",
+                    notchCost = "charmCost_25",
+                    shopName = "LegEater",
+                    isGoodItem = true
+                }
             },
             //TODO: Nailmaster's Glory
             //Joni's Blessing
-            new ReqDef()
-            {
-                boolName = "gotCharm_27",
-                sceneName = "Cliffs_05",
-                objectName = "Shiny Item Stand",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "CLAW",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_27",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_27",
-                shopSpriteKey = "Charms.27.png",
-                notchCost = "charmCost_27"
+            { "gotCharm_27", new ReqDef()
+                {
+                    boolName = "gotCharm_27",
+                    sceneName = "Cliffs_05",
+                    objectName = "Shiny Item Stand",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "CLAW",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_27",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_27",
+                    shopSpriteKey = "Charms.27.png",
+                    notchCost = "charmCost_27"
+                }
             },
             //Shape of Unn
-            new ReqDef()
-            {
-                boolName = "gotCharm_28",
-                sceneName = "Fungus1_Slug",
-                objectName = "Shiny Item",
-                altObjectName = "Shiny Item Return",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "(ACID + (CLAW | WINGS)) | (SUPERDASH + WINGS + FIREBALL + CLAW + DASH + MAGSKIPS)",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_28",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_28",
-                shopSpriteKey = "Charms.28.png",
-                notchCost = "charmCost_28"
+            { "gotCharm_28", new ReqDef()
+                {
+                    boolName = "gotCharm_28",
+                    sceneName = "Fungus1_Slug",
+                    objectName = "Shiny Item",
+                    altObjectName = "Shiny Item Return",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "(ACID + (CLAW | WINGS)) | (SUPERDASH + WINGS + FIREBALL + CLAW + DASH + MAGSKIPS)",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_28",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_28",
+                    shopSpriteKey = "Charms.28.png",
+                    notchCost = "charmCost_28"
+                }
             },
             //Hiveblood
-            new ReqDef()
-            {
-                boolName = "gotCharm_29",
-                sceneName = "Hive_05",
-                objectName = "Shiny Item Stand",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "(CLAW + (WINGS | MISCSKIPS)) | (WINGS + DASH + MISCSKIPS)",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_29",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_29",
-                shopSpriteKey = "Charms.29.png",
-                notchCost = "charmCost_29"
+            { "gotCharm_29", new ReqDef()
+                {
+                    boolName = "gotCharm_29",
+                    sceneName = "Hive_05",
+                    objectName = "Shiny Item Stand",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "(CLAW + (WINGS | MISCSKIPS)) | (WINGS + DASH + MISCSKIPS)",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_29",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_29",
+                    shopSpriteKey = "Charms.29.png",
+                    notchCost = "charmCost_29"
+                }
             },
             //TODO: Dream Wielder
             //Dashmaster
-            new ReqDef()
-            {
-                boolName = "gotCharm_31",
-                sceneName = "Fungus2_23",
-                objectName = "Shiny Item Stand",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_31",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_31",
-                shopSpriteKey = "Charms.31.png",
-                notchCost = "charmCost_31",
-                progression = true
+            { "gotCharm_31", new ReqDef()
+                {
+                    boolName = "gotCharm_31",
+                    sceneName = "Fungus2_23",
+                    objectName = "Shiny Item Stand",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_31",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_31",
+                    shopSpriteKey = "Charms.31.png",
+                    notchCost = "charmCost_31",
+                    progression = true
+                }
             },
             //Quick Slash
-            new ReqDef()
-            {
-                boolName = "gotCharm_32",
-                sceneName = "Deepnest_East_14b",
-                objectName = "Shiny Item",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "DASH + QUAKE + (CLAW | (WINGS + MISCSKIPS))",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_32",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_32",
-                shopSpriteKey = "Charms.32.png",
-                notchCost = "charmCost_32"
+            { "gotCharm_32", new ReqDef()
+                {
+                    boolName = "gotCharm_32",
+                    sceneName = "Deepnest_East_14b",
+                    objectName = "Shiny Item",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "DASH + QUAKE + (CLAW | (WINGS + MISCSKIPS))",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_32",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_32",
+                    shopSpriteKey = "Charms.32.png",
+                    notchCost = "charmCost_32"
+                }
             },
             //Spell Twister
-            new ReqDef()
-            {
-                boolName = "gotCharm_33",
-                sceneName = "Ruins1_30",
-                objectName = "Shiny Item Stand",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "((CLAW | WINGS) + SHADESKIPS) | (CLAW + (DASH | SUPERDASH | WINGS | ACID))",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_33",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_33",
-                shopSpriteKey = "Charms.33.png",
-                notchCost = "charmCost_33",
-                isGoodItem = true
+            { "gotCharm_33", new ReqDef()
+                {
+                    boolName = "gotCharm_33",
+                    sceneName = "Ruins1_30",
+                    objectName = "Shiny Item Stand",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "((CLAW | WINGS) + SHADESKIPS) | (CLAW + (DASH | SUPERDASH | WINGS | ACID))",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_33",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_33",
+                    shopSpriteKey = "Charms.33.png",
+                    notchCost = "charmCost_33",
+                    isGoodItem = true
+                }
             },
             //Deep Focus
-            new ReqDef()
-            {
-                boolName = "gotCharm_34",
-                sceneName = "Mines_36",
-                objectName = "Shiny Item Stand",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "(SUPERDASH + (CLAW | (WINGS + FIREBALL + SPIKETUNNELS))) | (WINGS + DASH + SPIKETUNNELS)",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_34",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_34",
-                shopSpriteKey = "Charms.34.png",
-                notchCost = "charmCost_34"
+            { "gotCharm_34", new ReqDef()
+                {
+                    boolName = "gotCharm_34",
+                    sceneName = "Mines_36",
+                    objectName = "Shiny Item Stand",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "(SUPERDASH + (CLAW | (WINGS + FIREBALL + SPIKETUNNELS))) | (WINGS + DASH + SPIKETUNNELS)",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_34",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_34",
+                    shopSpriteKey = "Charms.34.png",
+                    notchCost = "charmCost_34"
+                }
             },
             //Grubberfly's Elegy
-            new ReqDef()
-            {
-                boolName = "gotCharm_35",
-                sceneName = "Crossroads_38",
-                objectName = "Shiny Item Grubberfly",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "EVERYTHING",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_35",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_35",
-                shopSpriteKey = "Charms.35.png",
-                notchCost = "charmCost_35",
-                progression = true
+            { "gotCharm_35", new ReqDef()
+                {
+                    boolName = "gotCharm_35",
+                    sceneName = "Crossroads_38",
+                    objectName = "Shiny Item Grubberfly",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "EVERYTHING",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_35",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_35",
+                    shopSpriteKey = "Charms.35.png",
+                    notchCost = "charmCost_35",
+                    progression = true
+                }
             },
             //TODO: Kingsoul/Void Heart
             //Sprintmaster (Sly with key)
-            new ReqDef()
-            {
-                boolName = "gotCharm_37",
-                sceneName = "Room_shop",
-                objectName = "Shop Menu",
-                replace = false,
-                logic = "CLAW | (WINGS + (DASH | ((FIREBALL | SCREAM) + FIREBALLSKIPS)))",
-                type = ItemType.Shop,
-                nameKey = "CHARM_NAME_37",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_37",
-                shopSpriteKey = "Charms.37.png",
-                notchCost = "charmCost_37",
-                shopName = "SlyKey"
+            { "gotCharm_37", new ReqDef()
+                {
+                    boolName = "gotCharm_37",
+                    sceneName = "Room_shop",
+                    objectName = "Shop Menu",
+                    replace = false,
+                    logic = "CLAW | (WINGS + (DASH | ((FIREBALL | SCREAM) + FIREBALLSKIPS)))",
+                    type = ItemType.Shop,
+                    nameKey = "CHARM_NAME_37",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_37",
+                    shopSpriteKey = "Charms.37.png",
+                    notchCost = "charmCost_37",
+                    shopName = "SlyKey"
+                }
             },
             //Dreamshield
-            new ReqDef()
-            {
-                boolName = "gotCharm_38",
-                sceneName = "RestingGrounds_17",
-                objectName = "Shiny Item Stand",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "CLAW | MISCSKIPS",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_38",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_38",
-                shopSpriteKey = "Charms.38.png",
-                notchCost = "charmCost_38"
+            { "gotCharm_38", new ReqDef()
+                {
+                    boolName = "gotCharm_38",
+                    sceneName = "RestingGrounds_17",
+                    objectName = "Shiny Item Stand",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "CLAW | MISCSKIPS",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_38",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_38",
+                    shopSpriteKey = "Charms.38.png",
+                    notchCost = "charmCost_38"
+                }
             },
             //Weaversong
-            new ReqDef()
-            {
-                boolName = "gotCharm_39",
-                sceneName = "Deepnest_45_v02",
-                objectName = "Shiny Item (1)",
-                fsmName = "Shiny Control",
-                replace = false,
-                logic = "CLAW",
-                type = ItemType.Charm,
-                nameKey = "CHARM_NAME_39",
-                shopDescKey = "RANDOMIZER_CHARM_DESC_39",
-                shopSpriteKey = "Charms.39.png",
-                notchCost = "charmCost_39",
-                progression = true
+            { "gotCharm_39", new ReqDef()
+                {
+                    boolName = "gotCharm_39",
+                    sceneName = "Deepnest_45_v02",
+                    objectName = "Shiny Item (1)",
+                    fsmName = "Shiny Control",
+                    replace = false,
+                    logic = "CLAW",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_39",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_39",
+                    shopSpriteKey = "Charms.39.png",
+                    notchCost = "charmCost_39",
+                    progression = true
+                }
             }
             //TODO: Grimmchild
             //TODO: Geo Chests
@@ -862,7 +909,7 @@ namespace RandomizerMod
         };
 
         private Dictionary<string, List<string>> shopItems;
-        private Dictionary<string, string> otherItems;
+        private Dictionary<string, string> nonShopItems;
 
         private List<string> unobtainedLocations;
         private List<string> unobtainedItems;
@@ -871,10 +918,12 @@ namespace RandomizerMod
         public bool randomizeDone;
         public List<RandomizerAction> actions;
         public NewGameSettings settings;
+        
+        private IEnumerator coroutine;
 
         public void Start()
         {
-            otherItems = new Dictionary<string, string>();
+            nonShopItems = new Dictionary<string, string>();
 
             shopItems = new Dictionary<string, List<string>>();
             shopItems.Add("Sly", new List<string>());
@@ -884,12 +933,24 @@ namespace RandomizerMod
             shopItems.Add("LegEater", new List<string>());
             //shopItems.Add("Lemm", new List<string>()); TODO: Custom shop component to handle lemm
 
-            unobtainedLocations = items.Where(item => item.type != ItemType.Shop).Select(item => item.boolName).ToList();
+            unobtainedLocations = items.Where(item => item.Value.type != ItemType.Shop).Select(item => item.Key).ToList();
             unobtainedLocations.AddRange(shopItems.Keys);
-            unobtainedItems = items.Select(item => item.boolName).ToList();
+            unobtainedItems = items.Keys.ToList();
             obtainedItems = new List<string>();
 
-            StartCoroutine(Randomize());
+            coroutine = Randomize();
+            StartCoroutine(coroutine);
+        }
+
+        //Failsafe for extremely slow computers
+        public void ForceFinish()
+        {
+            if (coroutine != null)
+            {
+                while (coroutine.MoveNext());
+                StopCoroutine(coroutine);
+                coroutine = null;
+            }
         }
 
         //You don't have to write good code if you spam "yield return new WaitForEndOfFrame()" everywhere
@@ -959,7 +1020,7 @@ namespace RandomizerMod
                 }
                 else
                 {
-                    otherItems.Add(placeLocation, placeItem);
+                    nonShopItems.Add(placeLocation, placeItem);
                 }
 
                 currentDepth++;
@@ -971,7 +1032,7 @@ namespace RandomizerMod
             foreach (string str in unobtainedItems)
             {
                 yield return new WaitForEndOfFrame();
-                if (items.Where(item => item.boolName == str).First().progression)
+                if (items[str].progression)
                 {
                     unusedProgressionItems.Add(str);
                 }
@@ -1013,7 +1074,7 @@ namespace RandomizerMod
                 }
                 else
                 {
-                    otherItems.Add(placeLocation, placeItem);
+                    nonShopItems.Add(placeLocation, placeItem);
                 }
             }
 
@@ -1021,7 +1082,7 @@ namespace RandomizerMod
             List<string> goodItems = new List<string>();
             foreach (string str in unobtainedItems)
             {
-                if (items.Where(item => item.boolName == str).First().isGoodItem)
+                if (items[str].isGoodItem)
                 {
                     goodItems.Add(str);
                 }
@@ -1065,7 +1126,7 @@ namespace RandomizerMod
                 }
                 else
                 {
-                    otherItems.Add(placeLocation, placeItem);
+                    nonShopItems.Add(placeLocation, placeItem);
                 }
             }
 
@@ -1089,12 +1150,12 @@ namespace RandomizerMod
 
             actions = new List<RandomizerAction>();
 
-            foreach (KeyValuePair<string, string> kvp in otherItems)
+            foreach (KeyValuePair<string, string> kvp in nonShopItems)
             {
                 yield return new WaitForEndOfFrame();
 
-                ReqDef oldItem = items.Where(item => item.boolName == kvp.Key).First();
-                ReqDef newItem = items.Where(item => item.boolName == kvp.Value).First();
+                ReqDef oldItem = items[kvp.Key];
+                ReqDef newItem = items[kvp.Value];
 
                 if (oldItem.replace)
                 {
@@ -1128,8 +1189,8 @@ namespace RandomizerMod
                             case ItemType.Big:
                                 if (newItem.boolName == "hasDash" || newItem.boolName == "hasShadowDash")
                                 {
-                                    ReqDef dash = items.Where(item => item.boolName == "hasDash").First();
-                                    ReqDef shadowDash = items.Where(item => item.boolName == "hasShadowDash").First();
+                                    ReqDef dash = items["hasDash"];
+                                    ReqDef shadowDash = items["hasShadowDash"];
 
                                     actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, new BigItemDef[]
                                     {
@@ -1179,18 +1240,18 @@ namespace RandomizerMod
                                 {
                                     case "hasVengefulSpirit":
                                     case "hasShadeSoul":
-                                        spell1 = items.Where(item => item.boolName == "hasVengefulSpirit").First();
-                                        spell2 = items.Where(item => item.boolName == "hasShadeSoul").First();
+                                        spell1 = items["hasVengefulSpirit"];
+                                        spell2 = items["hasShadeSoul"];
                                         break;
                                     case "hasHowlingWraiths":
                                     case "hasAbyssShriek":
-                                        spell1 = items.Where(item => item.boolName == "hasHowlingWraiths").First();
-                                        spell2 = items.Where(item => item.boolName == "hasAbyssShriek").First();
+                                        spell1 = items["hasHowlingWraiths"];
+                                        spell2 = items["hasAbyssShriek"];
                                         break;
                                     case "hasDesolateDive":
                                     case "hasDescendingDark":
-                                        spell1 = items.Where(item => item.boolName == "hasDesolateDive").First();
-                                        spell2 = items.Where(item => item.boolName == "hasDescendingDark").First();
+                                        spell1 = items["hasDesolateDive"];
+                                        spell2 = items["hasDescendingDark"];
                                         break;
                                     default:
                                         throw new Exception("Unknown spell name: " + newItem.boolName);
@@ -1243,7 +1304,7 @@ namespace RandomizerMod
 
                 foreach (string item in newShopItems)
                 {
-                    ReqDef newItem = items.Where(i => i.boolName == item).First();
+                    ReqDef newItem = items[item];
 
                     if (newItem.type == ItemType.Spell)
                     {
@@ -1321,7 +1382,7 @@ namespace RandomizerMod
 
             foreach (string str in unobtainedItems)
             {
-                if (items.Where(item => item.boolName == str).First().progression)
+                if (items[str].progression)
                 {
                     List<string> hypothetical = unobtainedLocations.Where(item => IsReachable(item, str)).ToList();
                     if (hypothetical.Count > reachableCount) progression.Add(str);
@@ -1353,7 +1414,7 @@ namespace RandomizerMod
                     logic = "((CLAW | WINGS) + SHADESKIPS) | (CLAW + (DASH | SUPERDASH | WINGS | ACID))";
                     break;
                 default:
-                    logic = items.Where(item => item.boolName == boolName).First().logic;
+                    logic = items[boolName].logic;
                     break;
             }
 
