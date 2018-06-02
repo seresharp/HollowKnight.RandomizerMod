@@ -206,7 +206,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2b.1";
+            string ver = "2b.2";
             int minAPI = 41;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
@@ -401,6 +401,28 @@ namespace RandomizerMod
                     case "Room_temple":
                         //Handle completion restrictions
                         ProcessRestrictions();
+                        break;
+                    case "Room_Final_Boss_Core":
+                        //Trigger Radiance fight without requiring dream nail hit
+                        //Prevents skipping the fight in all bosses mode
+                        if (Settings.allBosses)
+                        {
+                            PlayMakerFSM dreamFSM = FSMUtility.LocateFSM(to.FindGameObject("Dream Enter"), "Control");
+                            SendEvent enterRadiance = new SendEvent
+                            {
+                                eventTarget = new FsmEventTarget()
+                                {
+                                    target = FsmEventTarget.EventTarget.FSMComponent,
+                                    fsmComponent = dreamFSM
+                                },
+                                sendEvent = FsmEvent.FindEvent("NAIL HIT"),
+                                delay = 0,
+                                everyFrame = false
+                            };
+
+                            PlayMakerFSM bossFSM = FSMUtility.LocateFSM(to.FindGameObject("Hollow Knight Boss"), "Control");
+                            bossFSM.GetState("H Collapsed").AddAction(enterRadiance);
+                        }
                         break;
                     case "Cliffs_06":
                         //Prevent banish ending in all bosses
