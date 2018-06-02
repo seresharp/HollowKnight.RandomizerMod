@@ -1190,18 +1190,36 @@ namespace RandomizerMod
                 Log("Empty string passed into ChangeToScene, ignoring");
                 return;
             }
+            
+            SceneLoad.FinishDelegate loadScene = () =>
+            {
+                GameManager.instance.StopAllCoroutines();
+
+                GameManager.instance.StopAllCoroutines();
+                sceneLoad.SetValue(GameManager.instance, null);
+
+                GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo()
+                {
+                    IsFirstLevelForPlayer = false,
+                    SceneName = sceneName,
+                    HeroLeaveDirection = ModTools.GetGatePosition(gateName),
+                    EntryGateName = gateName,
+                    EntryDelay = delay,
+                    PreventCameraFadeOut = true,
+                    WaitForSceneTransitionCameraFade = false,
+                    Visualization = GameManager.SceneLoadVisualizations.Default,
+                    AlwaysUnloadUnusedAssets = true
+                });
+            };
 
             SceneLoad load = (SceneLoad)sceneLoad.GetValue(GameManager.instance);
             if (load != null)
             {
-                load.Finish += () =>
-                {
-                    GameManager.instance.ChangeToScene(sceneName, gateName, delay);
-                };
+                load.Finish += loadScene;
             }
             else
             {
-                GameManager.instance.ChangeToScene(sceneName, gateName, delay);
+                loadScene.Invoke();
             }
         }
     }
