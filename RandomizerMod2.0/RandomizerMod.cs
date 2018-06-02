@@ -489,6 +489,23 @@ namespace RandomizerMod
                                 Object.Destroy(GameObject.Find("Ruins_front_gate"));
                             }
                             break;
+                        case "Fungus2_26":
+                            //Prevent leg eater from doing anything but opening the shop
+                            PlayMakerFSM legEater = FSMUtility.LocateFSM(GameObject.Find("Leg Eater"), "Conversation Control");
+                            FsmState legEaterChoice = legEater.GetState("Convo Choice");
+                            legEaterChoice.RemoveTransitionsTo("Convo 1");
+                            legEaterChoice.RemoveTransitionsTo("Convo 2");
+                            legEaterChoice.RemoveTransitionsTo("Convo 3");
+                            legEaterChoice.RemoveTransitionsTo("Infected Crossroad");
+                            legEaterChoice.RemoveTransitionsTo("Bought Charm");
+                            legEaterChoice.RemoveTransitionsTo("Gold Convo");
+                            legEaterChoice.RemoveTransitionsTo("All Gold");
+                            legEaterChoice.RemoveTransitionsTo("Ready To Leave");
+                            legEater.GetState("All Gold?").RemoveTransitionsTo("No Shop");
+
+                            //Just in case something other than the "Ready To Leave" state controls this
+                            PlayerData.instance.legEaterLeft = false;
+                            break;
                         case "Abyss_18":
                             //Remove bench in basin to prevent soft lock
                             if (!PlayerData.instance.hasWalljump)
