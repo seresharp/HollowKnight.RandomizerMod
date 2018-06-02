@@ -128,7 +128,7 @@ namespace RandomizerMod
             bosses.Add("killedFalseKnight", "False Knight");
             bosses.Add("killedFlukeMother", "Flukemarm");
             bosses.Add("killedGhostGalien", "Galien");
-            bosses.Add("colosseumGoldCompleted", "God Tamer");
+            bosses.Add("killedLobsterLancer", "God Tamer");
             bosses.Add("killedGhostAladar", "Gorb");
             bosses.Add("killedGreyPrince", "Grey Prince Zote");
             bosses.Add("killedBigFly", "Gruz Mother");
@@ -634,6 +634,15 @@ namespace RandomizerMod
                 PlayerData.instance.openedBlackEggDoor = false;
                 PlayerData.instance.quirrelLeftEggTemple = true;
 
+                //Prevent the game from opening the door
+                GameObject door = GameObject.Find("Final Boss Door");
+                PlayMakerFSM doorFSM = FSMUtility.LocateFSM(door, "Control");
+                doorFSM.SetState("Idle");
+
+                //The door is cosmetic, gotta get rid of the actual TransitionPoint too
+                TransitionPoint doorTransitionPoint = door.GetComponentInChildren<TransitionPoint>(true);
+                doorTransitionPoint.gameObject.SetActive(false);
+
                 //Make Hornet appear
                 GameObject hornet = GameObject.Find("Hornet Black Egg NPC");
                 hornet.SetActive(true);
@@ -764,6 +773,8 @@ namespace RandomizerMod
 
                 //All checks passed, time to open up
                 PlayerData.instance.openedBlackEggDoor = true;
+                doorFSM.SetState("Opened");
+                doorTransitionPoint.gameObject.SetActive(true);
             }
         }
 
