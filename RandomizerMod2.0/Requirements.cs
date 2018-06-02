@@ -1185,6 +1185,10 @@ namespace RandomizerMod
                             case ItemType.Charm:
                             case ItemType.Shop:
                                 actions.Add(new ChangeShinyIntoCharm(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItem.boolName));
+                                if (!string.IsNullOrEmpty(oldItem.altObjectName))
+                                {
+                                    actions.Add(new ChangeShinyIntoCharm(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItem.boolName));
+                                }
                                 break;
                             case ItemType.Big:
                                 if (newItem.boolName == "hasDash" || newItem.boolName == "hasShadowDash")
@@ -1192,7 +1196,7 @@ namespace RandomizerMod
                                     ReqDef dash = items["hasDash"];
                                     ReqDef shadowDash = items["hasShadowDash"];
 
-                                    actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, new BigItemDef[]
+                                    BigItemDef[] newItemsArray = new BigItemDef[]
                                     {
                                         new BigItemDef()
                                         {
@@ -1214,11 +1218,17 @@ namespace RandomizerMod
                                             descOneKey = shadowDash.descOneKey,
                                             descTwoKey = shadowDash.descTwoKey
                                         }
-                                    }));
+                                    };
+
+                                    actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItemsArray));
+                                    if (!string.IsNullOrEmpty(oldItem.altObjectName))
+                                    {
+                                        actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItemsArray));
+                                    }
                                 }
                                 else
                                 {
-                                    actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, new BigItemDef[]
+                                    BigItemDef[] newItemsArray = new BigItemDef[]
                                     {
                                         new BigItemDef()
                                         {
@@ -1230,7 +1240,13 @@ namespace RandomizerMod
                                             descOneKey = newItem.descOneKey,
                                             descTwoKey = newItem.descTwoKey
                                         }
-                                    }));
+                                    };
+
+                                    actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItemsArray));
+                                    if (!string.IsNullOrEmpty(oldItem.altObjectName))
+                                    {
+                                        actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItemsArray));
+                                    }
                                 }
                                 break;
                             case ItemType.Spell:
@@ -1257,7 +1273,7 @@ namespace RandomizerMod
                                         throw new Exception("Unknown spell name: " + newItem.boolName);
                                 }
 
-                                actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, new BigItemDef[]
+                                BigItemDef[] newItems = new BigItemDef[]
                                 {
                                     new BigItemDef()
                                     {
@@ -1279,7 +1295,13 @@ namespace RandomizerMod
                                         descOneKey = spell2.descOneKey,
                                         descTwoKey = spell2.descTwoKey
                                     }
-                                }));
+                                };
+
+                                actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItems));
+                                if (!string.IsNullOrEmpty(oldItem.altObjectName))
+                                {
+                                    actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItems));
+                                }
                                 break;
                             default:
                                 throw new Exception("Unimplemented type in randomization: " + oldItem.type);
