@@ -2,6 +2,7 @@
 using HutongGames.PlayMaker.Actions;
 using UnityEngine;
 using RandomizerMod.Extensions;
+using RandomizerMod.FsmStateActions;
 
 namespace RandomizerMod.Actions
 {
@@ -13,14 +14,16 @@ namespace RandomizerMod.Actions
         [SerializeField] private string fsmName;
         [SerializeField] private string stateName;
         [SerializeField] private string boolName;
+        [SerializeField] private bool playerdata;
 
-        public ChangeBoolTest(string sceneName, string objectName, string fsmName, string stateName, string boolName)
+        public ChangeBoolTest(string sceneName, string objectName, string fsmName, string stateName, string boolName, bool playerdata = false)
         {
             this.sceneName = sceneName;
             this.objectName = objectName;
             this.fsmName = fsmName;
             this.stateName = stateName;
             this.boolName = boolName;
+            this.playerdata = playerdata;
         }
 
         //Looping this much to change only one action is pretty bad
@@ -33,7 +36,19 @@ namespace RandomizerMod.Actions
                 {
                     if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)
                     {
-                        fsm.GetState(stateName).GetActionsOfType<PlayerDataBoolTest>()[0].boolName = boolName;
+                        PlayerDataBoolTest pdBoolTest = fsm.GetState(stateName).GetActionsOfType<PlayerDataBoolTest>()[0];
+
+                        if (playerdata)
+                        {
+                            pdBoolTest.boolName = boolName;
+                        }
+                        else
+                        {
+                            RandomizerBoolTest boolTest = new RandomizerBoolTest(boolName, pdBoolTest.isFalse, pdBoolTest.isTrue);
+                            fsm.GetState(stateName).RemoveActionsOfType<PlayerDataBoolTest>();
+                            fsm.GetState(stateName).AddFirstAction(boolTest);
+                        }
+
                         break;
                     }
                 }

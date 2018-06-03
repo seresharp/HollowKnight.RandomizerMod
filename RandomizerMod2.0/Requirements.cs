@@ -907,6 +907,35 @@ namespace RandomizerMod
             //TODO: Keys
             //TODO: Ore
         };
+        private Dictionary<string, string[]> additiveItems = new Dictionary<string, string[]>()
+        {
+            { "Dash", new string[]
+                {
+                    "hasDash",
+                    "hasShadowDash"
+                }
+            },
+            { "Fireball", new string[]
+                {
+                    "hasVengefulSpirit",
+                    "hasShadeSoul"
+                }
+            },
+            { "Quake", new string[]
+                {
+                    "hasDesolateDive",
+                    "hasDescendingDark"
+                }
+            },
+            { "Scream", new string[]
+                {
+                    "hasHowlingWraiths",
+                    "hasAbyssShriek"
+                }
+            }
+        };
+
+        private Dictionary<string, int> additiveCounts;
 
         private Dictionary<string, List<string>> shopItems;
         private Dictionary<string, string> nonShopItems;
@@ -1165,14 +1194,21 @@ namespace RandomizerMod
                     oldItem.type = ItemType.Charm;
                 }
 
+                string randomizerBoolName = GetAdditiveBoolName(newItem.boolName);
+                bool playerdata = string.IsNullOrEmpty(randomizerBoolName);
+                if (playerdata)
+                {
+                    randomizerBoolName = newItem.boolName;
+                }
+
                 //Dream nail needs a special case
                 if (oldItem.boolName == "hasDreamNail")
                 {
-                    actions.Add(new ChangeBoolTest("RestingGrounds_04", "Binding Shield Activate", "FSM", "Check", newItem.boolName));
-                    actions.Add(new ChangeBoolTest("RestingGrounds_04", "Dreamer Plaque Inspect", "Conversation Control", "End", newItem.boolName));
-                    actions.Add(new ChangeBoolTest("RestingGrounds_04", "Dreamer Scene 2", "Control", "Init", newItem.boolName));
-                    actions.Add(new ChangeBoolTest("RestingGrounds_04", "PreDreamnail", "FSM", "Check", newItem.boolName));
-                    actions.Add(new ChangeBoolTest("RestingGrounds_04", "PostDreamnail", "FSM", "Check", newItem.boolName));
+                    actions.Add(new ChangeBoolTest("RestingGrounds_04", "Binding Shield Activate", "FSM", "Check", randomizerBoolName, playerdata));
+                    actions.Add(new ChangeBoolTest("RestingGrounds_04", "Dreamer Plaque Inspect", "Conversation Control", "End", randomizerBoolName, playerdata));
+                    actions.Add(new ChangeBoolTest("RestingGrounds_04", "Dreamer Scene 2", "Control", "Init", randomizerBoolName, playerdata));
+                    actions.Add(new ChangeBoolTest("RestingGrounds_04", "PreDreamnail", "FSM", "Check", randomizerBoolName, playerdata));
+                    actions.Add(new ChangeBoolTest("RestingGrounds_04", "PostDreamnail", "FSM", "Check", randomizerBoolName, playerdata));
                 }
 
                 //Good luck to anyone trying to figure out this horrifying switch
@@ -1191,116 +1227,13 @@ namespace RandomizerMod
                                 }
                                 break;
                             case ItemType.Big:
-                                if (newItem.boolName == "hasDash" || newItem.boolName == "hasShadowDash")
-                                {
-                                    ReqDef dash = items["hasDash"];
-                                    ReqDef shadowDash = items["hasShadowDash"];
-
-                                    BigItemDef[] newItemsArray = new BigItemDef[]
-                                    {
-                                        new BigItemDef()
-                                        {
-                                            boolName = dash.boolName,
-                                            spriteKey = dash.bigSpriteKey,
-                                            takeKey = dash.takeKey,
-                                            nameKey = dash.nameKey,
-                                            buttonKey = dash.buttonKey,
-                                            descOneKey = dash.descOneKey,
-                                            descTwoKey = dash.descTwoKey
-                                        },
-                                        new BigItemDef()
-                                        {
-                                            boolName = shadowDash.boolName,
-                                            spriteKey = shadowDash.bigSpriteKey,
-                                            takeKey = shadowDash.takeKey,
-                                            nameKey = shadowDash.nameKey,
-                                            buttonKey = shadowDash.buttonKey,
-                                            descOneKey = shadowDash.descOneKey,
-                                            descTwoKey = shadowDash.descTwoKey
-                                        }
-                                    };
-
-                                    actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItemsArray));
-                                    if (!string.IsNullOrEmpty(oldItem.altObjectName))
-                                    {
-                                        actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItemsArray));
-                                    }
-                                }
-                                else
-                                {
-                                    BigItemDef[] newItemsArray = new BigItemDef[]
-                                    {
-                                        new BigItemDef()
-                                        {
-                                            boolName = newItem.boolName,
-                                            spriteKey = newItem.bigSpriteKey,
-                                            takeKey = newItem.takeKey,
-                                            nameKey = newItem.nameKey,
-                                            buttonKey = newItem.buttonKey,
-                                            descOneKey = newItem.descOneKey,
-                                            descTwoKey = newItem.descTwoKey
-                                        }
-                                    };
-
-                                    actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItemsArray));
-                                    if (!string.IsNullOrEmpty(oldItem.altObjectName))
-                                    {
-                                        actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItemsArray));
-                                    }
-                                }
-                                break;
                             case ItemType.Spell:
-                                ReqDef spell1;
-                                ReqDef spell2;
-                                switch (newItem.boolName)
-                                {
-                                    case "hasVengefulSpirit":
-                                    case "hasShadeSoul":
-                                        spell1 = items["hasVengefulSpirit"];
-                                        spell2 = items["hasShadeSoul"];
-                                        break;
-                                    case "hasHowlingWraiths":
-                                    case "hasAbyssShriek":
-                                        spell1 = items["hasHowlingWraiths"];
-                                        spell2 = items["hasAbyssShriek"];
-                                        break;
-                                    case "hasDesolateDive":
-                                    case "hasDescendingDark":
-                                        spell1 = items["hasDesolateDive"];
-                                        spell2 = items["hasDescendingDark"];
-                                        break;
-                                    default:
-                                        throw new Exception("Unknown spell name: " + newItem.boolName);
-                                }
+                                BigItemDef[] newItemsArray = GetBigItemDefArray(newItem.boolName);
 
-                                BigItemDef[] newItems = new BigItemDef[]
-                                {
-                                    new BigItemDef()
-                                    {
-                                        boolName = spell1.boolName,
-                                        spriteKey = spell1.bigSpriteKey,
-                                        takeKey = spell1.takeKey,
-                                        nameKey = spell1.nameKey,
-                                        buttonKey = spell1.buttonKey,
-                                        descOneKey = spell1.descOneKey,
-                                        descTwoKey = spell1.descTwoKey
-                                    },
-                                    new BigItemDef()
-                                    {
-                                        boolName = spell2.boolName,
-                                        spriteKey = spell2.bigSpriteKey,
-                                        takeKey = spell2.takeKey,
-                                        nameKey = spell2.nameKey,
-                                        buttonKey = spell2.buttonKey,
-                                        descOneKey = spell2.descOneKey,
-                                        descTwoKey = spell2.descTwoKey
-                                    }
-                                };
-
-                                actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItems));
+                                actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItemsArray, randomizerBoolName, playerdata));
                                 if (!string.IsNullOrEmpty(oldItem.altObjectName))
                                 {
-                                    actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItems));
+                                    actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItemsArray, randomizerBoolName, playerdata));
                                 }
                                 break;
                             default:
@@ -1315,6 +1248,8 @@ namespace RandomizerMod
             int shopAdditiveItems = 0;
             List<ShopItemDef> slyItems = new List<ShopItemDef>();
 
+            //TODO: Change to use additiveItems rather than hard coded
+            //No point rewriting this before making the shop component
             foreach (KeyValuePair<string, List<string>> kvp in shopItems)
             {
                 yield return new WaitForEndOfFrame();
@@ -1577,6 +1512,82 @@ namespace RandomizerMod
             }
 
             return ret;
+        }
+
+        private string GetAdditivePrefix(string boolName)
+        {
+            foreach (KeyValuePair<string, string[]> kvp in additiveItems)
+            {
+                if (kvp.Value.Contains(boolName))
+                {
+                    return kvp.Key;
+                }
+            }
+
+            return null;
+        }
+
+        private BigItemDef[] GetBigItemDefArray(string boolName)
+        {
+            string prefix = GetAdditivePrefix(boolName);
+            if (prefix != null)
+            {
+                List<BigItemDef> itemDefs = new List<BigItemDef>();
+                foreach (string str in additiveItems[prefix])
+                {
+                    ReqDef item = items[str];
+                    itemDefs.Add(new BigItemDef()
+                    {
+                        boolName = item.boolName,
+                        spriteKey = item.bigSpriteKey,
+                        takeKey = item.takeKey,
+                        nameKey = item.nameKey,
+                        buttonKey = item.buttonKey,
+                        descOneKey = item.descOneKey,
+                        descTwoKey = item.descTwoKey
+                    });
+                }
+
+                return itemDefs.ToArray();
+            }
+            else
+            {
+                ReqDef item = items[boolName];
+                return new BigItemDef[]
+                {
+                    new BigItemDef()
+                    {
+                        boolName = item.boolName,
+                        spriteKey = item.bigSpriteKey,
+                        takeKey = item.takeKey,
+                        nameKey = item.nameKey,
+                        buttonKey = item.buttonKey,
+                        descOneKey = item.descOneKey,
+                        descTwoKey = item.descTwoKey
+                    }
+                };
+            }
+        }
+
+        private string GetAdditiveBoolName(string boolName)
+        {
+            if (additiveCounts == null)
+            {
+                additiveCounts = new Dictionary<string, int>();
+                foreach (string str in additiveItems.Keys)
+                {
+                    additiveCounts.Add(str, 0);
+                }
+            }
+
+            string prefix = GetAdditivePrefix(boolName);
+            if (!string.IsNullOrEmpty(prefix))
+            {
+                additiveCounts[prefix] = additiveCounts[prefix] + 1;
+                return prefix + additiveCounts[prefix];
+            }
+
+            return null;
         }
     }
 }

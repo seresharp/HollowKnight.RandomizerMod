@@ -43,6 +43,14 @@ namespace RandomizerMod.FsmStateActions
             }
         }
 
+        public RandomizerBoolTest(string boolName, FsmEvent failEvent, FsmEvent successEvent, bool playerdata = false)
+        {
+            this.boolName = boolName;
+            this.playerdata = playerdata;
+            this.failEvent = failEvent;
+            this.successEvent = successEvent;
+        }
+
         public override void OnEnter()
         {
             if ((playerdata && PlayerData.instance.GetBool(boolName)) || (!playerdata && RandomizerMod.instance.Settings.GetBool(false, boolName)))
