@@ -481,6 +481,13 @@ namespace RandomizerMod
                                 }
                             }
                             break;
+                        case "Ruins2_04":
+                            //Shield husk doesn't walk as far as on old patches, making something pogoable to make up for this
+                            if (!PlayerData.instance.hasWalljump && !PlayerData.instance.hasDoubleJump)
+                            {
+                                GameObject.Find("Direction Pole White Palace").GetComponent<NonBouncer>().active = false;
+                            }
+                            break;
                         case "Fungus2_21":
                             //Remove city crest gate
                             if (PlayerData.instance.hasCityKey)
