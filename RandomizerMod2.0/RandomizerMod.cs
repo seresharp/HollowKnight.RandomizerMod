@@ -47,6 +47,9 @@ namespace RandomizerMod
 
         public override void Initialize()
         {
+            //Make sure the play mode screen is always unlocked
+            GameManager.instance.EnablePermadeathMode();
+            
             sprites = new Dictionary<string, Sprite>();
             languageStrings = new Dictionary<string, Dictionary<string, string>>();
 
@@ -206,7 +209,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2b.3";
+            string ver = "2b.4";
             int minAPI = 41;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
