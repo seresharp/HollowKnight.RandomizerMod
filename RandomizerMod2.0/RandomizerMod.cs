@@ -1221,15 +1221,13 @@ namespace RandomizerMod
             SceneLoad.FinishDelegate loadScene = () =>
             {
                 GameManager.instance.StopAllCoroutines();
-
-                GameManager.instance.StopAllCoroutines();
                 sceneLoad.SetValue(GameManager.instance, null);
 
                 GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo()
                 {
                     IsFirstLevelForPlayer = false,
                     SceneName = sceneName,
-                    HeroLeaveDirection = ModTools.GetGatePosition(gateName),
+                    HeroLeaveDirection = Tools.GetGatePosition(gateName),
                     EntryGateName = gateName,
                     EntryDelay = delay,
                     PreventCameraFadeOut = true,
