@@ -675,9 +675,9 @@ namespace RandomizerMod
                     replace = false,
                     logic = "CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)",
                     type = ItemType.Shop,
-                    nameKey = "CHARM_NAME_23",
+                    nameKey = "CHARM_NAME_23_G",
                     shopDescKey = "RANDOMIZER_CHARM_DESC_23",
-                    shopSpriteKey = "Charms.23.png",
+                    shopSpriteKey = "Charms.23_G.png",
                     notchCost = "charmCost_23",
                     shopName = "LegEater",
                     isGoodItem = true
@@ -692,9 +692,9 @@ namespace RandomizerMod
                     replace = false,
                     logic = "CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)",
                     type = ItemType.Shop,
-                    nameKey = "CHARM_NAME_24",
+                    nameKey = "CHARM_NAME_24_G",
                     shopDescKey = "RANDOMIZER_CHARM_DESC_24",
-                    shopSpriteKey = "Charms.24.png",
+                    shopSpriteKey = "Charms.24_G.png",
                     notchCost = "charmCost_24",
                     shopName = "LegEater"
                 }
@@ -708,9 +708,9 @@ namespace RandomizerMod
                     replace = false,
                     logic = "CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)",
                     type = ItemType.Shop,
-                    nameKey = "CHARM_NAME_25",
+                    nameKey = "CHARM_NAME_25_G",
                     shopDescKey = "RANDOMIZER_CHARM_DESC_25",
-                    shopSpriteKey = "Charms.25.png",
+                    shopSpriteKey = "Charms.25_G.png",
                     notchCost = "charmCost_25",
                     shopName = "LegEater",
                     isGoodItem = true
