@@ -179,5 +179,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\ShopIcons\Dreamnail.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Charms\23_G.png" />
+    <EmbeddedResource Include="Resources\Charms\24_G.png" />
+    <EmbeddedResource Include="Resources\Charms\25_G.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
