@@ -209,7 +209,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2b.4";
+            string ver = "2b.5";
             int minAPI = 41;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
@@ -605,11 +605,17 @@ namespace RandomizerMod
                             }
 
                             //Destroy everything relating to the dreamer cutscene
+                            //This stuff is in another scene and doesn't exist immediately, so I can't use Object.Destroy
                             Components.ObjectDestroyer.Destroy("Dreamer Scene 1");
                             Components.ObjectDestroyer.Destroy("Hornet Saver");
                             Components.ObjectDestroyer.Destroy("Cutscene Dreamer");
                             Components.ObjectDestroyer.Destroy("Dream Scene Activate");
 
+                            //Fix the camera lock zone by removing the FSM that destroys it
+                            if (!PlayerData.instance.hornet1Defeated)
+                            {
+                                Object.Destroy(FSMUtility.LocateFSM(GameObject.Find("Camera Locks Boss"), "FSM"));
+                            }
                             break;
                         case "Room_Slug_Shrine":
                             //Remove bench before unn
