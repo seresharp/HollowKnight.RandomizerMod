@@ -62,6 +62,7 @@
     <Compile Include="Actions\ChangeShinyIntoTrinket.cs" />
     <Compile Include="Actions\ChangeShopContents.cs" />
     <Compile Include="Actions\ChangeChestGeo.cs" />
+    <Compile Include="Components\Shop.cs" />
     <Compile Include="FsmStateActions\RandomizerSellRelics.cs" />
     <Compile Include="Actions\ReplaceObjectWithShiny.cs" />
     <Compile Include="Components\BigItemPopup.cs" />
@@ -183,6 +184,39 @@
     <EmbeddedResource Include="Resources\Charms\23_G.png" />
     <EmbeddedResource Include="Resources\Charms\24_G.png" />
     <EmbeddedResource Include="Resources\Charms\25_G.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\UI\Shop\Background.png" />
+    <EmbeddedResource Include="Resources\UI\Shop\Selector.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Anim\Shop\BottomFleur\0.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\BottomFleur\1.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\BottomFleur\2.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\BottomFleur\3.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\BottomFleur\4.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\BottomFleur\5.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\BottomFleur\6.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\BottomFleur\7.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\BottomFleur\8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Anim\Shop\TopFleur\0.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\TopFleur\1.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\TopFleur\2.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\TopFleur\3.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\TopFleur\4.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\TopFleur\5.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\TopFleur\6.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\TopFleur\7.png" />
+    <EmbeddedResource Include="Resources\Anim\Shop\TopFleur\8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\UI\Shop\Shitpost.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\UI\Shop\Essence.png" />
+    <EmbeddedResource Include="Resources\UI\Shop\Geo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
