@@ -49,7 +49,10 @@ namespace RandomizerMod
         {
             //Make sure the play mode screen is always unlocked
             GameManager.instance.EnablePermadeathMode();
-            
+
+            //Unlock godseeker too because idk why not
+            GameManager.instance.SetStatusRecordInt("RecBossRushMode", 1);
+
             sprites = new Dictionary<string, Sprite>();
             languageStrings = new Dictionary<string, Dictionary<string, string>>();
 
@@ -209,8 +212,8 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2b.5";
-            int minAPI = 41;
+            string ver = "2b.6";
+            int minAPI = 45;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
 
