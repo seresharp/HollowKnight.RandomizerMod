@@ -860,8 +860,6 @@ namespace RandomizerMod
                
             Object.Destroy(playScreen.topFleur.gameObject);
             
-            Log("v8?");
-
             MenuButton classic = (MenuButton)playScreen.defaultHighlight;
             MenuButton steel = (MenuButton)classic.FindSelectableOnDown();
             MenuButton back = (MenuButton)steel.FindSelectableOnDown();

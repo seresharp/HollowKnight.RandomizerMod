@@ -73,7 +73,6 @@ namespace RandomizerMod.Extensions
             newEvent.eventID = type;
             newEvent.callback.AddListener(func);
 
-            // TODO: Make this not null
             self.gameObject.GetOrAddComponent<EventTrigger>().triggers.Add(newEvent);
 
             if (type == EventTriggerType.Submit) self.AddEvent(EventTriggerType.PointerClick, func);
