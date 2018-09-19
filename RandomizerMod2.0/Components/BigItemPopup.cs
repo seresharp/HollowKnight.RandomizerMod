@@ -94,7 +94,7 @@ namespace RandomizerMod.Components
 
         public void Start()
         {
-            GameManager.instance.SaveGame(GameManager.instance.profileID);
+            GameManager.instance.SaveGame(GameManager.instance.profileID, x => {});
             StartCoroutine(ShowPopup());
         }
 
