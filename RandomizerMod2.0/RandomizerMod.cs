@@ -382,7 +382,7 @@ namespace RandomizerMod
                     if (SceneHasPreload(from.name) && WorldInfo.NameLooksLikeGameplayScene(to.name) && !string.IsNullOrEmpty(GameManager.instance.entryGateName))
                     {
                         Log($"Detected preload scene {from.name}, reloading {to.name} ({GameManager.instance.entryGateName})");
-                        ChangeToScene(to.name, GameManager.instance.entryGateName, 0);
+                        ChangeToScene(to.name, GameManager.instance.entryGateName);
                         return;
                     }
 
@@ -391,7 +391,7 @@ namespace RandomizerMod
                     GameObject oldShiny = GameObject.Find("Randomizer Shiny");
                     if (oldShiny != null) Object.DestroyImmediate(oldShiny);
 
-                    EditShinies(from, to);
+                    EditShinies(to);
                 }
                 catch (Exception e)
                 {
@@ -799,30 +799,29 @@ namespace RandomizerMod
                             languageStrings["Hornet"].Add("HORNET_DOOR_UNOPENED", $"You haven't killed {missingBosses.Count} bosses.");
                             return;
                         }
-                        else
+
+                        string hornetStr = "You haven't killed ";
+                        for (int i = 0; i < missingBosses.Count; i++)
                         {
-                            string hornetStr = "You haven't killed ";
-                            for (int i = 0; i < missingBosses.Count; i++)
+                            if (i != 0 && i == missingBosses.Count - 1)
                             {
-                                if (i != 0 && i == missingBosses.Count - 1)
-                                {
-                                    hornetStr += " and ";
-                                }
-
-                                hornetStr += missingBosses[i];
-
-                                if (i != missingBosses.Count - 1)
-                                {
-                                    hornetStr += ", ";
-                                }
+                                hornetStr += " and ";
                             }
-                            hornetStr += ".";
 
-                            languageStrings["Hornet"].Add("HORNET_DOOR_UNOPENED", hornetStr);
-                            return;
+                            hornetStr += missingBosses[i];
+
+                            if (i != missingBosses.Count - 1)
+                            {
+                                hornetStr += ", ";
+                            }
                         }
+                        hornetStr += ".";
+
+                        languageStrings["Hornet"].Add("HORNET_DOOR_UNOPENED", hornetStr);
+                        return;
                     }
-                    else if (PlayerData.instance.royalCharmState != 4)
+
+                    if (PlayerData.instance.royalCharmState != 4)
                     {
                         languageStrings["Hornet"].Add("HORNET_DOOR_UNOPENED", "You chose all bosses, go get void heart ya dip.");
                         return;
@@ -836,7 +835,7 @@ namespace RandomizerMod
             }
         }
 
-        private void EditShinies(Scene from, Scene to)
+        private void EditShinies(Scene to)
         {
             RandomizerAction.FetchFSMList(to);
             foreach (RandomizerAction action in Settings.actions)
@@ -860,33 +859,41 @@ namespace RandomizerMod
             //Fetch data from vanilla screen
             MenuScreen playScreen = UIManager.instance.playModeMenuScreen;
 
+            playScreen.title.gameObject.transform.localPosition = new Vector3(0, 520.56f);
+               
+            Object.Destroy(playScreen.topFleur.gameObject);
+            
             MenuButton classic = (MenuButton)playScreen.defaultHighlight;
             MenuButton steel = (MenuButton)classic.FindSelectableOnDown();
             MenuButton back = (MenuButton)steel.FindSelectableOnDown();
+            
+            GameObject parent = steel.transform.parent.gameObject;
+            
+            Object.Destroy(parent.GetComponent<VerticalLayoutGroup>());
 
             //Create new buttons
             MenuButton startRandoBtn = classic.Clone("StartRando", MenuButton.MenuButtonType.Proceed, new Vector2(650, -480), "Start Game", "Randomizer v2", sprites["UI.logo.png"]);
             MenuButton startNormalBtn = classic.Clone("StartNormal", MenuButton.MenuButtonType.Proceed, new Vector2(-650, -480), "Start Game", "Non-Randomizer");
-
+            
             startNormalBtn.transform.localScale = startRandoBtn.transform.localScale = new Vector2(0.75f, 0.75f);
 
             MenuButton backBtn = back.Clone("Back", MenuButton.MenuButtonType.Proceed, new Vector2(0, -100), "Back");
 
-            MenuButton allBossesBtn = back.Clone("AllBosses", MenuButton.MenuButtonType.Activate, new Vector2(0, 750), "All Bosses: False");
-            MenuButton allSkillsBtn = back.Clone("AllSkills", MenuButton.MenuButtonType.Activate, new Vector2(0, 660), "All Skills: False");
-            MenuButton allCharmsBtn = back.Clone("AllCharms", MenuButton.MenuButtonType.Activate, new Vector2(0, 570), "All Charms: False");
+            MenuButton allBossesBtn = back.Clone("AllBosses", MenuButton.MenuButtonType.Activate, new Vector2(0, 850), "All Bosses: False");
+            MenuButton allSkillsBtn = back.Clone("AllSkills", MenuButton.MenuButtonType.Activate, new Vector2(0, 760), "All Skills: False");
+            MenuButton allCharmsBtn = back.Clone("AllCharms", MenuButton.MenuButtonType.Activate, new Vector2(0, 670), "All Charms: False");
 
-            MenuButton charmNotchBtn = back.Clone("SalubraNotches", MenuButton.MenuButtonType.Activate, new Vector2(900, 750), "Salubra Notches: True");
-            MenuButton lemmBtn = back.Clone("LemmSellAll", MenuButton.MenuButtonType.Activate, new Vector2(900, 660), "Lemm Sell All: True");
+            MenuButton charmNotchBtn = back.Clone("SalubraNotches", MenuButton.MenuButtonType.Activate, new Vector2(900, 850), "Salubra Notches: True");
+            MenuButton lemmBtn = back.Clone("LemmSellAll", MenuButton.MenuButtonType.Activate, new Vector2(900, 760), "Lemm Sell All: True");
 
-            MenuButton presetBtn = back.Clone("RandoPreset", MenuButton.MenuButtonType.Activate, new Vector2(-900, 750), "Preset: Easy");
-            MenuButton shadeSkipsBtn = back.Clone("ShadeSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 660), "Shade Skips: False");
-            MenuButton acidSkipsBtn = back.Clone("AcidSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 570), "Acid Skips: False");
-            MenuButton spikeTunnelsBtn = back.Clone("SpikeTunnelSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 480), "Spike Tunnels: False");
-            MenuButton miscSkipsBtn = back.Clone("MiscSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 390), "Misc Skips: False");
-            MenuButton fireballSkipsBtn = back.Clone("FireballSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 300), "Fireball Skips: False");
-            MenuButton magolorBtn = back.Clone("MagolorSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 210), "Mag Skips: False");
-
+            MenuButton presetBtn = back.Clone("RandoPreset", MenuButton.MenuButtonType.Activate, new Vector2(-900, 850), "Preset: Easy");
+            MenuButton shadeSkipsBtn = back.Clone("ShadeSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 760), "Shade Skips: False");
+            MenuButton acidSkipsBtn = back.Clone("AcidSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 670), "Acid Skips: False");
+            MenuButton spikeTunnelsBtn = back.Clone("SpikeTunnelSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 580), "Spike Tunnels: False");
+            MenuButton miscSkipsBtn = back.Clone("MiscSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 490), "Misc Skips: False");
+            MenuButton fireballSkipsBtn = back.Clone("FireballSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 400), "Fireball Skips: False");
+            MenuButton magolorBtn = back.Clone("MagolorSkips", MenuButton.MenuButtonType.Activate, new Vector2(-900, 310), "Mag Skips: False");
+            
             #region seed
             GameObject seedGameObject = back.Clone("Seed", MenuButton.MenuButtonType.Activate, new Vector2(0, 1130), "Click to type a custom seed").gameObject;
             Object.DestroyImmediate(seedGameObject.GetComponent<MenuButton>());
@@ -900,6 +907,7 @@ namespace RandomizerMod
             seedRect.sizeDelta = new Vector2(337, 63.2f);
 
             InputField customSeedInput = seedGameObject.AddComponent<InputField>();
+            customSeedInput.transform.localPosition = new Vector3(0, 1240);
             customSeedInput.textComponent = seedGameObject.transform.Find("Text").GetComponent<Text>();
 
             newGameSettings.seed = new System.Random().Next(999999999);
@@ -933,10 +941,10 @@ namespace RandomizerMod
             #endregion
 
             //Dirty way of making labels
-            GameObject modeLabel = back.Clone("ModeLabel", MenuButton.MenuButtonType.Activate, new Vector2(-900, 860), "Required Skips").gameObject;
-            GameObject restrictionsLabel = back.Clone("RestrictionsLabel", MenuButton.MenuButtonType.Activate, new Vector2(0, 860), "Restrictions").gameObject;
-            GameObject qolLabel = back.Clone("QoLLabel", MenuButton.MenuButtonType.Activate, new Vector2(900, 860), "Quality of Life").gameObject;
-            GameObject seedLabel = back.Clone("SeedLabel", MenuButton.MenuButtonType.Activate, new Vector2(0, 1200), "Seed:").gameObject;
+            GameObject modeLabel = back.Clone("ModeLabel", MenuButton.MenuButtonType.Activate, new Vector2(-900, 960), "Required Skips").gameObject;
+            GameObject restrictionsLabel = back.Clone("RestrictionsLabel", MenuButton.MenuButtonType.Activate, new Vector2(0, 960), "Restrictions").gameObject;
+            GameObject qolLabel = back.Clone("QoLLabel", MenuButton.MenuButtonType.Activate, new Vector2(900, 960), "Quality of Life").gameObject;
+            GameObject seedLabel = back.Clone("SeedLabel", MenuButton.MenuButtonType.Activate, new Vector2(0, 1300), "Seed:").gameObject;
 
             Object.Destroy(modeLabel.GetComponent<EventTrigger>());
             Object.Destroy(restrictionsLabel.GetComponent<EventTrigger>());
@@ -951,6 +959,7 @@ namespace RandomizerMod
             //We don't need these old buttons anymore
             Object.Destroy(classic.gameObject);
             Object.Destroy(steel.gameObject);
+            Object.Destroy(parent.FindGameObjectInChildren("GGButton"));
             Object.Destroy(back.gameObject);
 
             //Gotta put something here, we destroyed the old default
@@ -1031,6 +1040,7 @@ namespace RandomizerMod
             dict.Add("Mag Skips", magolorText);
 
             //Add useful events
+            startNormalBtn.gameObject.PrintSceneHierarchyTree("garbage");
             startNormalBtn.AddEvent(EventTriggerType.Submit, data => StartNewGame(false));
             startRandoBtn.AddEvent(EventTriggerType.Submit, data => StartNewGame(true));
             allBossesBtn.AddEvent(EventTriggerType.Submit, data =>
@@ -1162,7 +1172,7 @@ namespace RandomizerMod
             Settings.allBosses = newGameSettings.allBosses;
             Settings.allCharms = newGameSettings.allCharms;
             Settings.allSkills = newGameSettings.allSkills;
-
+            
             //Charm tutorial popup is annoying, get rid of it
             PlayerData.instance.hasCharm = true;
 
@@ -1184,7 +1194,7 @@ namespace RandomizerMod
             }
         }
 
-        private bool SceneHasPreload(string sceneName)
+        private static bool SceneHasPreload(string sceneName)
         {
             if (string.IsNullOrEmpty(sceneName))
             {
@@ -1211,12 +1221,7 @@ namespace RandomizerMod
             }
 
             //Also check if the scene is a preload since this is also passed to activeSceneChanged sometimes
-            if (sceneName.EndsWith("_preload") || sceneName.EndsWith("_boss") || sceneName.EndsWith("_boss_defeated"))
-            {
-                return true;
-            }
-
-            return false;
+            return sceneName.EndsWith("_preload") || sceneName.EndsWith("_boss") || sceneName.EndsWith("_boss_defeated");
         }
 
         public void ChangeToScene(string sceneName, string gateName, float delay = 0f)
