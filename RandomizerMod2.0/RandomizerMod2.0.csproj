@@ -84,6 +84,7 @@
     <Compile Include="Actions\ChangeShinyIntoTrinket.cs" />
     <Compile Include="Actions\ChangeShopContents.cs" />
     <Compile Include="Actions\ChangeChestGeo.cs" />
+    <Compile Include="BenchHandler.cs" />
     <Compile Include="Components\Shop.cs" />
     <Compile Include="FsmStateActions\RandomizerSellRelics.cs" />
     <Compile Include="Actions\ReplaceObjectWithShiny.cs" />

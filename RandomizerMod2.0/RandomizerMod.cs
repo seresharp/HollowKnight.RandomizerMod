@@ -167,6 +167,11 @@ namespace RandomizerMod
             ModHooks.Instance.SetPlayerBoolHook += BoolSetOverride;
             ModHooks.Instance.CharmUpdateHook += UpdateCharmNotches;
 
+            On.PlayerData.SetBenchRespawn_RespawnMarker_string_int += BenchHandler.HandleBenchSave;
+            On.PlayerData.SetBenchRespawn_string_string_bool += BenchHandler.HandleBenchSave;
+            On.PlayerData.SetBenchRespawn_string_string_int_bool += BenchHandler.HandleBenchSave;
+            On.HutongGames.PlayMaker.Actions.BoolTest.OnEnter += BenchHandler.HandleBenchBoolTest;
+
             //Set instance for outside use
             instance = this;
         }
@@ -344,7 +349,6 @@ namespace RandomizerMod
 
         private void HandleSceneChanges(Scene from, Scene to)
         {
-            //TODO: Prevent player from skipping Radiance in all bosses randomizer
             if (GameManager.instance.GetSceneNameString() == Constants.MENU_SCENE)
             {
                 try
@@ -519,20 +523,6 @@ namespace RandomizerMod
                             //Just in case something other than the "Ready To Leave" state controls this
                             PlayerData.instance.legEaterLeft = false;
                             break;
-                        case "Abyss_18":
-                            //Remove bench in basin to prevent soft lock
-                            if (!PlayerData.instance.hasWalljump)
-                            {
-                                Object.Destroy(GameObject.Find("Toll Machine Bench"));
-                            }
-                            break;
-                        case "Waterways_02":
-                            //Remove bench above flukemarm to prevent soft lock
-                            if (!PlayerData.instance.hasWalljump && !PlayerData.instance.hasDoubleJump)
-                            {
-                                Object.Destroy(GameObject.Find("RestBench"));
-                            }
-                            break;
                         case "Crossroads_11_alt":
                         case "Fungus1_28":
                             //Make baldurs always able to spit rollers
@@ -618,13 +608,6 @@ namespace RandomizerMod
                             if (!PlayerData.instance.hornet1Defeated)
                             {
                                 Object.Destroy(FSMUtility.LocateFSM(GameObject.Find("Camera Locks Boss"), "FSM"));
-                            }
-                            break;
-                        case "Room_Slug_Shrine":
-                            //Remove bench before unn
-                            if (!PlayerData.instance.hasDash && !PlayerData.instance.hasAcidArmour && !PlayerData.instance.hasDoubleJump)
-                            {
-                                Object.Destroy(GameObject.Find("RestBench"));
                             }
                             break;
                         case "Ruins1_24":

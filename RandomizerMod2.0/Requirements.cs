@@ -228,7 +228,7 @@ namespace RandomizerMod
                     sceneName = "Ruins1_31b",
                     objectName = "Ruins Shaman",
                     replace = true,
-                    logic = "((CLAW | (WINGS + (DASH | FIREBALL | SCREAM)) + SHADESKIPS) | (CLAW + (DASH | SUPERDASH | WINGS | ACID))",
+                    logic = "((CLAW | (WINGS + (DASH | FIREBALL | SCREAM))) + SHADESKIPS) | (CLAW + (DASH | SUPERDASH | WINGS | ACID))",
                     type = ItemType.Spell,
                     bigSpriteKey = "Prompts.Fireball2.png",
                     takeKey = "GET_ITEM_INTRO3",
