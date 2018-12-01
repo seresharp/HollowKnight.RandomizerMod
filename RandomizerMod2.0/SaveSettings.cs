@@ -46,6 +46,12 @@ namespace RandomizerMod
             set => SetBool(value);
         }
 
+        public bool slyCharm
+        {
+            get => GetBool(false);
+            set => SetBool(value);
+        }
+
         private static Type[] types;
 
         public List<RandomizerAction> actions = new List<RandomizerAction>();

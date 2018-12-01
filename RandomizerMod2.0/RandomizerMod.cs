@@ -261,6 +261,7 @@ namespace RandomizerMod
             if (boolName == "hasDescendingDark") return PlayerData.instance.quakeLevel > 1;
             if (boolName == "hasHowlingWraiths") return PlayerData.instance.screamLevel > 0;
             if (boolName == "hasAbyssShriek") return PlayerData.instance.screamLevel > 1;
+            if (boolName == "gotSlyCharm") return Settings.slyCharm;
 
             if (boolName.StartsWith("RandomizerMod.")) return Settings.GetBool(false, boolName.Substring(14));
 
@@ -696,7 +697,7 @@ namespace RandomizerMod
                         case "Room_Sly_Storeroom":
                             // Make Sly pickup send Sly back upstairs
                             FsmState slyFinish = FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish");
-                            slyFinish.AddAction(new RandomizerSetBool("gotSlyCharm", true, true));
+                            slyFinish.AddAction(new RandomizerSetBool("slyCharm", true));
 
                             // The game breaks if you leave the storeroom after this, so just send the player out of the shop completely
                             // People will think it's an intentional feature to cut out pointless walking anyway
