@@ -33,14 +33,19 @@ namespace RandomizerMod.Actions
                 {
                     if (fsm.FsmName == "Shiny Control" && (fsm.gameObject.name == "Shiny Item" || fsm.gameObject.name == "Shiny Item (1)") && fsm.gameObject.GetComponent<Rigidbody2D>() != null)
                     {
-                        shinyPrefab = Object.Instantiate(fsm.gameObject);
-                        shinyPrefab.SetActive(false);
-                        shinyPrefab.name = "Randomizer Shiny";
-                        Object.DontDestroyOnLoad(shinyPrefab);
+                        SetShinyPrefab(fsm.gameObject);
                         break;
                     }
                 }
             }
+        }
+
+        public static void SetShinyPrefab(GameObject obj)
+        {
+            shinyPrefab = Object.Instantiate(obj);
+            shinyPrefab.SetActive(false);
+            shinyPrefab.name = "Randomizer Shiny";
+            Object.DontDestroyOnLoad(shinyPrefab);
         }
 
         protected static void ResetFSM(PlayMakerFSM fsm)

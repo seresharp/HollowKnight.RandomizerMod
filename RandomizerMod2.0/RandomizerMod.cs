@@ -172,6 +172,9 @@ namespace RandomizerMod
             On.PlayerData.SetBenchRespawn_string_string_int_bool += BenchHandler.HandleBenchSave;
             On.HutongGames.PlayMaker.Actions.BoolTest.OnEnter += BenchHandler.HandleBenchBoolTest;
 
+            // Preload shiny item
+            Components.ShinyPreloader.Preload();
+
             //Set instance for outside use
             instance = this;
         }
