@@ -47,7 +47,7 @@ namespace RandomizerMod.Components
                 }
             }
 
-            kp.GetRootGameObjects().ToList().ForEach(kill => Destroy(kill));
+            UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(kp);
             Destroy(gameObject);
         }
     }
