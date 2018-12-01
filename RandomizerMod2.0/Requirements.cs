@@ -1542,7 +1542,7 @@ namespace RandomizerMod
                         if (obtainedItems.Contains("gotCharm_35") || obtainedItems.Contains("gotCharm_22") || obtainedItems.Contains("gotCharm_17") || obtainedItems.Contains("gotCharm_39")) goto case "true";
                         if (obtainedItems.Contains("gotCharm_13") && settings.miscSkips) goto case "true";
                         if (obtainedItems.Contains("gotCharm_18") && settings.magolorSkips) goto case "true";
-                        if (obtainedItems.Contains("hasUpwardSlash")) goto case "true";
+                        if (obtainedItems.Contains("hasUpwardSlash")) goto case "DASH";
                         goto case "false";
                     case "SHADESKIPS":
                         if (settings.shadeSkips) goto case "true";

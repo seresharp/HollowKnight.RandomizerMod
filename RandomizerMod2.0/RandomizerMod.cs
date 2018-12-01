@@ -280,6 +280,14 @@ namespace RandomizerMod
             else if (boolName == "gotCharm_25") PlayerData.instance.SetBool("fragileStrength_unbreakable", value);
             //Gotta update the acid pools after getting this
             else if (boolName == "hasAcidArmour" && value) PlayMakerFSM.BroadcastEvent("GET ACID ARMOUR");
+            //Make nail arts work
+            else if (boolName == "hasCyclone" || boolName == "hasUpwardSlash" || boolName == "hasDashSlash")
+            {
+                PlayerData.instance.SetBoolInternal(boolName, value);
+                PlayerData.instance.hasNailArt = PlayerData.instance.hasCyclone || PlayerData.instance.hasUpwardSlash || PlayerData.instance.hasDashSlash;
+                PlayerData.instance.hasAllNailArts = PlayerData.instance.hasCyclone && PlayerData.instance.hasUpwardSlash && PlayerData.instance.hasDashSlash;
+                return;
+            }
             //It's just way easier if I can treat spells as bools
             else if (boolName == "hasVengefulSpirit" && value && PlayerData.instance.fireballLevel <= 0) PlayerData.instance.SetInt("fireballLevel", 1);
             else if (boolName == "hasVengefulSpirit" && !value) PlayerData.instance.SetInt("fireballLevel", 0);
@@ -310,7 +318,7 @@ namespace RandomizerMod
                         PlayerData.instance.SetBool("hasDash", true);
                     }
                 }
-                
+
                 Settings.SetBool(value, boolName);
                 return;
             }
