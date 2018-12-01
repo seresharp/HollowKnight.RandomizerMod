@@ -462,6 +462,9 @@ namespace RandomizerMod
                             PlayMakerFSM blocker = FSMUtility.LocateFSM(GameObject.Find("Blocker"), "Blocker Control");
                             blocker.GetState("Idle").RemoveTransitionsTo("Close");
                             blocker.GetState("Shot Anim End").RemoveTransitionsTo("Close");
+
+                            //Add hard save to shaman shiny
+                            FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerSetHardSave());
                             break;
                         case "Abyss_10":
                             //Something might be required here after properly processing shade cloak
@@ -639,7 +642,8 @@ namespace RandomizerMod
                                     childFSM.GetState("Destroy").AddFirstAction(openGate);
                                     childFSM.GetState("Finish").AddFirstAction(openGate);
 
-                                    //TODO: Hard save
+                                    // Add hard save after picking up item
+                                    childFSM.GetState("Finish").AddFirstAction(new RandomizerSetHardSave());
 
                                     break;
                                 }

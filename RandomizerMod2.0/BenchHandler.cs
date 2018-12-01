@@ -45,9 +45,7 @@ namespace RandomizerMod
         private static bool CanSaveInRoom(string sceneName)
         {
             PlayerData pd = PlayerData.instance;
-
-            RandomizerMod.instance.Log("\"" + sceneName + "\"" + " " + (sceneName == "Room_Slug_Shrine"));
-
+            
             switch (sceneName)
             {
                 case "Abyss_18": // Basin bench

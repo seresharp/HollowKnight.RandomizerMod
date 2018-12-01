@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using HutongGames.PlayMaker;
-using RandomizerMod.Components;
 
 namespace RandomizerMod.FsmStateActions
 {
@@ -12,11 +11,11 @@ namespace RandomizerMod.FsmStateActions
 
         public RandomizerCallStaticMethod(Type t, string methodName, object[] parameters)
         {
-            info = typeof(BigItemPopup).GetMethod(methodName, BindingFlags.Static | BindingFlags.Public);
+            info = t.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public);
 
             if (info == null)
             {
-                info = typeof(BigItemPopup).GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic);
+                info = t.GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic);
             }
 
             if (info == null)

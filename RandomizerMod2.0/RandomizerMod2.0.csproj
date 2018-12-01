@@ -98,6 +98,7 @@
     <Compile Include="FsmStateActions\RandomizerChangeScene.cs" />
     <Compile Include="FsmStateActions\RandomizerGiveTrinket.cs" />
     <Compile Include="FsmStateActions\RandomizerSetBool.cs" />
+    <Compile Include="FsmStateActions\RandomizerSetHardSave.cs" />
     <Compile Include="NewGameSettings.cs" />
     <Compile Include="Extensions\PlayMakerFSMExtensions.cs" />
     <Compile Include="FsmStateActions\RandomizerBoolTest.cs" />
