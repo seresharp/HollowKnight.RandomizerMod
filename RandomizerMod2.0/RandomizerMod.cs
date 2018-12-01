@@ -215,6 +215,7 @@ namespace RandomizerMod
                 }
 
                 pd.SetInt("charmSlots", notches);
+                GameManager.instance.RefreshOvercharm();
             }
         }
 
