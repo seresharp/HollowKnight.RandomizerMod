@@ -221,7 +221,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2b.7";
+            string ver = "2b.8";
             int minAPI = 45;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
@@ -437,6 +437,20 @@ namespace RandomizerMod
                             PlayMakerFSM bossFSM = FSMUtility.LocateFSM(to.FindGameObject("Hollow Knight Boss"), "Control");
                             bossFSM.GetState("H Collapsed").AddAction(enterRadiance);
                         }
+                        break;
+                    case "Room_nailmaster_03":
+                        // Dash slash room
+                        // Remove pickup if the player doesn't have enough geo for it
+                        if (PlayerData.instance.geo < 800)
+                        {
+                            Object.Destroy(GameObject.Find("Randomizer Shiny"));
+                        }
+                        else
+                        {
+                            // Otherwise, make them lose the geo on picking it up
+                            FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerTakeGeo(800));
+                        }
+
                         break;
                     case "Cliffs_06":
                         //Prevent banish ending in all bosses

@@ -87,6 +87,7 @@
     <Compile Include="BenchHandler.cs" />
     <Compile Include="Components\ShinyPreloader.cs" />
     <Compile Include="Components\Shop.cs" />
+    <Compile Include="FsmStateActions\RandomizerTakeGeo.cs" />
     <Compile Include="FsmStateActions\RandomizerSellRelics.cs" />
     <Compile Include="Actions\ReplaceObjectWithShiny.cs" />
     <Compile Include="Components\BigItemPopup.cs" />
@@ -242,6 +243,16 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\UI\Shop\Essence.png" />
     <EmbeddedResource Include="Resources\UI\Shop\Geo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Prompts\CycloneSlash.png" />
+    <EmbeddedResource Include="Resources\Prompts\DashSlash.png" />
+    <EmbeddedResource Include="Resources\Prompts\GreatSlash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ShopIcons\CycloneSlash.png" />
+    <EmbeddedResource Include="Resources\ShopIcons\DashSlash.png" />
+    <EmbeddedResource Include="Resources\ShopIcons\GreatSlash.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

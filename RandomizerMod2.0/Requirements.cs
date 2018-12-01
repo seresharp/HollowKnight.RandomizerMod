@@ -899,10 +899,70 @@ namespace RandomizerMod
                     notchCost = "charmCost_39",
                     progression = true
                 }
+            },
+            //Cyclone Slash
+            { "hasCyclone", new ReqDef()
+                {
+                    boolName = "hasCyclone",
+                    sceneName = "Room_nailmaster",
+                    objectName = "NM Mato NPC",
+                    replace = true,
+                    logic = "CLAW",
+                    type = ItemType.Big,
+                    bigSpriteKey = "Prompts.CycloneSlash.png",
+                    takeKey = "GET_ITEM_INTRO3",
+                    nameKey = "INV_NAME_ART_CYCLONE",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_CYCLONE_1",
+                    descTwoKey = "GET_CYCLONE_2",
+                    shopDescKey = "INV_DESC_ART_CYCLONE",
+                    shopSpriteKey = "ShopIcons.CycloneSlash.png",
+                    progression = false
+                }
+            },
+            //Dash Slash
+            { "hasUpwardSlash", new ReqDef()
+                {
+                    boolName = "hasUpwardSlash",
+                    sceneName = "Room_nailmaster_03",
+                    objectName = "NM Oro NPC",
+                    replace = true,
+                    logic = "CLAW | (WINGS + SHADESKIPS)",
+                    type = ItemType.Big,
+                    bigSpriteKey = "Prompts.DashSlash.png",
+                    takeKey = "GET_ITEM_INTRO3",
+                    nameKey = "INV_NAME_ART_UPPER",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_DSLASH_1",
+                    descTwoKey = "GET_DSLASH_2",
+                    shopDescKey = "INV_DESC_ART_UPPER",
+                    shopSpriteKey = "ShopIcons.DashSlash.png",
+                    progression = true
+                }
+            },
+            //Great Slash
+            { "hasDashSlash", new ReqDef()
+                {
+                    boolName = "hasDashSlash",
+                    sceneName = "Room_nailmaster_02",
+                    objectName = "NM Sheo NPC",
+                    replace = true,
+                    logic = "CLAW + ((DASH + (SUPERDASH | WINGS)) | (WINGS + SUPERDASH))",
+                    type = ItemType.Big,
+                    bigSpriteKey = "Prompts.GreatSlash.png",
+                    takeKey = "GET_ITEM_INTRO3",
+                    nameKey = "INV_NAME_ART_DASH",
+                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+                    descOneKey = "GET_GSLASH_1",
+                    descTwoKey = "GET_GSLASH_2",
+                    shopDescKey = "INV_DESC_ART_DASH",
+                    shopSpriteKey = "ShopIcons.GreatSlash.png",
+                    progression = false
+                }
             }
+
             //TODO: Grimmchild
             //TODO: Geo Chests
-            //TODO: Nail arts
             //TODO: Relics
             //TODO: Keys
             //TODO: Ore
@@ -1482,6 +1542,7 @@ namespace RandomizerMod
                         if (obtainedItems.Contains("gotCharm_35") || obtainedItems.Contains("gotCharm_22") || obtainedItems.Contains("gotCharm_17") || obtainedItems.Contains("gotCharm_39")) goto case "true";
                         if (obtainedItems.Contains("gotCharm_13") && settings.miscSkips) goto case "true";
                         if (obtainedItems.Contains("gotCharm_18") && settings.magolorSkips) goto case "true";
+                        if (obtainedItems.Contains("hasUpwardSlash")) goto case "true";
                         goto case "false";
                     case "SHADESKIPS":
                         if (settings.shadeSkips) goto case "true";
