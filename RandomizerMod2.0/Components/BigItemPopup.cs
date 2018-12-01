@@ -13,6 +13,8 @@ namespace RandomizerMod.Components
         private static Font perpetua;
         private static Sprite[] frames;
 
+        private bool showInstantly;
+
         public Sprite imagePrompt;
         public string takeText;
         public string nameText;
@@ -100,6 +102,9 @@ namespace RandomizerMod.Components
 
         private IEnumerator ShowPopup()
         {
+            //Check for skipping popup
+            Coroutine skipCoroutine = StartCoroutine(LookForShowInstantly());
+
             //Begin dimming the scene
             GameObject dimmer = CanvasUtil.CreateImagePanel(gameObject, blackPixel, new CanvasUtil.RectData(Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one));
             dimmer.GetComponent<Image>().preserveAspect = false;
@@ -109,9 +114,9 @@ namespace RandomizerMod.Components
             dimmerCG.interactable = false;
             dimmerCG.alpha = 0;
 
-            StartCoroutine(CanvasUtil.FadeInCanvasGroup(dimmerCG));
-
-            yield return new WaitForSeconds(0.1f);
+            StartCoroutine(FadeInCanvasGroup(dimmerCG));
+            
+            yield return WaitForSeconds(0.1f);
 
             //Aim for 400 high prompt image
             float scaler = imagePrompt.texture.height / 400f;
@@ -138,14 +143,14 @@ namespace RandomizerMod.Components
             topTextTwoCG.interactable = false;
             topTextTwoCG.alpha = 0;
 
-            StartCoroutine(CanvasUtil.FadeInCanvasGroup(topImageCG));
-            StartCoroutine(CanvasUtil.FadeInCanvasGroup(topTextOneCG));
-            yield return StartCoroutine(CanvasUtil.FadeInCanvasGroup(topTextTwoCG));
+            StartCoroutine(FadeInCanvasGroup(topImageCG));
+            StartCoroutine(FadeInCanvasGroup(topTextOneCG));
+            yield return StartCoroutine(FadeInCanvasGroup(topTextTwoCG));
 
             //Animate the middle fleur
             GameObject fleur = CanvasUtil.CreateImagePanel(gameObject, frames[0], new CanvasUtil.RectData(new Vector2(frames[0].texture.width / 1.6f, frames[0].texture.height / 1.6f), Vector2.zero, new Vector2(0.5f, 0.4125f), new Vector2(0.5f, 0.4125f)));
             yield return StartCoroutine(AnimateFleur(fleur, 12));
-            yield return new WaitForSeconds(0.25f);
+            yield return WaitForSeconds(0.25f);
 
             //Fade in the remaining text
             GameObject botTextOne = CanvasUtil.CreateTextPanel(gameObject, buttonText, 34, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.335f), new Vector2(0.5f, 0.335f)), perpetua);
@@ -168,10 +173,10 @@ namespace RandomizerMod.Components
             botTextThreeCG.interactable = false;
             botTextThreeCG.alpha = 0;
 
-            yield return StartCoroutine(CanvasUtil.FadeInCanvasGroup(botTextOneCG));
-            StartCoroutine(CanvasUtil.FadeInCanvasGroup(botTextTwoCG));
-            yield return StartCoroutine(CanvasUtil.FadeInCanvasGroup(botTextThreeCG));
-            yield return new WaitForSeconds(1.5f);
+            yield return StartCoroutine(FadeInCanvasGroup(botTextOneCG));
+            StartCoroutine(FadeInCanvasGroup(botTextTwoCG));
+            yield return StartCoroutine(FadeInCanvasGroup(botTextThreeCG));
+            yield return WaitForSeconds(1.5f);
 
             //Can I offer you an egg in this trying time?
             GameObject egg = CanvasUtil.CreateImagePanel(gameObject, RandomizerMod.sprites["UI.egg.png"], new CanvasUtil.RectData(new Vector2(RandomizerMod.sprites["UI.egg.png"].texture.width / 1.65f, RandomizerMod.sprites["UI.egg.png"].texture.height / 1.65f), Vector2.zero, new Vector2(0.5f, 0.1075f), new Vector2(0.5f, 0.1075f)));
@@ -182,7 +187,11 @@ namespace RandomizerMod.Components
             eggCG.alpha = 0;
 
             //Should wait for one fade in, don't want to poll input immediately
-            yield return CanvasUtil.FadeInCanvasGroup(eggCG);
+            yield return FadeInCanvasGroup(eggCG);
+
+            //Stop doing things instantly before polling input
+            StopCoroutine(skipCoroutine);
+            showInstantly = false;
 
             //Save the coroutine to stop it later
             Coroutine coroutine = StartCoroutine(BlinkCanvasGroup(eggCG));
@@ -199,7 +208,7 @@ namespace RandomizerMod.Components
             yield return FadeOutCanvasGroup(gameObject.GetComponent<CanvasGroup>());
 
             //Small delay before hero control
-            yield return new WaitForSeconds(0.75f);
+            yield return WaitForSeconds(0.75f);
 
             //Optionally send FSM event after finishing
             if (fsmObj != null && fsmEvent != null)
@@ -221,7 +230,7 @@ namespace RandomizerMod.Components
             {
                 img.sprite = frames[spriteNum];
                 spriteNum++;
-                yield return new WaitForSeconds(1 / fps);
+                yield return WaitForSeconds(1 / fps);
             }
         }
 
@@ -230,7 +239,31 @@ namespace RandomizerMod.Components
             while (true)
             {
                 yield return FadeOutCanvasGroup(cg);
-                yield return CanvasUtil.FadeInCanvasGroup(cg);
+                yield return FadeInCanvasGroup(cg);
+            }
+        }
+
+        private IEnumerator WaitForSeconds(float seconds)
+        {
+            float timePassed = 0f;
+            while (timePassed < seconds && !showInstantly)
+            {
+                timePassed += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        private IEnumerator LookForShowInstantly()
+        {
+            while (true)
+            {
+                HeroActions actions = GameManager.instance.inputHandler.inputActions;
+                if (actions.jump.WasPressed || actions.attack.WasPressed || actions.menuCancel.WasPressed)
+                {
+                    showInstantly = true;
+                    break;
+                }
+                yield return new WaitForEndOfFrame();
             }
         }
 
@@ -240,7 +273,7 @@ namespace RandomizerMod.Components
             float loopFailsafe = 0f;
             cg.alpha = 0f;
             cg.gameObject.SetActive(true);
-            while (cg.alpha < 1f)
+            while (cg.alpha < 1f && !showInstantly)
             {
                 cg.alpha += Time.deltaTime * 2f;
                 loopFailsafe += Time.deltaTime;
@@ -266,7 +299,7 @@ namespace RandomizerMod.Components
         {
             float loopFailsafe = 0f;
             cg.interactable = false;
-            while (cg.alpha > 0.05f)
+            while (cg.alpha > 0.05f && !showInstantly)
             {
                 cg.alpha -= Time.deltaTime * 2f;
                 loopFailsafe += Time.deltaTime;
