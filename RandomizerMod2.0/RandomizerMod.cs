@@ -469,6 +469,13 @@ namespace RandomizerMod
                         case "Abyss_10":
                             //Something might be required here after properly processing shade cloak
                             break;
+                        case "Abyss_12":
+                            //Destroy shriek pickup if the player doesn't have wraiths
+                            if (PlayerData.instance.screamLevel == 0)
+                            {
+                                Object.Destroy(GameObject.Find("Randomizer Shiny"));
+                            }
+                            break;
                         case "Ruins1_32":
                             //Platform after soul master
                             if (!PlayerData.instance.hasWalljump)
