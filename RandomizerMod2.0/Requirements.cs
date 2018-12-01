@@ -166,7 +166,7 @@ namespace RandomizerMod
                     sceneName = "Waterways_13",
                     objectName = "Shiny Item Acid",
                     replace = true,
-                    logic = "(CLAW + (SUPERDASH | ACID | (WINGS + DASH + SPIKETUNNELS + (FIREBALL | SCREAM | DASHMASTER)))) | (WINGS + ACID + (SUPERDASH | (DASH + SPIKETUNNELS + (FIREBALL | SCREAM | DASHMASTER))))",
+                    logic = "(CLAW + (SUPERDASH | ACID | (WINGS + DASH + SPIKETUNNELS + (FIREBALL | SCREAM | DASHMASTER | SHARPSHADOW)))) | (WINGS + ACID + (SUPERDASH | (DASH + SPIKETUNNELS + (FIREBALL | SCREAM | DASHMASTER | SHARPSHADOW))))",
                     type = ItemType.Big,
                     bigSpriteKey = "Prompts.Isma.png",
                     takeKey = "GET_ITEM_INTRO8",
@@ -301,7 +301,7 @@ namespace RandomizerMod
                     progression = true
                 }
             },
-            //Abyss Shriek TODO: Require wraiths for this pickup
+            //Abyss Shriek
             { "hasAbyssShriek", new ReqDef()
                 {
                     boolName = "hasAbyssShriek",
@@ -716,7 +716,21 @@ namespace RandomizerMod
                     isGoodItem = true
                 }
             },
-            //TODO: Nailmaster's Glory
+            //Nailmaster's Glory
+            { "gotCharm_26", new ReqDef()
+                {
+                    boolName = "gotCharm_26",
+                    sceneName = "Room_Sly_Storeroom",
+                    objectName = "Sly Basement NPC",
+                    replace = true,
+                    logic = "CYCLONESLASH + DASHSLASH + GREATSLASH",
+                    type = ItemType.Charm,
+                    nameKey = "CHARM_NAME_26",
+                    shopDescKey = "RANDOMIZER_CHARM_DESC_26",
+                    shopSpriteKey = "Charms.26.png",
+                    notchCost = "charmCost_26"
+                }
+            },
             //Joni's Blessing
             { "gotCharm_27", new ReqDef()
                 {
@@ -792,7 +806,7 @@ namespace RandomizerMod
                     objectName = "Shiny Item",
                     fsmName = "Shiny Control",
                     replace = false,
-                    logic = "DASH + QUAKE + (CLAW | (WINGS + MISCSKIPS))",
+                    logic = "(DASH | MISCSKIPS) + QUAKE + (CLAW | (WINGS + MISCSKIPS))",
                     type = ItemType.Charm,
                     nameKey = "CHARM_NAME_32",
                     shopDescKey = "RANDOMIZER_CHARM_DESC_32",
@@ -1564,6 +1578,18 @@ namespace RandomizerMod
                         else goto case "false";
                     case "DASHMASTER":
                         if (obtainedItems.Contains("gotCharm_31")) goto case "true";
+                        else goto case "false";
+                    case "SHARPSHADOW":
+                        if (obtainedItems.Contains("gotCharm_16")) goto case "SHADOWDASH";
+                        else goto case "false";
+                    case "CYCLONESLASH":
+                        if (obtainedItems.Contains("hasCyclone")) goto case "true";
+                        else goto case "false";
+                    case "DASHSLASH":
+                        if (obtainedItems.Contains("hasUpwardSlash")) goto case "true";
+                        else goto case "false";
+                    case "GREATSLASH":
+                        if (obtainedItems.Contains("hasDashSlash")) goto case "true";
                         else goto case "false";
                     case "EVERYTHING":
                         goto case "false";
