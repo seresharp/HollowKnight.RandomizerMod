@@ -900,9 +900,72 @@ namespace RandomizerMod
                     progression = true
                 }
             }
+              //Cyclone Slash
+	            /*{ "hasCyclone", new ReqDef() 
+	                {
+	                    boolName = "hasCyclone",
+	                    sceneName = "Room_Nailmaster",
+	                    objectName =
+	                    fsmName =
+	                    replace = false,
+	                    logic = "CLAW",
+	                    type = ItemType.Big,
+	                    bigSpriteKey = "Prompts.CycloneSlash.png",
+	                    takeKey = "GET_ITEM_INTRO3",
+	                    nameKey = "INV_NAME_ART_CYCLONE",
+	                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+	                    descOneKey = "GET_CYCLONE_1",
+	                    descTwoKey = "GET_CYCLONE_2",
+	                    shopDescKey = "INV_DESC_ART_CYCLONE",
+	                    shopSpriteKey = "ShopIcons.CycloneSlash.png",
+	                    progression = true
+	                }
+	            },*/
+	            //Dash Slash
+	            /*{ "hasUpwardSlash", new ReqDef()
+	                {   
+	                    boolName = "hasUpwardSlash",
+	                    sceneName = "Room_Nailmaster_03",
+	                    objectName =
+	                    fsmName =
+	                    replace = false,
+	                    logic = "CLAW | (WINGS + SHADESKIPS)",
+	                    type = ItemType.Big,
+	                    bigSpriteKey = "Prompts.DashSlash.png",
+	                    takeKey = "GET_ITEM_INTRO3",
+	                    nameKey = "INV_NAME_ART_UPPER",
+	                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+	                    descOneKey = "GET_DSLASH_1",
+	                    descTwoKey = "GET_DSLASH_2",
+	                    shopDescKey = "INV_DESC_ART_UPPER",
+	                    shopSpriteKey = "ShopIcons.DashSlash.png",
+	                    progression = true
+	                }
+	            },*/            
+	            //Great Slash
+	            /*{ "hasDashSlash", new ReqDef()
+	                {   
+	                    boolName = "hasDashSlash",
+	                    sceneName = "Room_Nailmaster_02",
+	                    objectName =
+	                    fsmName =
+	                    replace = false,
+	                    logic = "CLAW + ((DASH + (SUPERDASH | WINGS)) | (WINGS + SUPERDASH))",
+	                    type = ItemType.Big,
+	                    bigSpriteKey = "Prompts.GreatSlash.png",
+	                    takeKey = "GET_ITEM_INTRO3",
+	                    nameKey = "INV_NAME_ART_DASH",
+	                    buttonKey = "RANDOMIZER_BUTTON_DESC",
+	                    descOneKey = "GET_GSLASH_1",
+	                    descTwoKey = "GET_GSLASH_2",
+	                    shopDescKey = "INV_DESC_ART_DASH",
+	                    shopSpriteKey = "ShopIcons.GreatSlash.png",
+	                    progression = true
+	                }
+	            },*/            
+
             //TODO: Grimmchild
             //TODO: Geo Chests
-            //TODO: Nail arts
             //TODO: Relics
             //TODO: Keys
             //TODO: Ore
