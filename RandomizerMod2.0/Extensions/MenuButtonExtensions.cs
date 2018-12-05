@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ModCommon;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
@@ -73,7 +72,13 @@ namespace RandomizerMod.Extensions
             newEvent.eventID = type;
             newEvent.callback.AddListener(func);
 
-            self.gameObject.GetOrAddComponent<EventTrigger>().triggers.Add(newEvent);
+            EventTrigger trig = self.gameObject.GetComponent<EventTrigger>();
+            if (trig == null)
+            {
+                trig = self.gameObject.AddComponent<EventTrigger>();
+            }
+
+            trig.triggers.Add(newEvent);
 
             if (type == EventTriggerType.Submit) self.AddEvent(EventTriggerType.PointerClick, func);
         }

@@ -34,9 +34,6 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="ModCommon">
-      <HintPath>..\..\..\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\Mods\ModCommon.dll</HintPath>
-    </Reference>
     <Reference Include="PlayMaker">
       <HintPath>..\..\..\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\PlayMaker.dll</HintPath>
     </Reference>
@@ -87,6 +84,7 @@
     <Compile Include="BenchHandler.cs" />
     <Compile Include="Components\ShinyPreloader.cs" />
     <Compile Include="Components\Shop.cs" />
+    <Compile Include="Extensions\ModCommonTheft.cs" />
     <Compile Include="FsmStateActions\RandomizerTakeGeo.cs" />
     <Compile Include="FsmStateActions\RandomizerSellRelics.cs" />
     <Compile Include="Actions\ReplaceObjectWithShiny.cs" />

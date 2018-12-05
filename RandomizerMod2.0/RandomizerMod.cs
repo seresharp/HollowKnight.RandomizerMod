@@ -13,7 +13,6 @@ using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
-using ModCommon;
 
 using Object = UnityEngine.Object;
 
@@ -165,29 +164,7 @@ namespace RandomizerMod
             int minAPI = 45;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
-
-            bool noModCommon = true;
-
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (Assembly assembly in assemblies)
-            {
-                try
-                {
-                    if (assembly.GetTypes().Where(type => type.Namespace == "ModCommon").Any())
-                    {
-                        noModCommon = false;
-                        break;
-                    }
-                }
-                catch
-                {
-                    Log(assembly.FullName + " is broken, too bad");
-                }
-            }
-            
-            if (apiTooLow && noModCommon) ver += " (Update API and install ModCommon)";
-            else if (apiTooLow) ver += " (Update API)";
-            else if (noModCommon) ver += " (Install ModCommon)";
+            if (apiTooLow) ver += " (Update API)";
 
             return ver;
         }
@@ -861,7 +838,6 @@ namespace RandomizerMod
             dict.Add("Mag Skips", magolorText);
 
             //Add useful events
-            startNormalBtn.gameObject.PrintSceneHierarchyTree("garbage");
             startNormalBtn.AddEvent(EventTriggerType.Submit, data => StartNewGame(false));
             startRandoBtn.AddEvent(EventTriggerType.Submit, data => StartNewGame(true));
             allBossesBtn.AddEvent(EventTriggerType.Submit, data =>
@@ -1066,7 +1042,7 @@ namespace RandomizerMod
                 {
                     IsFirstLevelForPlayer = false,
                     SceneName = sceneName,
-                    HeroLeaveDirection = Tools.GetGatePosition(gateName),
+                    HeroLeaveDirection = GetGatePosition(gateName),
                     EntryGateName = gateName,
                     EntryDelay = delay,
                     PreventCameraFadeOut = true,
@@ -1085,6 +1061,16 @@ namespace RandomizerMod
             {
                 loadScene.Invoke();
             }
+        }
+
+        private static GlobalEnums.GatePosition GetGatePosition(string name)
+        {
+            if (name.Contains("top")) return GlobalEnums.GatePosition.top;
+            if (name.Contains("bot")) return GlobalEnums.GatePosition.bottom;
+            if (name.Contains("left")) return GlobalEnums.GatePosition.left;
+            if (name.Contains("right")) return GlobalEnums.GatePosition.right;
+            if (name.Contains("door")) return GlobalEnums.GatePosition.door;
+            return GlobalEnums.GatePosition.unknown;
         }
     }
 }
