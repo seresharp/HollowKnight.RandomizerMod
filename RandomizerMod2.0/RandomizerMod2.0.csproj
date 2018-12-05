@@ -101,15 +101,16 @@
     <Compile Include="FsmStateActions\RandomizerGiveTrinket.cs" />
     <Compile Include="FsmStateActions\RandomizerSetBool.cs" />
     <Compile Include="FsmStateActions\RandomizerSetHardSave.cs" />
-    <Compile Include="NewGameSettings.cs" />
+    <Compile Include="LanguageStringManager.cs" />
     <Compile Include="Extensions\PlayMakerFSMExtensions.cs" />
     <Compile Include="FsmStateActions\RandomizerBoolTest.cs" />
     <Compile Include="Actions\RandomizerAction.cs" />
+    <Compile Include="Randomization\LogicManager.cs" />
     <Compile Include="RandomizerMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Requirements.cs" />
+    <Compile Include="Randomization\Randomizer.cs" />
+    <Compile Include="RestrictionManager.cs" />
     <Compile Include="SaveSettings.cs" />
-    <Compile Include="Components\ShinyGetter.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Prompts\Dash.png" />
@@ -253,6 +254,9 @@
     <EmbeddedResource Include="Resources\ShopIcons\CycloneSlash.png" />
     <EmbeddedResource Include="Resources\ShopIcons\DashSlash.png" />
     <EmbeddedResource Include="Resources\ShopIcons\GreatSlash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\items.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -27,8 +27,8 @@ namespace RandomizerMod.Actions
     public class ChangeShopContents : RandomizerAction, ISerializationCallbackReceiver
     {
         //Variables that actually get used
-        [SerializeField] private string sceneName;
-        [SerializeField] private string objectName;
+        [SerializeField] public string SceneName;
+        [SerializeField] public string ObjectName;
         private ShopItemDef[] items;
 
         //Variable for serialization hack
@@ -57,17 +57,36 @@ namespace RandomizerMod.Actions
 
         public ChangeShopContents(string sceneName, string objectName, ShopItemDef[] items)
         {
-            this.sceneName = sceneName;
-            this.objectName = objectName;
+            SceneName = sceneName;
+            ObjectName = objectName;
             this.items = items;
+        }
+
+        public void AddItemDefs(ShopItemDef[] newItems)
+        {
+            if (items == null)
+            {
+                items = newItems;
+                return;
+            }
+
+            if (newItems == null)
+            {
+                return;
+            }
+
+            ShopItemDef[] combined = new ShopItemDef[items.Length + newItems.Length];
+            items.CopyTo(combined, 0);
+            newItems.CopyTo(combined, items.Length);
+            items = combined;
         }
 
         public override void Process()
         {
-            if (GameManager.instance.GetSceneNameString() == sceneName)
+            if (GameManager.instance.GetSceneNameString() == SceneName)
             {
                 //Find the shop and save an item for use later
-                GameObject shopObj = GameObject.Find(objectName);
+                GameObject shopObj = GameObject.Find(ObjectName);
                 ShopMenuStock shop = shopObj.GetComponent<ShopMenuStock>();
                 GameObject itemPrefab = Object.Instantiate(shop.stock[0]);
                 itemPrefab.SetActive(false);

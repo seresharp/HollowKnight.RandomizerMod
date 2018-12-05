@@ -32,17 +32,6 @@ namespace RandomizerMod.Actions
         {
             if (GameManager.instance.GetSceneNameString() == sceneName)
             {
-                //If we somehow don't have a shiny reference, get one
-                if (shinyPrefab == null)
-                {
-                    GameObject shinyGetter = new GameObject();
-                    Object.DontDestroyOnLoad(shinyGetter);
-                    shinyGetter.AddComponent<ShinyGetter>().GetShinyPrefab();
-
-                    //This should get called again by the hooks, so we can just exit
-                    return;
-                }
-
                 Scene scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
                 GameObject obj = scene.FindGameObject(objectName);
 

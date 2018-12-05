@@ -52,9 +52,52 @@ namespace RandomizerMod
             set => SetBool(value);
         }
 
+        public bool ShadeSkips
+        {
+            get => GetBool(false);
+            set => SetBool(value);
+        }
+
+        public bool AcidSkips
+        {
+            get => GetBool(false);
+            set => SetBool(value);
+        }
+
+        public bool SpikeTunnels
+        {
+            get => GetBool(false);
+            set => SetBool(value);
+        }
+
+        public bool MiscSkips
+        {
+            get => GetBool(false);
+            set => SetBool(value);
+        }
+
+        public bool FireballSkips
+        {
+            get => GetBool(false);
+            set => SetBool(value);
+        }
+
+        public bool MagSkips
+        {
+            get => GetBool(false);
+            set => SetBool(value);
+        }
+
+        public int Seed
+        {
+            get => GetInt(-1);
+            set => SetInt(value);
+        }
+
         private static Type[] types;
 
         public List<RandomizerAction> actions = new List<RandomizerAction>();
+        public Dictionary<string, string> itemPlacements = new Dictionary<string, string>();
 
         //Serialize actions list into string dict because Unity serializer can't handle inheritance
         public void OnBeforeSerialize()
@@ -63,6 +106,11 @@ namespace RandomizerMod
             {
                 string json = JsonUtility.ToJson(actions[i]);
                 StringValues.Add($"RandomizerAction:{i}:{actions[i].GetType()}", json);
+            }
+
+            foreach (string key in itemPlacements.Keys)
+            {
+                StringValues.Add($"itemPlacements:{key}", itemPlacements[key]);
             }
         }
 
@@ -88,6 +136,10 @@ namespace RandomizerMod
                         }
                     }
                     StringValues.Remove(key);
+                }
+                else if (key.StartsWith("itemPlacements"))
+                {
+                    itemPlacements.Add(key.Split(':')[1], StringValues[key]);
                 }
             }
 

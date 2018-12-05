@@ -29,17 +29,6 @@ namespace RandomizerMod.Actions
         {
             if (GameManager.instance.GetSceneNameString() == sceneName)
             {
-                //If we somehow don't have a shiny reference, get one
-                if (shinyPrefab == null)
-                {
-                    GameObject obj = new GameObject();
-                    Object.DontDestroyOnLoad(obj);
-                    obj.AddComponent<ShinyGetter>().GetShinyPrefab();
-
-                    //This should get called again by the hooks, so we can just exit
-                    return;
-                }
-
                 foreach (PlayMakerFSM fsm in fsmList)
                 {
                     if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)

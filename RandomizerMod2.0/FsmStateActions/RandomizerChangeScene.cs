@@ -1,5 +1,4 @@
 ﻿using HutongGames.PlayMaker;
-using GlobalEnums;
 
 namespace RandomizerMod.FsmStateActions
 {
@@ -16,29 +15,12 @@ namespace RandomizerMod.FsmStateActions
 
         public override void OnEnter()
         {
-            GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo()
+            if (!string.IsNullOrEmpty(sceneName) && !string.IsNullOrEmpty(gateName))
             {
-                SceneName = sceneName,
-                EntryGateName = gateName,
-                HeroLeaveDirection = GetGatePosition(gateName),
-                EntryDelay = 0,
-                WaitForSceneTransitionCameraFade = true,
-                Visualization = GameManager.SceneLoadVisualizations.Default,
-                AlwaysUnloadUnusedAssets = false
-            });
+                RandomizerMod.instance.ChangeToScene(sceneName, gateName);
+            }
 
             Finish();
-        }
-
-        private GatePosition GetGatePosition(string name)
-        {
-            if (name.Contains("top")) return GatePosition.top;
-            if (name.Contains("bot")) return GatePosition.bottom;
-            if (name.Contains("left")) return GatePosition.left;
-            if (name.Contains("right")) return GatePosition.right;
-            if (name.Contains("door")) return GatePosition.door;
-
-            return GatePosition.unknown;
         }
     }
 }

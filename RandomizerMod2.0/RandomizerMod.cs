@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.IO;
-using System.Xml;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
 using Modding;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,7 +12,6 @@ using UnityEngine.EventSystems;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
-using RandomizerMod.Actions;
 using RandomizerMod.FsmStateActions;
 using ModCommon;
 
@@ -36,17 +35,16 @@ namespace RandomizerMod
         public static GameObject largeGeoPrefab;
 
         public static Dictionary<string, Sprite> sprites;
-        private static Dictionary<string, Dictionary<string, string>> languageStrings;
-        private static Dictionary<string, string> skills;
-        private static Dictionary<string, string> bosses;
 
-        private NewGameSettings newGameSettings;
-        private Requirements randomizeObj;
+        private Thread randomizeThread;
 
         public static RandomizerMod instance { get; private set; }
 
         public override void Initialize()
         {
+            //Set instance for outside use
+            instance = this;
+
             //Make sure the play mode screen is always unlocked
             GameManager.instance.EnablePermadeathMode();
 
@@ -54,15 +52,15 @@ namespace RandomizerMod
             GameManager.instance.SetStatusRecordInt("RecBossRushMode", 1);
 
             sprites = new Dictionary<string, Sprite>();
-            languageStrings = new Dictionary<string, Dictionary<string, string>>();
 
             //Load logo and xml from embedded resources
-            foreach (string res in Assembly.GetExecutingAssembly().GetManifestResourceNames())
+            Assembly randoDLL = GetType().Assembly;
+            foreach (string res in randoDLL.GetManifestResourceNames())
             {
                 if (res.EndsWith(".png"))
                 {
                     //Read bytes of image
-                    Stream imageStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res);
+                    Stream imageStream = randoDLL.GetManifestResourceStream(res);
                     byte[] buffer = new byte[imageStream.Length];
                     imageStream.Read(buffer, 0, buffer.Length);
                     imageStream.Dispose();
@@ -73,37 +71,29 @@ namespace RandomizerMod
 
                     //Create sprite from texture
                     sprites.Add(res.Replace("RandomizerMod.Resources.", ""), Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f)));
-                    Log("Created sprite from embedded image: " + res);
+                    LogDebug("Created sprite from embedded image: " + res);
                 }
                 else if (res.EndsWith("language.xml"))
                 {
                     //No sense having the whole init die if this xml is formatted improperly
                     try
                     {
-                        //Load XmlDocument from resource stream
-                        Stream xmlStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res);
-                        XmlDocument xml = new XmlDocument();
-                        xml.Load(xmlStream);
-                        xmlStream.Dispose();
-
-                        foreach (XmlNode node in xml.SelectNodes("Language/entry"))
-                        {
-                            string sheet = node.Attributes["sheet"].Value;
-                            string key = node.Attributes["key"].Value;
-
-                            if (!languageStrings.ContainsKey(sheet))
-                            {
-                                languageStrings[sheet] = new Dictionary<string, string>();
-                            }
-
-                            languageStrings[sheet][key] = node.InnerText.Replace("\\n", "\n");
-                        }
-
-                        Log("Language xml processed");
+                        LanguageStringManager.LoadLanguageXML(randoDLL.GetManifestResourceStream(res));
                     }
                     catch (Exception e)
                     {
                         LogError("Could not process language xml:\n" + e);
+                    }
+                }
+                else if (res.EndsWith("items.xml"))
+                {
+                    try
+                    {
+                        Randomization.LogicManager.ParseXML(randoDLL.GetManifestResourceStream(res));
+                    }
+                    catch (Exception e)
+                    {
+                        LogError("Could not process items xml:\n" + e);
                     }
                 }
                 else
@@ -112,60 +102,13 @@ namespace RandomizerMod
                 }
             }
 
-            //Set up dictionaries for restriction checking
-            skills = new Dictionary<string, string>();
-            skills.Add("hasDash", "Mothwing Cloak");
-            skills.Add("hasShadowDash", "Shade Cloak");
-            skills.Add("hasWalljump", "Mantis Claw");
-            skills.Add("hasDoubleJump", "Monarch Wings");
-            skills.Add("hasAcidArmour", "Isma's Tear");
-            skills.Add("hasDashSlash", "Great Slash");
-            skills.Add("hasUpwardSlash", "Dash Slash");
-            skills.Add("hasCyclone", "Cyclone Slash");
-
-            bosses = new Dictionary<string, string>();
-            bosses.Add("killedInfectedKnight", "Broken Vessel");
-            bosses.Add("killedMawlek", "Brooding Mawlek");
-            bosses.Add("collectorDefeated", "The Collector");
-            bosses.Add("defeatedMegaBeamMiner", "Crystal Guardian 1");
-            bosses.Add("killedDungDefender", "Dung Defender");
-            bosses.Add("killedGhostHu", "Elder Hu");
-            bosses.Add("falseKnightDreamDefeated", "Failed Champion");
-            bosses.Add("killedFalseKnight", "False Knight");
-            bosses.Add("killedFlukeMother", "Flukemarm");
-            bosses.Add("killedGhostGalien", "Galien");
-            bosses.Add("killedLobsterLancer", "God Tamer");
-            bosses.Add("killedGhostAladar", "Gorb");
-            bosses.Add("killedGreyPrince", "Grey Prince Zote");
-            bosses.Add("killedBigFly", "Gruz Mother");
-            bosses.Add("killedHiveKnight", "Hive Knight");
-            bosses.Add("killedHornet", "Hornet 1");
-            bosses.Add("hornetOutskirtsDefeated", "Hornet 2");
-            bosses.Add("infectedKnightDreamDefeated", "Lost Kin");
-            bosses.Add("defeatedMantisLords", "Mantis Lords");
-            bosses.Add("killedGhostMarkoth", "Markoth");
-            bosses.Add("killedGhostMarmu", "Marmu");
-            bosses.Add("killedNightmareGrimm", "Nightmare King Grimm");
-            bosses.Add("killedGhostNoEyes", "No Eyes");
-            bosses.Add("killedMimicSpider", "Nosk");
-            bosses.Add("killedMageLord", "Soul Master");
-            bosses.Add("mageLordDreamDefeated", "Soul Tyrant");
-            bosses.Add("killedTraitorLord", "Traitor Lord");
-            bosses.Add("killedGrimm", "Troupe Master Grimm");
-            bosses.Add("killedMegaJellyfish", "Uumuu");
-            bosses.Add("killedBlackKnight", "Watcher Knights");
-            bosses.Add("killedWhiteDefender", "White Defender");
-            bosses.Add("killedGhostXero", "Xero");
-            bosses.Add("killedZote", "Zote");
-
             //Add hooks
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += HandleSceneChanges;
             ModHooks.Instance.OnEnableEnemyHook += GetGeoPrefabs;
-            ModHooks.Instance.LanguageGetHook += LanguageOverride;
+            ModHooks.Instance.LanguageGetHook += LanguageStringManager.GetLanguageString;
             ModHooks.Instance.GetPlayerIntHook += IntOverride;
             ModHooks.Instance.GetPlayerBoolHook += BoolGetOverride;
             ModHooks.Instance.SetPlayerBoolHook += BoolSetOverride;
-            ModHooks.Instance.CharmUpdateHook += UpdateCharmNotches;
 
             On.PlayerData.SetBenchRespawn_RespawnMarker_string_int += BenchHandler.HandleBenchSave;
             On.PlayerData.SetBenchRespawn_string_string_bool += BenchHandler.HandleBenchSave;
@@ -174,9 +117,6 @@ namespace RandomizerMod
 
             // Preload shiny item
             Components.ShinyPreloader.Preload();
-
-            //Set instance for outside use
-            instance = this;
         }
 
         private void UpdateCharmNotches(PlayerData pd, HeroController controller)
@@ -221,7 +161,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2b.8";
+            string ver = "2b.9";
             int minAPI = 45;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
@@ -270,6 +210,12 @@ namespace RandomizerMod
 
         private void BoolSetOverride(string boolName, bool value)
         {
+            // Check for Salubra notches if it's a charm
+            if (boolName.StartsWith("gotCharm_"))
+            {
+                UpdateCharmNotches(PlayerData.instance, HeroController.instance);
+            }
+
             //For some reason these all have two bools
             if (boolName == "hasDash") PlayerData.instance.SetBool("canDash", value);
             else if (boolName == "hasShadowDash") PlayerData.instance.SetBool("canShadowDash", value);
@@ -333,16 +279,6 @@ namespace RandomizerMod
             return PlayerData.instance.GetIntInternal(intName);
         }
 
-        private string LanguageOverride(string key, string sheetTitle)
-        {
-            if (languageStrings.ContainsKey(sheetTitle) && languageStrings[sheetTitle].ContainsKey(key))
-            {
-                return languageStrings[sheetTitle][key];
-            }
-
-            return Language.Language.GetInternal(key, sheetTitle);
-        }
-
         private bool GetGeoPrefabs(GameObject enemy, bool isAlreadyDead)
         {
             if (smallGeoPrefab == null || mediumGeoPrefab == null || largeGeoPrefab == null)
@@ -373,20 +309,36 @@ namespace RandomizerMod
                     LogError("Error editing menu:\n" + e);
                 }
             }
+            else if (GameManager.instance.GetSceneNameString() == Constants.END_CREDITS && Settings != null && Settings.randomizer && Settings.itemPlacements.Count != 0)
+            {
+                foreach (GameObject obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
+                {
+                    Object.Destroy(obj);
+                }
+
+                GameObject canvas = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
+                float y = -30;
+                foreach (KeyValuePair<string, string> item in Settings.itemPlacements)
+                {
+                    y -= 1020 / Settings.itemPlacements.Count;
+                    CanvasUtil.CreateTextPanel(canvas, item.Key + " - " + item.Value, 16, TextAnchor.UpperLeft, new CanvasUtil.RectData(new Vector2(1920, 50), new Vector2(0, y), new Vector2(0, 1), new Vector2(0, 1), new Vector2(0f, 0f)), Components.BigItemPopup.perpetua);
+                }
+            }
 
             if (GameManager.instance.IsGameplayScene())
             {
                 try
                 {
-                    if (randomizeObj != null)
+                    if (randomizeThread != null)
                     {
-                        randomizeObj.ForceFinish();
-
-                        if (randomizeObj.randomizeDone)
+                        if (randomizeThread.IsAlive)
                         {
-                            Settings.actions = randomizeObj.actions;
-                            Object.Destroy(randomizeObj.gameObject);
-                            randomizeObj = null;
+                            randomizeThread.Join();
+                        }
+
+                        if (Randomization.Randomizer.randomizeDone)
+                        {
+                            Settings.actions = Randomization.Randomizer.actions;
                         }
                         else
                         {
@@ -423,7 +375,7 @@ namespace RandomizerMod
                 {
                     case "Room_temple":
                         //Handle completion restrictions
-                        ProcessRestrictions();
+                        RestrictionManager.ProcessRestrictions();
                         break;
                     case "Room_Final_Boss_Core":
                         //Trigger Radiance fight without requiring dream nail hit
@@ -712,163 +664,10 @@ namespace RandomizerMod
             }
         }
 
-        private void ProcessRestrictions()
-        {
-            if (Settings.allBosses || Settings.allCharms || Settings.allSkills)
-            {
-                languageStrings["Hornet"] = new Dictionary<string, string>();
-
-                //Close the door and get rid of Quirrel
-                PlayerData.instance.openedBlackEggDoor = false;
-                PlayerData.instance.quirrelLeftEggTemple = true;
-
-                //Prevent the game from opening the door
-                GameObject door = GameObject.Find("Final Boss Door");
-                PlayMakerFSM doorFSM = FSMUtility.LocateFSM(door, "Control");
-                doorFSM.SetState("Idle");
-
-                //The door is cosmetic, gotta get rid of the actual TransitionPoint too
-                TransitionPoint doorTransitionPoint = door.GetComponentInChildren<TransitionPoint>(true);
-                doorTransitionPoint.gameObject.SetActive(false);
-
-                //Make Hornet appear
-                GameObject hornet = GameObject.Find("Hornet Black Egg NPC");
-                hornet.SetActive(true);
-                FsmState activeCheck = FSMUtility.LocateFSM(hornet, "Conversation Control").GetState("Active?");
-                activeCheck.RemoveActionsOfType<IntCompare>();
-                activeCheck.RemoveActionsOfType<PlayerDataBoolTest>();
-
-                //Check dreamers
-                if (!PlayerData.instance.lurienDefeated || !PlayerData.instance.monomonDefeated || !PlayerData.instance.hegemolDefeated)
-                {
-                    languageStrings["Hornet"].Add("HORNET_DOOR_UNOPENED", "What kind of idiot comes here without even killing the dreamers?");
-                    return;
-                }
-
-                //Check all charms
-                if (Settings.allCharms)
-                {
-                    PlayerData.instance.CountCharms();
-                    if (PlayerData.instance.charmsOwned < 40)
-                    {
-                        languageStrings["Hornet"].Add("HORNET_DOOR_UNOPENED", "What are you doing here? Go get the rest of the charms.");
-                        return;
-                    }
-                    else if (PlayerData.instance.royalCharmState < 3)
-                    {
-                        languageStrings["Hornet"].Add("HORNET_DOOR_UNOPENED", "Nice try, but half of a charm doesn't count. Go get the rest of the kingsoul.");
-                        return;
-                    }
-                }
-
-                //Check all skills
-                if (Settings.allSkills)
-                {
-                    List<string> missingSkills = new List<string>();
-
-                    foreach (KeyValuePair<string, string> kvp in skills)
-                    {
-                        if (!PlayerData.instance.GetBool(kvp.Key))
-                        {
-                            missingSkills.Add(kvp.Value);
-                        }
-                    }
-
-                    //These aren't as easy to check in a loop, so I'm just gonna check them manually
-                    if (PlayerData.instance.fireballLevel == 0) missingSkills.Add("Vengeful Spirit");
-                    if (PlayerData.instance.fireballLevel < 2) missingSkills.Add("Shade Soul");
-                    if (PlayerData.instance.quakeLevel == 0) missingSkills.Add("Desolate Dive");
-                    if (PlayerData.instance.quakeLevel < 2) missingSkills.Add("Descending Dark");
-                    if (PlayerData.instance.screamLevel == 0) missingSkills.Add("Howling Wraiths");
-                    if (PlayerData.instance.screamLevel < 2) missingSkills.Add("Abyss Shriek");
-
-                    if (missingSkills.Count > 0)
-                    {
-                        string hornetStr = "You are still missing ";
-                        for (int i = 0; i < missingSkills.Count; i++)
-                        {
-                            if (i != 0 && i == missingSkills.Count - 1)
-                            {
-                                hornetStr += " and ";
-                            }
-
-                            hornetStr += missingSkills[i];
-
-                            if (i != missingSkills.Count - 1)
-                            {
-                                hornetStr += ", ";
-                            }
-                        }
-                        hornetStr += ".";
-
-                        languageStrings["Hornet"].Add("HORNET_DOOR_UNOPENED", hornetStr);
-                        return;
-                    }
-                }
-
-                //Check all bosses
-                if (Settings.allBosses)
-                {
-                    List<string> missingBosses = new List<string>();
-
-                    foreach (KeyValuePair<string, string> kvp in bosses)
-                    {
-                        if (!PlayerData.instance.GetBool(kvp.Key))
-                        {
-                            missingBosses.Add(kvp.Value);
-                        }
-                    }
-
-                    //CG2 has no bool
-                    if (PlayerData.instance.killsMegaBeamMiner > 0) missingBosses.Add("Crystal Guardian 2");
-
-                    if (missingBosses.Count > 0)
-                    {
-                        if (missingBosses.Count >= 10)
-                        {
-                            languageStrings["Hornet"].Add("HORNET_DOOR_UNOPENED", $"You haven't killed {missingBosses.Count} bosses.");
-                            return;
-                        }
-
-                        string hornetStr = "You haven't killed ";
-                        for (int i = 0; i < missingBosses.Count; i++)
-                        {
-                            if (i != 0 && i == missingBosses.Count - 1)
-                            {
-                                hornetStr += " and ";
-                            }
-
-                            hornetStr += missingBosses[i];
-
-                            if (i != missingBosses.Count - 1)
-                            {
-                                hornetStr += ", ";
-                            }
-                        }
-                        hornetStr += ".";
-
-                        languageStrings["Hornet"].Add("HORNET_DOOR_UNOPENED", hornetStr);
-                        return;
-                    }
-
-                    if (PlayerData.instance.royalCharmState != 4)
-                    {
-                        languageStrings["Hornet"].Add("HORNET_DOOR_UNOPENED", "You chose all bosses, go get void heart ya dip.");
-                        return;
-                    }
-                }
-
-                //All checks passed, time to open up
-                PlayerData.instance.openedBlackEggDoor = true;
-                doorFSM.SetState("Opened");
-                doorTransitionPoint.gameObject.SetActive(true);
-            }
-        }
-
         private void EditShinies(Scene to)
         {
-            RandomizerAction.FetchFSMList(to);
-            foreach (RandomizerAction action in Settings.actions)
+            Actions.RandomizerAction.FetchFSMList(to);
+            foreach (Actions.RandomizerAction action in Settings.actions)
             {
                 try
                 {
@@ -883,8 +682,8 @@ namespace RandomizerMod
 
         private void EditUI()
         {
-            //Reset new game settings
-            newGameSettings.SetDefaults();
+            //Reset settings
+            Settings = new SaveSettings();
 
             //Fetch data from vanilla screen
             MenuScreen playScreen = UIManager.instance.playModeMenuScreen;
@@ -940,20 +739,12 @@ namespace RandomizerMod
             customSeedInput.transform.localPosition = new Vector3(0, 1240);
             customSeedInput.textComponent = seedGameObject.transform.Find("Text").GetComponent<Text>();
 
-            newGameSettings.seed = new System.Random().Next(999999999);
-            customSeedInput.text = newGameSettings.seed.ToString();
-
-            /*Text t = Object.Instantiate(customSeedInput.textComponent) as Text;
-            t.transform.SetParent(customSeedInput.transform.Find("Text"));
-            customSeedInput.placeholder = t;
-            t.horizontalOverflow = HorizontalWrapMode.Overflow;
-            t.text = "Mouse over to type a custom seed";
-            //t.fontSize = 1;
-            //t.transform.Translate(new Vector3(500f, 0f, 0f));*/
+            Settings.Seed = new System.Random().Next(999999999);
+            customSeedInput.text = Settings.Seed.ToString();
 
             customSeedInput.caretColor = Color.white;
             customSeedInput.contentType = InputField.ContentType.IntegerNumber;
-            customSeedInput.onEndEdit.AddListener(data => newGameSettings.seed = Convert.ToInt32(data));
+            customSeedInput.onEndEdit.AddListener(data => Settings.Seed = Convert.ToInt32(data));
             customSeedInput.navigation = Navigation.defaultNavigation;
             customSeedInput.caretWidth = 8;
             customSeedInput.characterLimit = 9;
@@ -1075,32 +866,32 @@ namespace RandomizerMod
             startRandoBtn.AddEvent(EventTriggerType.Submit, data => StartNewGame(true));
             allBossesBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                newGameSettings.allBosses = !newGameSettings.allBosses;
-                allBossesText.text = "All Bosses: " + newGameSettings.allBosses;
+                Settings.allBosses = !Settings.allBosses;
+                allBossesText.text = "All Bosses: " + Settings.allBosses;
                 allBossesAlign.AlignText();
             });
             allSkillsBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                newGameSettings.allSkills = !newGameSettings.allSkills;
-                allSkillsText.text = "All Skills: " + newGameSettings.allSkills;
+                Settings.allSkills = !Settings.allSkills;
+                allSkillsText.text = "All Skills: " + Settings.allSkills;
                 allSkillsAlign.AlignText();
             });
             allCharmsBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                newGameSettings.allCharms = !newGameSettings.allCharms;
-                allCharmsText.text = "All Charms: " + newGameSettings.allCharms;
+                Settings.allCharms = !Settings.allCharms;
+                allCharmsText.text = "All Charms: " + Settings.allCharms;
                 allCharmsAlign.AlignText();
             });
             charmNotchBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                newGameSettings.charmNotch = !newGameSettings.charmNotch;
-                charmNotchText.text = "Salubra Notches: " + newGameSettings.charmNotch;
+                Settings.charmNotch = !Settings.charmNotch;
+                charmNotchText.text = "Salubra Notches: " + Settings.charmNotch;
                 charmNotchAlign.AlignText();
             });
             lemmBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                newGameSettings.lemm = !newGameSettings.lemm;
-                lemmText.text = "Lemm Sell All: " + newGameSettings.lemm;
+                Settings.lemm = !Settings.lemm;
+                lemmText.text = "Lemm Sell All: " + Settings.lemm;
                 lemmAlign.AlignText();
             });
             presetBtn.AddEvent(EventTriggerType.Submit, data =>
@@ -1108,25 +899,40 @@ namespace RandomizerMod
                 if (presetText.text.Contains("Easy"))
                 {
                     presetText.text = "Preset: Hard";
-                    newGameSettings.SetHard();
+                    Settings.ShadeSkips = true;
+                    Settings.AcidSkips = true;
+                    Settings.SpikeTunnels = true;
+                    Settings.MiscSkips = true;
+                    Settings.FireballSkips = true;
+                    Settings.MagSkips = false;
                 }
                 else if (presetText.text.Contains("Hard"))
                 {
                     presetText.text = "Preset: Moglar";
-                    newGameSettings.SetMagolor();
+                    Settings.ShadeSkips = true;
+                    Settings.AcidSkips = true;
+                    Settings.SpikeTunnels = true;
+                    Settings.MiscSkips = true;
+                    Settings.FireballSkips = true;
+                    Settings.MagSkips = true;
                 }
                 else
                 {
                     presetText.text = "Preset: Easy";
-                    newGameSettings.SetEasy();
+                    Settings.ShadeSkips = false;
+                    Settings.AcidSkips = false;
+                    Settings.SpikeTunnels = false;
+                    Settings.MiscSkips = false;
+                    Settings.FireballSkips = false;
+                    Settings.MagSkips = false;
                 }
 
-                shadeSkipsText.text = "Shade Skips: " + newGameSettings.shadeSkips;
-                acidSkipsText.text = "Acid Skips: " + newGameSettings.acidSkips;
-                spikeTunnelsText.text = "Spike Tunnels: " + newGameSettings.spikeTunnels;
-                miscSkipsText.text = "Misc Skips: " + newGameSettings.miscSkips;
-                fireballSkipsText.text = "Fireball Skips: " + newGameSettings.fireballSkips;
-                magolorText.text = "Mag Skips: " + newGameSettings.magolorSkips;
+                shadeSkipsText.text = "Shade Skips: " + Settings.ShadeSkips;
+                acidSkipsText.text = "Acid Skips: " + Settings.AcidSkips;
+                spikeTunnelsText.text = "Spike Tunnels: " + Settings.SpikeTunnels;
+                miscSkipsText.text = "Misc Skips: " + Settings.MiscSkips;
+                fireballSkipsText.text = "Fireball Skips: " + Settings.FireballSkips;
+                magolorText.text = "Mag Skips: " + Settings.MagSkips;
 
                 presetAlign.AlignText();
                 shadeSkipsAlign.AlignText();
@@ -1138,8 +944,8 @@ namespace RandomizerMod
             });
             shadeSkipsBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                newGameSettings.shadeSkips = !newGameSettings.shadeSkips;
-                shadeSkipsText.text = "Shade Skips: " + newGameSettings.shadeSkips;
+                Settings.ShadeSkips = !Settings.ShadeSkips;
+                shadeSkipsText.text = "Shade Skips: " + Settings.ShadeSkips;
                 shadeSkipsAlign.AlignText();
 
                 presetText.text = "Preset: Custom";
@@ -1147,8 +953,8 @@ namespace RandomizerMod
             });
             acidSkipsBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                newGameSettings.acidSkips = !newGameSettings.acidSkips;
-                acidSkipsText.text = "Acid Skips: " + newGameSettings.acidSkips;
+                Settings.AcidSkips = !Settings.AcidSkips;
+                acidSkipsText.text = "Acid Skips: " + Settings.AcidSkips;
                 acidSkipsAlign.AlignText();
 
                 presetText.text = "Preset: Custom";
@@ -1156,8 +962,8 @@ namespace RandomizerMod
             });
             spikeTunnelsBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                newGameSettings.spikeTunnels = !newGameSettings.spikeTunnels;
-                spikeTunnelsText.text = "Spike Tunnels: " + newGameSettings.spikeTunnels;
+                Settings.SpikeTunnels = !Settings.SpikeTunnels;
+                spikeTunnelsText.text = "Spike Tunnels: " + Settings.SpikeTunnels;
                 spikeTunnelsAlign.AlignText();
 
                 presetText.text = "Preset: Custom";
@@ -1165,8 +971,8 @@ namespace RandomizerMod
             });
             miscSkipsBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                newGameSettings.miscSkips = !newGameSettings.miscSkips;
-                miscSkipsText.text = "Misc Skips: " + newGameSettings.miscSkips;
+                Settings.MiscSkips = !Settings.MiscSkips;
+                miscSkipsText.text = "Misc Skips: " + Settings.MiscSkips;
                 miscSkipsAlign.AlignText();
 
                 presetText.text = "Preset: Custom";
@@ -1174,8 +980,8 @@ namespace RandomizerMod
             });
             fireballSkipsBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                newGameSettings.fireballSkips = !newGameSettings.fireballSkips;
-                fireballSkipsText.text = "Fireball Skips: " + newGameSettings.fireballSkips;
+                Settings.FireballSkips = !Settings.FireballSkips;
+                fireballSkipsText.text = "Fireball Skips: " + Settings.FireballSkips;
                 fireballSkipsAlign.AlignText();
 
                 presetText.text = "Preset: Custom";
@@ -1183,8 +989,8 @@ namespace RandomizerMod
             });
             magolorBtn.AddEvent(EventTriggerType.Submit, data =>
             {
-                newGameSettings.magolorSkips = !newGameSettings.magolorSkips;
-                magolorText.text = "Mag Skips: " + newGameSettings.magolorSkips;
+                Settings.MagSkips = !Settings.MagSkips;
+                magolorText.text = "Mag Skips: " + Settings.MagSkips;
                 magolorAlign.AlignText();
 
                 presetText.text = "Preset: Custom";
@@ -1194,15 +1000,6 @@ namespace RandomizerMod
 
         private void StartNewGame(bool randomizer)
         {
-            Settings = new SaveSettings();
-
-            //No reason to limit these to only when randomizer is enabled
-            Settings.charmNotch = newGameSettings.charmNotch;
-            Settings.lemm = newGameSettings.lemm;
-            Settings.allBosses = newGameSettings.allBosses;
-            Settings.allCharms = newGameSettings.allCharms;
-            Settings.allSkills = newGameSettings.allSkills;
-            
             //Charm tutorial popup is annoying, get rid of it
             PlayerData.instance.hasCharm = true;
 
@@ -1216,11 +1013,9 @@ namespace RandomizerMod
             if (randomizer)
             {
                 Settings.randomizer = true;
-                
-                GameObject obj = new GameObject();
-                Object.DontDestroyOnLoad(obj);
-                randomizeObj = obj.AddComponent<Requirements>();
-                randomizeObj.settings = newGameSettings;
+
+                randomizeThread = new Thread(new ThreadStart(Randomization.Randomizer.Randomize));
+                randomizeThread.Start();
             }
         }
 

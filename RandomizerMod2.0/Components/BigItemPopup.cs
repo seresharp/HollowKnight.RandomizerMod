@@ -10,7 +10,7 @@ namespace RandomizerMod.Components
     internal class BigItemPopup : MonoBehaviour
     {
         private static Sprite blackPixel = CanvasUtil.NullSprite(new byte[] { 0x00, 0x00, 0x00, 0xAA });
-        private static Font perpetua;
+        public static Font perpetua;
         private static Sprite[] frames;
 
         private bool showInstantly;

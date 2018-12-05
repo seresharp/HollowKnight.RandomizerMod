@@ -47,4 +47,14 @@
     <entry sheet="Prompts" key="RANDOMIZER_EMPTY"></entry>
     <entry sheet="Prompts" key="JIJI_DOOR_KEY">This key may be required to enter waterways. Think hard before opening! Use simple key?</entry>
     <entry sheet="Prompts" key="BATH_HOUSE_KEY">This key may be required to enter waterways. Think hard before opening! Use simple key?</entry>
+    <entry sheet="Elderbug" key="ELDERBUG_FLOWER_REQUEST">F-for me..? Senpai you're so kind.</entry>
+    <entry sheet="Elderbug" key="ELDERBUG_FLOWER_REREQUEST">F-for me..? Senpai you're so kind.</entry>
+    <entry sheet="Elderbug" key="ELDERBUG_FLOWER_ACCEPT">Thank you senpai!</entry>
+    <entry sheet="Elderbug" key="ELDERBUG_FLOWER_DECLINE">O-oh...</entry>
+    <entry sheet="Prompts" key="ELDERBUG_FLOWER">Give Elderbug-chan the flower?</entry>
+    <entry sheet="Hornet" key="HORNET_GREENPATH">I'm not so hard? Are you kidding me?</entry>
+    <entry sheet="MainMenu" key="VIDEO_VSYNC">Input Lag:</entry>
+    <entry sheet="MainMenu" key="DESC_VSYNC">Leave on to make the game unplayable.</entry>
+    <entry sheet="Titles" key="DIRTMOUTH_MAIN">Elderbug</entry>
+    <entry sheet="Titles" key="DIRTMOUTH_SUB">is a cool dude</entry>
 </Language>
