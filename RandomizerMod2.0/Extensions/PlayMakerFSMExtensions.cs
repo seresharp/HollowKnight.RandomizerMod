@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
 
 namespace RandomizerMod.Extensions
 {
@@ -21,7 +19,10 @@ namespace RandomizerMod.Extensions
         {
             foreach (FsmState state in self.FsmStates)
             {
-                if (state.Name == name) return state;
+                if (state.Name == name)
+                {
+                    return state;
+                }
             }
 
             return null;

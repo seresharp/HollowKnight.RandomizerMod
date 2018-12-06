@@ -1,9 +1,9 @@
 ﻿using System;
-using UnityEngine;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
+using UnityEngine;
 
 namespace RandomizerMod.Actions
 {
@@ -17,7 +17,9 @@ namespace RandomizerMod.Actions
         [SerializeField] private string boolName;
 
         public ChangeShinyIntoCharm(string sceneName, string objectName, string fsmName, string boolName)
-            : this(sceneName, objectName, fsmName, Convert.ToInt32(boolName.Substring(9))) { }
+            : this(sceneName, objectName, fsmName, Convert.ToInt32(boolName.Substring(9)))
+        {
+        }
 
         public ChangeShinyIntoCharm(string sceneName, string objectName, string fsmName, int charmNum)
         {
@@ -33,7 +35,7 @@ namespace RandomizerMod.Actions
         {
             if (GameManager.instance.GetSceneNameString() == sceneName)
             {
-                foreach (PlayMakerFSM fsm in fsmList)
+                foreach (PlayMakerFSM fsm in FsmList)
                 {
                     if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)
                     {
@@ -41,21 +43,21 @@ namespace RandomizerMod.Actions
                         FsmState charm = fsm.GetState("Charm?");
                         FsmState getCharm = fsm.GetState("Get Charm");
 
-                        //Remove actions that stop shiny from spawning
+                        // Remove actions that stop shiny from spawning
                         pdBool.RemoveActionsOfType<PlayerDataBoolTest>();
                         pdBool.RemoveActionsOfType<StringCompare>();
 
-                        //Add action to potentially despawn the object
+                        // Add action to potentially despawn the object
                         pdBool.AddAction(new RandomizerBoolTest(boolName, null, "COLLECTED", true));
 
-                        //Force the FSM into the charm state, set it to the correct charm
+                        // Force the FSM into the charm state, set it to the correct charm
                         charm.ClearTransitions();
                         charm.AddTransition("FINISHED", "Get Charm");
                         getCharm.RemoveActionsOfType<SetPlayerDataBool>();
                         getCharm.AddAction(new RandomizerSetBool(boolName, true, true));
                         fsm.GetState("Normal Msg").GetActionsOfType<SetFsmInt>()[0].setValue = charmNum;
 
-                        //Changes have been made, stop looping
+                        // Changes have been made, stop looping
                         break;
                     }
                 }

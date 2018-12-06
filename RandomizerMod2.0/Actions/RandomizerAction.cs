@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
+using HutongGames.PlayMaker;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using HutongGames.PlayMaker;
 
 using Object = UnityEngine.Object;
 
@@ -13,29 +12,26 @@ namespace RandomizerMod.Actions
     [Serializable]
     public abstract class RandomizerAction
     {
+        private static List<PlayMakerFSM> fsmList;
+        private static GameObject shinyPrefab;
+
         private static FieldInfo fsmStartState = typeof(Fsm).GetField("startState", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        protected static List<PlayMakerFSM> fsmList;
-        protected static GameObject shinyPrefab;
+        protected static PlayMakerFSM[] FsmList => fsmList.ToArray();
 
-        public abstract void Process();
+        protected static GameObject ShinyPrefab => Object.Instantiate(shinyPrefab);
         
-        //Always call before processing
-        //PlayMakerFSM.FsmList does not contain inactive FSMs
+        // Always call before processing
+        // PlayMakerFSM.FsmList does not contain inactive FSMs
         public static void FetchFSMList(Scene scene)
         {
             fsmList = new List<PlayMakerFSM>();
-            scene.GetRootGameObjects().ToList().ForEach(obj => fsmList.AddRange(obj.GetComponentsInChildren<PlayMakerFSM>(true)));
-            
-            if (shinyPrefab == null)
+
+            foreach (GameObject obj in scene.GetRootGameObjects())
             {
-                foreach (PlayMakerFSM fsm in fsmList)
+                foreach (PlayMakerFSM fsm in obj.GetComponentsInChildren<PlayMakerFSM>(true))
                 {
-                    if (fsm.FsmName == "Shiny Control" && (fsm.gameObject.name == "Shiny Item" || fsm.gameObject.name == "Shiny Item (1)") && fsm.gameObject.GetComponent<Rigidbody2D>() != null)
-                    {
-                        SetShinyPrefab(fsm.gameObject);
-                        break;
-                    }
+                    AddToFsmList(fsm);
                 }
             }
         }
@@ -45,12 +41,17 @@ namespace RandomizerMod.Actions
             shinyPrefab = Object.Instantiate(obj);
             shinyPrefab.SetActive(false);
             shinyPrefab.name = "Randomizer Shiny";
-            Object.DontDestroyOnLoad(shinyPrefab);
+            Object.DontDestroyOnLoad(ShinyPrefab);
         }
 
-        protected static void ResetFSM(PlayMakerFSM fsm)
+        public static void AddToFsmList(PlayMakerFSM fsm)
         {
-            fsm.SetState((string)fsmStartState.GetValue(fsm.Fsm));
+            if (fsm != null && fsmList != null && !fsmList.Contains(fsm))
+            {
+                fsmList.Add(fsm);
+            }
         }
+
+        public abstract void Process();
     }
 }

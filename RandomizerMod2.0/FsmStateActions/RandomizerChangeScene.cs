@@ -17,7 +17,7 @@ namespace RandomizerMod.FsmStateActions
         {
             if (!string.IsNullOrEmpty(sceneName) && !string.IsNullOrEmpty(gateName))
             {
-                RandomizerMod.instance.ChangeToScene(sceneName, gateName);
+                RandomizerMod.Instance.ChangeToScene(sceneName, gateName);
             }
 
             Finish();

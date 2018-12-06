@@ -3,50 +3,55 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Modding;
-using UnityEngine;
 using RandomizerMod.Actions;
+using UnityEngine;
 
 namespace RandomizerMod
 {
     public class SaveSettings : IModSettings, ISerializationCallbackReceiver
     {
-        public bool allBosses
+        public List<RandomizerAction> actions = new List<RandomizerAction>();
+        public Dictionary<string, string> itemPlacements = new Dictionary<string, string>();
+
+        private static Type[] types;
+
+        public bool AllBosses
         {
             get => GetBool(false);
             set => SetBool(value);
         }
 
-        public bool allSkills
+        public bool AllSkills
         {
             get => GetBool(false);
             set => SetBool(value);
         }
 
-        public bool allCharms
+        public bool AllCharms
         {
             get => GetBool(false);
             set => SetBool(value);
         }
 
-        public bool charmNotch
+        public bool CharmNotch
         {
             get => GetBool(false);
             set => SetBool(value);
         }
 
-        public bool lemm
+        public bool Lemm
         {
             get => GetBool(false);
             set => SetBool(value);
         }
 
-        public bool randomizer
+        public bool Randomizer
         {
             get => GetBool(false);
             set => SetBool(value);
         }
 
-        public bool slyCharm
+        public bool SlyCharm
         {
             get => GetBool(false);
             set => SetBool(value);
@@ -94,12 +99,7 @@ namespace RandomizerMod
             set => SetInt(value);
         }
 
-        private static Type[] types;
-
-        public List<RandomizerAction> actions = new List<RandomizerAction>();
-        public Dictionary<string, string> itemPlacements = new Dictionary<string, string>();
-
-        //Serialize actions list into string dict because Unity serializer can't handle inheritance
+        // Serialize actions list into string dict because Unity serializer can't handle inheritance
         public void OnBeforeSerialize()
         {
             for (int i = 0; i < actions.Count; i++)
@@ -114,13 +114,17 @@ namespace RandomizerMod
             }
         }
 
-        //Load the actions back into their list
+        // Load the actions back into their list
         public void OnAfterDeserialize()
         {
-            if (types == null) types = Assembly.GetAssembly(typeof(RandomizerAction)).GetTypes().Where(t => t.IsSubclassOf(typeof(RandomizerAction))).ToArray();
+            if (types == null)
+            {
+                types = Assembly.GetAssembly(typeof(RandomizerAction)).GetTypes().Where(t => t.IsSubclassOf(typeof(RandomizerAction))).ToArray();
+            }
+
             Dictionary<int, RandomizerAction> dict = new Dictionary<int, RandomizerAction>();
 
-            //Load the actions into a dict with numbers as keys
+            // Load the actions into a dict with numbers as keys
             foreach (string key in StringValues.Keys.ToList())
             {
                 if (key.StartsWith("RandomizerAction"))
@@ -135,6 +139,7 @@ namespace RandomizerMod
                             break;
                         }
                     }
+
                     StringValues.Remove(key);
                 }
                 else if (key.StartsWith("itemPlacements"))
@@ -143,8 +148,8 @@ namespace RandomizerMod
                 }
             }
 
-            //Put them back into the list in order
-            //This should be unnecessary in theory but I was having issues with order
+            // Put them back into the list in order
+            // This should be unnecessary in theory but I was having issues with order
             for (int i = 0; i < dict.Count; i++)
             {
                 actions.Add(dict[i]);

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 using Object = UnityEngine.Object;
 
@@ -15,17 +12,17 @@ namespace RandomizerMod.Extensions
     {
         public static MenuButton Clone(this MenuButton self, string name, MenuButton.MenuButtonType type, Vector2 pos, string text = null, string description = null, Sprite image = null)
         {
-            //Set up duplicate of button
+            // Set up duplicate of button
             MenuButton newBtn = Object.Instantiate(self.gameObject).GetComponent<MenuButton>();
             newBtn.name = name;
             newBtn.buttonType = type;
             newBtn.transform.SetParent(self.transform.parent);
             newBtn.transform.localScale = self.transform.localScale;
 
-            //Place the button in the proper spot
+            // Place the button in the proper spot
             newBtn.transform.localPosition = pos;
 
-            //Change text on the button
+            // Change text on the button
             if (text != null)
             {
                 Transform textTrans = newBtn.transform.Find("Text");
@@ -40,7 +37,7 @@ namespace RandomizerMod.Extensions
                 descTrans.GetComponent<Text>().text = description;
             }
 
-            //Change image on button to the logo
+            // Change image on button to the logo
             if (image != null)
             {
                 newBtn.transform.Find("Image").GetComponent<Image>().sprite = image;
@@ -80,7 +77,10 @@ namespace RandomizerMod.Extensions
 
             trig.triggers.Add(newEvent);
 
-            if (type == EventTriggerType.Submit) self.AddEvent(EventTriggerType.PointerClick, func);
+            if (type == EventTriggerType.Submit)
+            {
+                self.AddEvent(EventTriggerType.PointerClick, func);
+            }
         }
 
         public static void SetDown(this Selectable self, Selectable down)

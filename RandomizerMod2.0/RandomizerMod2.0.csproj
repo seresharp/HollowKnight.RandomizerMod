@@ -85,11 +85,11 @@
     <Compile Include="Components\ShinyPreloader.cs" />
     <Compile Include="Components\Shop.cs" />
     <Compile Include="Extensions\ModCommonTheft.cs" />
+    <Compile Include="FontManager.cs" />
     <Compile Include="FsmStateActions\RandomizerTakeGeo.cs" />
     <Compile Include="FsmStateActions\RandomizerSellRelics.cs" />
     <Compile Include="Actions\ReplaceObjectWithShiny.cs" />
     <Compile Include="Components\BigItemPopup.cs" />
-    <Compile Include="Components\FrameWaiter.cs" />
     <Compile Include="Components\ObjectDestroyer.cs" />
     <Compile Include="Extensions\SpriteExtensions.cs" />
     <Compile Include="FsmStateActions\RandomizerCallStaticMethod.cs" />
@@ -103,6 +103,7 @@
     <Compile Include="Extensions\PlayMakerFSMExtensions.cs" />
     <Compile Include="FsmStateActions\RandomizerBoolTest.cs" />
     <Compile Include="Actions\RandomizerAction.cs" />
+    <Compile Include="MenuChanger.cs" />
     <Compile Include="Randomization\LogicManager.cs" />
     <Compile Include="RandomizerMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

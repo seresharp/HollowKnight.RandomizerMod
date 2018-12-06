@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Xml;
 
@@ -15,10 +15,10 @@ namespace RandomizerMod.Randomization
         Spell
     }
 
-#pragma warning disable 0649 //Assigned via reflection
+#pragma warning disable 0649 // Assigned via reflection
     internal struct ReqDef
     {
-        //Control variables
+        // Control variables
         public string boolName;
         public string sceneName;
         public string objectName;
@@ -29,7 +29,7 @@ namespace RandomizerMod.Randomization
 
         public ItemType type;
 
-        //Big item variables
+        // Big item variables
         public string bigSpriteKey;
         public string takeKey;
         public string nameKey;
@@ -37,14 +37,14 @@ namespace RandomizerMod.Randomization
         public string descOneKey;
         public string descTwoKey;
 
-        //Shop variables
+        // Shop variables
         public string shopDescKey;
         public string shopSpriteKey;
         public string notchCost;
 
         public string shopName;
 
-        //Item tier flags
+        // Item tier flags
         public bool progression;
         public bool isGoodItem;
     }
@@ -67,14 +67,33 @@ namespace RandomizerMod.Randomization
         private static Dictionary<string, string[]> macros;
 
         public static string[] ItemNames => items.Keys.ToArray();
+
         public static string[] ShopNames => shops.Keys.ToArray();
+
         public static string[] AdditiveItemNames => additiveItems.Keys.ToArray();
+
+        public static void ParseXML(Stream xmlStream)
+        {
+            XmlDocument xml = new XmlDocument();
+            xml.Load(xmlStream);
+            xmlStream.Dispose();
+
+            macros = new Dictionary<string, string[]>();
+            additiveItems = new Dictionary<string, string[]>();
+            items = new Dictionary<string, ReqDef>();
+            shops = new Dictionary<string, ShopDef>();
+
+            ParseAdditiveItemXML(xml.SelectNodes("randomizer/additiveItemSet"));
+            ParseMacroXML(xml.SelectNodes("randomizer/macro"));
+            ParseItemXML(xml.SelectNodes("randomizer/item"));
+            ParseShopXML(xml.SelectNodes("randomizer/shop"));
+        }
 
         public static ReqDef GetItemDef(string name)
         {
             if (!items.TryGetValue(name, out ReqDef def))
             {
-                RandomizerMod.instance.LogWarn($"Nonexistent item \"{name}\" requested");
+                RandomizerMod.Instance.LogWarn($"Nonexistent item \"{name}\" requested");
             }
 
             return def;
@@ -84,7 +103,7 @@ namespace RandomizerMod.Randomization
         {
             if (!shops.TryGetValue(name, out ShopDef def))
             {
-                RandomizerMod.instance.LogWarn($"Nonexistent shop \"{name}\" requested");
+                RandomizerMod.Instance.LogWarn($"Nonexistent shop \"{name}\" requested");
             }
 
             return def;
@@ -104,7 +123,7 @@ namespace RandomizerMod.Randomization
             }
             else
             {
-                RandomizerMod.instance.LogWarn($"ParseLogic called for non-existent item/shop \"{item}\"");
+                RandomizerMod.Instance.LogWarn($"ParseLogic called for non-existent item/shop \"{item}\"");
                 return false;
             }
 
@@ -122,7 +141,7 @@ namespace RandomizerMod.Randomization
                     case "+":
                         if (stack.Count < 2)
                         {
-                            RandomizerMod.instance.LogWarn($"Could not parse logic for \"{item}\": Found + when stack contained less than 2 items");
+                            RandomizerMod.Instance.LogWarn($"Could not parse logic for \"{item}\": Found + when stack contained less than 2 items");
                             return false;
                         }
 
@@ -131,29 +150,29 @@ namespace RandomizerMod.Randomization
                     case "|":
                         if (stack.Count < 2)
                         {
-                            RandomizerMod.instance.LogWarn($"Could not parse logic for \"{item}\": Found | when stack contained less than 2 items");
+                            RandomizerMod.Instance.LogWarn($"Could not parse logic for \"{item}\": Found | when stack contained less than 2 items");
                             return false;
                         }
 
                         stack.Push(stack.Pop() | stack.Pop());
                         break;
                     case "SHADESKIPS":
-                        stack.Push(RandomizerMod.instance.Settings.ShadeSkips);
+                        stack.Push(RandomizerMod.Instance.Settings.ShadeSkips);
                         break;
                     case "ACIDSKIPS":
-                        stack.Push(RandomizerMod.instance.Settings.AcidSkips);
+                        stack.Push(RandomizerMod.Instance.Settings.AcidSkips);
                         break;
                     case "SPIKETUNNELS":
-                        stack.Push(RandomizerMod.instance.Settings.SpikeTunnels);
+                        stack.Push(RandomizerMod.Instance.Settings.SpikeTunnels);
                         break;
                     case "MISCSKIPS":
-                        stack.Push(RandomizerMod.instance.Settings.MiscSkips);
+                        stack.Push(RandomizerMod.Instance.Settings.MiscSkips);
                         break;
                     case "FIREBALLSKIPS":
-                        stack.Push(RandomizerMod.instance.Settings.FireballSkips);
+                        stack.Push(RandomizerMod.Instance.Settings.FireballSkips);
                         break;
                     case "MAGSKIPS":
-                        stack.Push(RandomizerMod.instance.Settings.MagSkips);
+                        stack.Push(RandomizerMod.Instance.Settings.MagSkips);
                         break;
                     case "EVERYTHING":
                         stack.Push(false);
@@ -166,13 +185,13 @@ namespace RandomizerMod.Randomization
 
             if (stack.Count == 0)
             {
-                RandomizerMod.instance.LogWarn($"Could not parse logic for \"{item}\": Stack empty after parsing");
+                RandomizerMod.Instance.LogWarn($"Could not parse logic for \"{item}\": Stack empty after parsing");
                 return false;
             }
 
             if (stack.Count != 1)
             {
-                RandomizerMod.instance.LogWarn($"Extra items in stack after parsing logic for \"{item}\"");
+                RandomizerMod.Instance.LogWarn($"Extra items in stack after parsing logic for \"{item}\"");
             }
 
             return stack.Pop();
@@ -182,7 +201,7 @@ namespace RandomizerMod.Randomization
         {
             if (!additiveItems.TryGetValue(name, out string[] items))
             {
-                RandomizerMod.instance.LogWarn($"Nonexistent additive item set \"{name}\" requested");
+                RandomizerMod.Instance.LogWarn($"Nonexistent additive item set \"{name}\" requested");
                 return null;
             }
 
@@ -200,7 +219,7 @@ namespace RandomizerMod.Randomization
                 string op = GetNextOperator(infix, ref i);
 
                 // Easiest way to deal with whitespace between operators
-                if (op.Trim(' ') == "")
+                if (op.Trim(' ') == string.Empty)
                 {
                     continue;
                 }
@@ -267,20 +286,14 @@ namespace RandomizerMod.Randomization
             return infix.Substring(start, i - start).Trim(' ');
         }
 
-        public static void ParseXML(Stream xmlStream)
+        private static void ParseAdditiveItemXML(XmlNodeList nodes)
         {
-            XmlDocument xml = new XmlDocument();
-            xml.Load(xmlStream);
-            xmlStream.Dispose();
-
-            macros = new Dictionary<string, string[]>();
-            additiveItems = new Dictionary<string, string[]>();
-            foreach (XmlNode setNode in xml.SelectNodes("randomizer/additiveItemSet"))
+            foreach (XmlNode setNode in nodes)
             {
                 XmlAttribute nameAttr = setNode.Attributes["name"];
                 if (nameAttr == null)
                 {
-                    RandomizerMod.instance.LogWarn("Node in items.xml has no name attribute");
+                    RandomizerMod.Instance.LogWarn("Node in items.xml has no name attribute");
                     continue;
                 }
 
@@ -290,46 +303,50 @@ namespace RandomizerMod.Randomization
                     additiveSet[i] = setNode.ChildNodes[i].InnerText;
                 }
 
-                RandomizerMod.instance.LogDebug($"Parsed XML for item set \"{nameAttr.InnerText}\"");
+                RandomizerMod.Instance.LogDebug($"Parsed XML for item set \"{nameAttr.InnerText}\"");
                 additiveItems.Add(nameAttr.InnerText, additiveSet);
                 macros.Add(nameAttr.InnerText, ShuntingYard(string.Join(" | ", additiveSet)));
             }
+        }
 
-            foreach (XmlNode macroNode in xml.SelectNodes("randomizer/macro"))
+        private static void ParseMacroXML(XmlNodeList nodes)
+        {
+            foreach (XmlNode macroNode in nodes)
             {
                 XmlAttribute nameAttr = macroNode.Attributes["name"];
                 if (nameAttr == null)
                 {
-                    RandomizerMod.instance.LogWarn("Node in items.xml has no name attribute");
+                    RandomizerMod.Instance.LogWarn("Node in items.xml has no name attribute");
                     continue;
                 }
 
-                RandomizerMod.instance.LogDebug($"Parsed XML for macro \"{nameAttr.InnerText}\"");
+                RandomizerMod.Instance.LogDebug($"Parsed XML for macro \"{nameAttr.InnerText}\"");
                 macros.Add(nameAttr.InnerText, ShuntingYard(macroNode.InnerText));
             }
+        }
 
-            items = new Dictionary<string, ReqDef>();
-
+        private static void ParseItemXML(XmlNodeList nodes)
+        {
             Dictionary<string, FieldInfo> reqFields = new Dictionary<string, FieldInfo>();
             typeof(ReqDef).GetFields().ToList().ForEach(f => reqFields.Add(f.Name, f));
 
-            foreach (XmlNode itemNode in xml.SelectNodes("randomizer/item"))
+            foreach (XmlNode itemNode in nodes)
             {
                 XmlAttribute nameAttr = itemNode.Attributes["name"];
                 if (nameAttr == null)
                 {
-                    RandomizerMod.instance.LogWarn("Node in items.xml has no name attribute");
+                    RandomizerMod.Instance.LogWarn("Node in items.xml has no name attribute");
                     continue;
                 }
 
-                //Setting as object prevents boxing in FieldInfo.SetValue calls
+                // Setting as object prevents boxing in FieldInfo.SetValue calls
                 object def = new ReqDef();
 
                 foreach (XmlNode fieldNode in itemNode.ChildNodes)
                 {
                     if (!reqFields.TryGetValue(fieldNode.Name, out FieldInfo field))
                     {
-                        RandomizerMod.instance.LogWarn($"Xml node \"{fieldNode.Name}\" does not map to a field in struct ReqDef");
+                        RandomizerMod.Instance.LogWarn($"Xml node \"{fieldNode.Name}\" does not map to a field in struct ReqDef");
                         continue;
                     }
 
@@ -345,7 +362,7 @@ namespace RandomizerMod.Randomization
                         }
                         else
                         {
-                            RandomizerMod.instance.LogWarn("string[] field not named \"logic\" found in ReqDef, ignoring");
+                            RandomizerMod.Instance.LogWarn("string[] field not named \"logic\" found in ReqDef, ignoring");
                         }
                     }
                     else if (field.FieldType == typeof(bool))
@@ -356,12 +373,12 @@ namespace RandomizerMod.Randomization
                         }
                         else
                         {
-                            RandomizerMod.instance.LogWarn($"Could not parse \"{fieldNode.InnerText}\" to bool");
+                            RandomizerMod.Instance.LogWarn($"Could not parse \"{fieldNode.InnerText}\" to bool");
                         }
                     }
                     else if (field.FieldType == typeof(ItemType))
                     {
-                        //Enum.TryParse doesn't exist in .NET 3.5
+                        // Enum.TryParse doesn't exist in .NET 3.5
                         ItemType type;
                         try
                         {
@@ -370,41 +387,42 @@ namespace RandomizerMod.Randomization
                         }
                         catch
                         {
-                            RandomizerMod.instance.LogWarn($"Could not parse \"{fieldNode.InnerText}\" to ItemType");
+                            RandomizerMod.Instance.LogWarn($"Could not parse \"{fieldNode.InnerText}\" to ItemType");
                         }
                     }
                     else
                     {
-                        RandomizerMod.instance.LogWarn("Unsupported type in ReqDef: " + field.FieldType.Name);
+                        RandomizerMod.Instance.LogWarn("Unsupported type in ReqDef: " + field.FieldType.Name);
                     }
                 }
 
-                RandomizerMod.instance.LogDebug($"Parsed XML for item \"{nameAttr.InnerText}\"");
+                RandomizerMod.Instance.LogDebug($"Parsed XML for item \"{nameAttr.InnerText}\"");
                 items.Add(nameAttr.InnerText, (ReqDef)def);
             }
+        }
 
-            shops = new Dictionary<string, ShopDef>();
-
+        private static void ParseShopXML(XmlNodeList nodes)
+        {
             Dictionary<string, FieldInfo> shopFields = new Dictionary<string, FieldInfo>();
             typeof(ShopDef).GetFields().ToList().ForEach(f => shopFields.Add(f.Name, f));
 
-            foreach (XmlNode shopNode in xml.SelectNodes("randomizer/shop"))
+            foreach (XmlNode shopNode in nodes)
             {
                 XmlAttribute nameAttr = shopNode.Attributes["name"];
                 if (nameAttr == null)
                 {
-                    RandomizerMod.instance.LogWarn("Node in items.xml has no name attribute");
+                    RandomizerMod.Instance.LogWarn("Node in items.xml has no name attribute");
                     continue;
                 }
 
-                //Setting as object prevents boxing in FieldInfo.SetValue calls
+                // Setting as object prevents boxing in FieldInfo.SetValue calls
                 object def = new ShopDef();
 
                 foreach (XmlNode fieldNode in shopNode.ChildNodes)
                 {
                     if (!shopFields.TryGetValue(fieldNode.Name, out FieldInfo field))
                     {
-                        RandomizerMod.instance.LogWarn($"Xml node \"{fieldNode.Name}\" does not map to a field in struct ReqDef");
+                        RandomizerMod.Instance.LogWarn($"Xml node \"{fieldNode.Name}\" does not map to a field in struct ReqDef");
                         continue;
                     }
 
@@ -420,7 +438,7 @@ namespace RandomizerMod.Randomization
                         }
                         else
                         {
-                            RandomizerMod.instance.LogWarn("string[] field not named \"logic\" found in ShopDef, ignoring");
+                            RandomizerMod.Instance.LogWarn("string[] field not named \"logic\" found in ShopDef, ignoring");
                         }
                     }
                     else if (field.FieldType == typeof(bool))
@@ -431,16 +449,16 @@ namespace RandomizerMod.Randomization
                         }
                         else
                         {
-                            RandomizerMod.instance.LogWarn($"Could not parse \"{fieldNode.InnerText}\" to bool");
+                            RandomizerMod.Instance.LogWarn($"Could not parse \"{fieldNode.InnerText}\" to bool");
                         }
                     }
                     else
                     {
-                        RandomizerMod.instance.LogWarn("Unsupported type in ShopDef: " + field.FieldType.Name);
+                        RandomizerMod.Instance.LogWarn("Unsupported type in ShopDef: " + field.FieldType.Name);
                     }
                 }
 
-                RandomizerMod.instance.LogDebug($"Parsed XML for shop \"{nameAttr.InnerText}\"");
+                RandomizerMod.Instance.LogDebug($"Parsed XML for shop \"{nameAttr.InnerText}\"");
                 shops.Add(nameAttr.InnerText, (ShopDef)def);
             }
         }

@@ -1,9 +1,9 @@
 ﻿using System;
-using UnityEngine;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
+using UnityEngine;
 
 namespace RandomizerMod.Actions
 {
@@ -29,29 +29,29 @@ namespace RandomizerMod.Actions
         {
             if (GameManager.instance.GetSceneNameString() == sceneName)
             {
-                foreach (PlayMakerFSM fsm in fsmList)
+                foreach (PlayMakerFSM fsm in FsmList)
                 {
                     if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)
                     {
                         FsmState pdBool = fsm.GetState("PD Bool?");
                         FsmState charm = fsm.GetState("Charm?");
 
-                        //Remove actions that stop shiny from spawning
+                        // Remove actions that stop shiny from spawning
                         pdBool.RemoveActionsOfType<PlayerDataBoolTest>();
                         pdBool.RemoveActionsOfType<StringCompare>();
 
-                        //Add our own check to stop the shiny from being grabbed twice
+                        // Add our own check to stop the shiny from being grabbed twice
                         pdBool.AddAction(new RandomizerBoolTest(boolName, null, "COLLECTED"));
 
-                        //The "Charm?" state is a good entry point for our geo spawning
+                        // The "Charm?" state is a good entry point for our geo spawning
                         charm.AddAction(new RandomizerSetBool(boolName, true));
                         charm.AddAction(new RandomizerAddGeo(fsm.gameObject, geoAmount));
 
-                        //Skip all the other type checks
+                        // Skip all the other type checks
                         charm.ClearTransitions();
                         charm.AddTransition("FINISHED", "Flash");
 
-                        //Changes have been made, stop looping
+                        // Changes have been made, stop looping
                         break;
                     }
                 }

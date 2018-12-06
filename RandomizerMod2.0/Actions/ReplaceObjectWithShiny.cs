@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
-using RandomizerMod.Components;
 using RandomizerMod.Extensions;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using Object = UnityEngine.Object;
 
@@ -34,34 +30,39 @@ namespace RandomizerMod.Actions
                 Scene scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
                 GameObject obj = scene.FindGameObject(objectName);
 
-                if (obj != null)
+                if (obj == null)
                 {
-                    //Put a shiny in the same location as the original
-                    GameObject shiny = Object.Instantiate(shinyPrefab);
-                    shiny.name = newShinyName;
-                    if (obj.transform.parent != null) shiny.transform.SetParent(obj.transform.parent);
-                    shiny.transform.position = obj.transform.position;
-                    shiny.transform.localPosition = obj.transform.localPosition;
-                    shiny.SetActive(obj.activeSelf);
-
-                    //Force the new shiny to fall straight downwards
-                    PlayMakerFSM fsm = FSMUtility.LocateFSM(shiny, "Shiny Control");
-                    FsmState fling = fsm.GetState("Fling?");
-                    fling.ClearTransitions();
-                    fling.AddTransition("FINISHED", "Fling R");
-                    FlingObject flingObj = fsm.GetState("Fling R").GetActionsOfType<FlingObject>()[0];
-                    flingObj.angleMin = flingObj.angleMax = 270;
-
-                    //For some reason not setting speed manually messes with the object position
-                    flingObj.speedMin = flingObj.speedMax = 0.1f;
-
-                    //Gotta put our new shiny into the fsm list
-                    fsmList.Add(fsm);
-
-                    //Destroy the original
-                    Object.Destroy(obj);
+                    throw new ArgumentException($"Could not find object {objectName} in scene {scene.name}");
                 }
-                else throw new ArgumentException($"Could not find object {objectName} in scene {scene.name}");
+
+                // Put a shiny in the same location as the original
+                GameObject shiny = ShinyPrefab;
+                shiny.name = newShinyName;
+                if (obj.transform.parent != null)
+                {
+                    shiny.transform.SetParent(obj.transform.parent);
+                }
+
+                shiny.transform.position = obj.transform.position;
+                shiny.transform.localPosition = obj.transform.localPosition;
+                shiny.SetActive(obj.activeSelf);
+
+                // Force the new shiny to fall straight downwards
+                PlayMakerFSM fsm = FSMUtility.LocateFSM(shiny, "Shiny Control");
+                FsmState fling = fsm.GetState("Fling?");
+                fling.ClearTransitions();
+                fling.AddTransition("FINISHED", "Fling R");
+                FlingObject flingObj = fsm.GetState("Fling R").GetActionsOfType<FlingObject>()[0];
+                flingObj.angleMin = flingObj.angleMax = 270;
+
+                // For some reason not setting speed manually messes with the object position
+                flingObj.speedMin = flingObj.speedMax = 0.1f;
+
+                // Gotta put our new shiny into the fsm list
+                AddToFsmList(fsm);
+
+                // Destroy the original
+                Object.Destroy(obj);
             }
         }
     }

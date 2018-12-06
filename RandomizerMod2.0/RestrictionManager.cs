@@ -17,7 +17,7 @@ namespace RandomizerMod
 
         static RestrictionManager()
         {
-            //Set up dictionaries for restriction checking
+            // Set up dictionaries for restriction checking
             skills = new Dictionary<string, string>();
             skills.Add("hasDash", "Mothwing Cloak");
             skills.Add("hasShadowDash", "Shade Cloak");
@@ -66,40 +66,40 @@ namespace RandomizerMod
 
         public static void ProcessRestrictions()
         {
-            if (RandomizerMod.instance.Settings.allBosses || RandomizerMod.instance.Settings.allCharms || RandomizerMod.instance.Settings.allSkills)
+            if (RandomizerMod.Instance.Settings.AllBosses || RandomizerMod.Instance.Settings.AllCharms || RandomizerMod.Instance.Settings.AllSkills)
             {
-                //Close the door and get rid of Quirrel
+                // Close the door and get rid of Quirrel
                 PlayerData.instance.openedBlackEggDoor = false;
                 PlayerData.instance.quirrelLeftEggTemple = true;
 
-                //Prevent the game from opening the door
+                // Prevent the game from opening the door
                 GameObject door = GameObject.Find("Final Boss Door");
                 PlayMakerFSM doorFSM = FSMUtility.LocateFSM(door, "Control");
                 doorFSM.SetState("Idle");
 
-                //The door is cosmetic, gotta get rid of the actual TransitionPoint too
+                // The door is cosmetic, gotta get rid of the actual TransitionPoint too
                 TransitionPoint doorTransitionPoint = door.GetComponentInChildren<TransitionPoint>(true);
                 doorTransitionPoint.gameObject.SetActive(false);
 
-                //Make Hornet appear
+                // Make Hornet appear
                 GameObject hornet = GameObject.Find("Hornet Black Egg NPC");
                 hornet.SetActive(true);
                 FsmState activeCheck = FSMUtility.LocateFSM(hornet, "Conversation Control").GetState("Active?");
                 activeCheck.RemoveActionsOfType<IntCompare>();
                 activeCheck.RemoveActionsOfType<PlayerDataBoolTest>();
 
-                //Reset Hornet dialog to default
+                // Reset Hornet dialog to default
                 LanguageStringManager.ResetString(HORNET_SHEET, HORNET_DOOR_KEY);
 
-                //Check dreamers
+                // Check dreamers
                 if (!PlayerData.instance.lurienDefeated || !PlayerData.instance.monomonDefeated || !PlayerData.instance.hegemolDefeated)
                 {
                     LanguageStringManager.SetString(HORNET_SHEET, HORNET_DOOR_KEY, "What kind of idiot comes here without even killing the dreamers?");
                     return;
                 }
 
-                //Check all charms
-                if (RandomizerMod.instance.Settings.allCharms)
+                // Check all charms
+                if (RandomizerMod.Instance.Settings.AllCharms)
                 {
                     PlayerData.instance.CountCharms();
                     if (PlayerData.instance.charmsOwned < 40)
@@ -114,8 +114,8 @@ namespace RandomizerMod
                     }
                 }
 
-                //Check all skills
-                if (RandomizerMod.instance.Settings.allSkills)
+                // Check all skills
+                if (RandomizerMod.Instance.Settings.AllSkills)
                 {
                     List<string> missingSkills = new List<string>();
 
@@ -127,13 +127,36 @@ namespace RandomizerMod
                         }
                     }
 
-                    //These aren't as easy to check in a loop, so I'm just gonna check them manually
-                    if (PlayerData.instance.fireballLevel == 0) missingSkills.Add("Vengeful Spirit");
-                    if (PlayerData.instance.fireballLevel < 2) missingSkills.Add("Shade Soul");
-                    if (PlayerData.instance.quakeLevel == 0) missingSkills.Add("Desolate Dive");
-                    if (PlayerData.instance.quakeLevel < 2) missingSkills.Add("Descending Dark");
-                    if (PlayerData.instance.screamLevel == 0) missingSkills.Add("Howling Wraiths");
-                    if (PlayerData.instance.screamLevel < 2) missingSkills.Add("Abyss Shriek");
+                    // These aren't as easy to check in a loop, so I'm just gonna check them manually
+                    if (PlayerData.instance.fireballLevel == 0)
+                    {
+                        missingSkills.Add("Vengeful Spirit");
+                    }
+
+                    if (PlayerData.instance.fireballLevel < 2)
+                    {
+                        missingSkills.Add("Shade Soul");
+                    }
+
+                    if (PlayerData.instance.quakeLevel == 0)
+                    {
+                        missingSkills.Add("Desolate Dive");
+                    }
+
+                    if (PlayerData.instance.quakeLevel < 2)
+                    {
+                        missingSkills.Add("Descending Dark");
+                    }
+
+                    if (PlayerData.instance.screamLevel == 0)
+                    {
+                        missingSkills.Add("Howling Wraiths");
+                    }
+
+                    if (PlayerData.instance.screamLevel < 2)
+                    {
+                        missingSkills.Add("Abyss Shriek");
+                    }
 
                     if (missingSkills.Count > 0)
                     {
@@ -152,6 +175,7 @@ namespace RandomizerMod
                                 hornetStr += ", ";
                             }
                         }
+
                         hornetStr += ".";
 
                         LanguageStringManager.SetString(HORNET_SHEET, HORNET_DOOR_KEY, hornetStr);
@@ -159,8 +183,8 @@ namespace RandomizerMod
                     }
                 }
 
-                //Check all bosses
-                if (RandomizerMod.instance.Settings.allBosses)
+                // Check all bosses
+                if (RandomizerMod.Instance.Settings.AllBosses)
                 {
                     List<string> missingBosses = new List<string>();
 
@@ -172,8 +196,11 @@ namespace RandomizerMod
                         }
                     }
 
-                    //CG2 has no bool
-                    if (PlayerData.instance.killsMegaBeamMiner > 0) missingBosses.Add("Crystal Guardian 2");
+                    // CG2 has no bool
+                    if (PlayerData.instance.killsMegaBeamMiner > 0)
+                    {
+                        missingBosses.Add("Crystal Guardian 2");
+                    }
 
                     if (missingBosses.Count > 0)
                     {
@@ -198,6 +225,7 @@ namespace RandomizerMod
                                 hornetStr += ", ";
                             }
                         }
+
                         hornetStr += ".";
 
                         LanguageStringManager.SetString(HORNET_SHEET, HORNET_DOOR_KEY, hornetStr);
@@ -211,7 +239,7 @@ namespace RandomizerMod
                     }
                 }
 
-                //All checks passed, time to open up
+                // All checks passed, time to open up
                 PlayerData.instance.openedBlackEggDoor = true;
                 doorFSM.SetState("Opened");
                 doorTransitionPoint.gameObject.SetActive(true);

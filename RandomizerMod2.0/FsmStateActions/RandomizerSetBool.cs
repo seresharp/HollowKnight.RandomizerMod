@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using HutongGames.PlayMaker;
 
 namespace RandomizerMod.FsmStateActions
@@ -21,8 +18,14 @@ namespace RandomizerMod.FsmStateActions
 
         public override void OnEnter()
         {
-            if (playerdata) PlayerData.instance.SetBool(name, val);
-            else RandomizerMod.instance.Settings.SetBool(val, name);
+            if (playerdata)
+            {
+                PlayerData.instance.SetBool(name, val);
+            }
+            else
+            {
+                RandomizerMod.Instance.Settings.SetBool(val, name);
+            }
 
             Finish();
         }

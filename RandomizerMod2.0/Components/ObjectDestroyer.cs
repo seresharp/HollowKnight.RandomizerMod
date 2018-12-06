@@ -5,7 +5,7 @@ namespace RandomizerMod.Components
 {
     internal class ObjectDestroyer : MonoBehaviour
     {
-        public string objectName;
+        private string objectName;
 
         public static void Destroy(string objectName)
         {

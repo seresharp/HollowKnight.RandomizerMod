@@ -1,9 +1,9 @@
 ﻿using System;
-using UnityEngine;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
+using UnityEngine;
 
 namespace RandomizerMod.Actions
 {
@@ -30,27 +30,27 @@ namespace RandomizerMod.Actions
         {
             if (GameManager.instance.GetSceneNameString() == sceneName)
             {
-                foreach (PlayMakerFSM fsm in fsmList)
+                foreach (PlayMakerFSM fsm in FsmList)
                 {
                     if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)
                     {
-                        //Remove actions that activate shiny item
+                        // Remove actions that activate shiny item
                         FsmState spawnItems = fsm.GetState("Spawn Items");
                         spawnItems.RemoveActionsOfType<ActivateAllChildren>();
                         fsm.GetState("Activated").RemoveActionsOfType<ActivateAllChildren>();
 
-                        //Add geo to chest
-                        //Chest geo pool cannot be trusted, often spawns less than it should
+                        // Add geo to chest
+                        // Chest geo pool cannot be trusted, often spawns less than it should
                         spawnItems.AddAction(new RandomizerAddGeo(fsm.gameObject, geoAmount));
 
-                        //Remove pre-existing geo from chest
+                        // Remove pre-existing geo from chest
                         foreach (FlingObjectsFromGlobalPool fling in spawnItems.GetActionsOfType<FlingObjectsFromGlobalPool>())
                         {
                             fling.spawnMin = 0;
                             fling.spawnMax = 0;
                         }
 
-                        //Changes have been made, stop looping
+                        // Changes have been made, stop looping
                         break;
                     }
                 }

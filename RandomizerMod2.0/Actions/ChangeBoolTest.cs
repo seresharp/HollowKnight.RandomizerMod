@@ -1,8 +1,8 @@
 ﻿using System;
 using HutongGames.PlayMaker.Actions;
-using UnityEngine;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
+using UnityEngine;
 
 namespace RandomizerMod.Actions
 {
@@ -26,13 +26,13 @@ namespace RandomizerMod.Actions
             this.playerdata = playerdata;
         }
 
-        //Looping this much to change only one action is pretty bad
-        //Use this class sparingly
+        // Looping this much to change only one action is pretty bad
+        // Use this class sparingly
         public override void Process()
         {
             if (GameManager.instance.GetSceneNameString() == sceneName)
             {
-                foreach (PlayMakerFSM fsm in fsmList)
+                foreach (PlayMakerFSM fsm in FsmList)
                 {
                     if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)
                     {

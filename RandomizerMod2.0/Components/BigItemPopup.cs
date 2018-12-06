@@ -1,52 +1,41 @@
 ﻿using System;
 using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
 using Modding;
 using RandomizerMod.Actions;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace RandomizerMod.Components
 {
     internal class BigItemPopup : MonoBehaviour
     {
         private static Sprite blackPixel = CanvasUtil.NullSprite(new byte[] { 0x00, 0x00, 0x00, 0xAA });
-        public static Font perpetua;
         private static Sprite[] frames;
 
-        private bool showInstantly;
+        private Sprite imagePrompt;
+        private string takeText;
+        private string nameText;
+        private string buttonText;
+        private string descOneText;
+        private string descTwoText;
+        private GameObject fsmObj;
+        private string fsmEvent;
 
-        public Sprite imagePrompt;
-        public string takeText;
-        public string nameText;
-        public string buttonText;
-        public string descOneText;
-        public string descTwoText;
-        public GameObject fsmObj;
-        public string fsmEvent;
+        private bool showInstantly;
         
         static BigItemPopup()
         {
-            CanvasUtil.CreateFonts();
-            foreach (Font f in Resources.FindObjectsOfTypeAll<Font>())
-            {
-                if (f.name == "Perpetua")
-                {
-                    perpetua = f;
-                    break;
-                }
-            }
-
             frames = new Sprite[] 
             {
-                RandomizerMod.sprites["Anim.BigItemFleur.0.png"],
-                RandomizerMod.sprites["Anim.BigItemFleur.1.png"],
-                RandomizerMod.sprites["Anim.BigItemFleur.2.png"],
-                RandomizerMod.sprites["Anim.BigItemFleur.3.png"],
-                RandomizerMod.sprites["Anim.BigItemFleur.4.png"],
-                RandomizerMod.sprites["Anim.BigItemFleur.5.png"],
-                RandomizerMod.sprites["Anim.BigItemFleur.6.png"],
-                RandomizerMod.sprites["Anim.BigItemFleur.7.png"],
-                RandomizerMod.sprites["Anim.BigItemFleur.8.png"],
+                RandomizerMod.GetSprite("Anim.BigItemFleur.0"),
+                RandomizerMod.GetSprite("Anim.BigItemFleur.1"),
+                RandomizerMod.GetSprite("Anim.BigItemFleur.2"),
+                RandomizerMod.GetSprite("Anim.BigItemFleur.3"),
+                RandomizerMod.GetSprite("Anim.BigItemFleur.4"),
+                RandomizerMod.GetSprite("Anim.BigItemFleur.5"),
+                RandomizerMod.GetSprite("Anim.BigItemFleur.6"),
+                RandomizerMod.GetSprite("Anim.BigItemFleur.7"),
+                RandomizerMod.GetSprite("Anim.BigItemFleur.8"),
             };
         }
 
@@ -54,13 +43,13 @@ namespace RandomizerMod.Components
         {
             for (int i = 0; i < items.Length; i++)
             {
-                if (!PlayerData.instance.GetBool(items[i].boolName))
+                if (!PlayerData.instance.GetBool(items[i].BoolName))
                 {
                     return Show(items[i], fsmObj, eventName);
                 }
             }
 
-            //In case of failure to give item, prevent soft lock
+            // In case of failure to give item, prevent soft lock
             if (fsmObj != null && eventName != null)
             {
                 FSMUtility.SendEventToGameObject(fsmObj, eventName);
@@ -71,18 +60,18 @@ namespace RandomizerMod.Components
 
         public static GameObject Show(BigItemDef item, GameObject fsmObj = null, string eventName = null)
         {
-            PlayerData.instance.SetBool(item.boolName, true);
-            return Show(item.spriteKey, item.takeKey, item.nameKey, item.buttonKey, item.descOneKey, item.descTwoKey, fsmObj, eventName);
+            PlayerData.instance.SetBool(item.BoolName, true);
+            return Show(item.SpriteKey, item.TakeKey, item.NameKey, item.ButtonKey, item.DescOneKey, item.DescTwoKey, fsmObj, eventName);
         }
 
         public static GameObject Show(string spriteKey, string takeKey, string nameKey, string buttonKey, string descOneKey, string descTwoKey, GameObject fsmObj = null, string eventName = null)
         {
-            //Create base canvas
+            // Create base canvas
             GameObject canvas = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
 
-            //Add popup component, set values
+            // Add popup component, set values
             BigItemPopup popup = canvas.AddComponent<BigItemPopup>();
-            popup.imagePrompt = RandomizerMod.sprites[spriteKey];
+            popup.imagePrompt = RandomizerMod.GetSprite(spriteKey);
             popup.takeText = Language.Language.Get(takeKey, "Prompts").Replace("<br>", " ");
             popup.nameText = Language.Language.Get(nameKey, "UI").Replace("<br>", " ");
             popup.buttonText = Language.Language.Get(buttonKey, "Prompts").Replace("<br>", " ");
@@ -96,16 +85,16 @@ namespace RandomizerMod.Components
 
         public void Start()
         {
-            GameManager.instance.SaveGame(GameManager.instance.profileID, x => {});
+            GameManager.instance.SaveGame(GameManager.instance.profileID, x => { });
             StartCoroutine(ShowPopup());
         }
 
         private IEnumerator ShowPopup()
         {
-            //Check for skipping popup
+            // Check for skipping popup
             Coroutine skipCoroutine = StartCoroutine(LookForShowInstantly());
 
-            //Begin dimming the scene
+            // Begin dimming the scene
             GameObject dimmer = CanvasUtil.CreateImagePanel(gameObject, blackPixel, new CanvasUtil.RectData(Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one));
             dimmer.GetComponent<Image>().preserveAspect = false;
             CanvasGroup dimmerCG = dimmer.AddComponent<CanvasGroup>();
@@ -118,13 +107,13 @@ namespace RandomizerMod.Components
             
             yield return WaitForSeconds(0.1f);
 
-            //Aim for 400 high prompt image
+            // Aim for 400 high prompt image
             float scaler = imagePrompt.texture.height / 400f;
             Vector2 size = new Vector2(imagePrompt.texture.width / scaler, imagePrompt.texture.height / scaler);
 
-            //Begin fading in the top bits of the popup
+            // Begin fading in the top bits of the popup
             GameObject topImage = CanvasUtil.CreateImagePanel(gameObject, imagePrompt, new CanvasUtil.RectData(size, Vector2.zero, new Vector2(0.5f, 0.75f), new Vector2(0.5f, 0.8f)));
-            GameObject topTextOne = CanvasUtil.CreateTextPanel(gameObject, takeText, 34, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.55f), new Vector2(0.5f, 0.55f)), perpetua);
+            GameObject topTextOne = CanvasUtil.CreateTextPanel(gameObject, takeText, 34, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.55f), new Vector2(0.5f, 0.55f)), FontManager.GetFont("Perpetua"));
             GameObject topTextTwo = CanvasUtil.CreateTextPanel(gameObject, nameText, 76, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 300), Vector2.zero, new Vector2(0.5f, 0.49f), new Vector2(0.5f, 0.49f)));
 
             CanvasGroup topImageCG = topImage.AddComponent<CanvasGroup>();
@@ -147,15 +136,15 @@ namespace RandomizerMod.Components
             StartCoroutine(FadeInCanvasGroup(topTextOneCG));
             yield return StartCoroutine(FadeInCanvasGroup(topTextTwoCG));
 
-            //Animate the middle fleur
+            // Animate the middle fleur
             GameObject fleur = CanvasUtil.CreateImagePanel(gameObject, frames[0], new CanvasUtil.RectData(new Vector2(frames[0].texture.width / 1.6f, frames[0].texture.height / 1.6f), Vector2.zero, new Vector2(0.5f, 0.4125f), new Vector2(0.5f, 0.4125f)));
             yield return StartCoroutine(AnimateFleur(fleur, 12));
             yield return WaitForSeconds(0.25f);
 
-            //Fade in the remaining text
-            GameObject botTextOne = CanvasUtil.CreateTextPanel(gameObject, buttonText, 34, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.335f), new Vector2(0.5f, 0.335f)), perpetua);
-            GameObject botTextTwo = CanvasUtil.CreateTextPanel(gameObject, descOneText, 34, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.26f), new Vector2(0.5f, 0.26f)), perpetua);
-            GameObject botTextThree =  CanvasUtil.CreateTextPanel(gameObject, descTwoText, 34, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.205f), new Vector2(0.5f, 0.205f)), perpetua);
+            // Fade in the remaining text
+            GameObject botTextOne = CanvasUtil.CreateTextPanel(gameObject, buttonText, 34, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.335f), new Vector2(0.5f, 0.335f)), FontManager.GetFont("Perpetua"));
+            GameObject botTextTwo = CanvasUtil.CreateTextPanel(gameObject, descOneText, 34, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.26f), new Vector2(0.5f, 0.26f)), FontManager.GetFont("Perpetua"));
+            GameObject botTextThree = CanvasUtil.CreateTextPanel(gameObject, descTwoText, 34, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.205f), new Vector2(0.5f, 0.205f)), FontManager.GetFont("Perpetua"));
 
             CanvasGroup botTextOneCG = botTextOne.AddComponent<CanvasGroup>();
             CanvasGroup botTextTwoCG = botTextTwo.AddComponent<CanvasGroup>();
@@ -178,45 +167,49 @@ namespace RandomizerMod.Components
             yield return StartCoroutine(FadeInCanvasGroup(botTextThreeCG));
             yield return WaitForSeconds(1.5f);
 
-            //Can I offer you an egg in this trying time?
-            GameObject egg = CanvasUtil.CreateImagePanel(gameObject, RandomizerMod.sprites["UI.egg.png"], new CanvasUtil.RectData(new Vector2(RandomizerMod.sprites["UI.egg.png"].texture.width / 1.65f, RandomizerMod.sprites["UI.egg.png"].texture.height / 1.65f), Vector2.zero, new Vector2(0.5f, 0.1075f), new Vector2(0.5f, 0.1075f)));
+            // Can I offer you an egg in this trying time?
+            GameObject egg = CanvasUtil.CreateImagePanel(gameObject, RandomizerMod.GetSprite("UI.egg"), new CanvasUtil.RectData(new Vector2(RandomizerMod.GetSprite("UI.egg").texture.width / 1.65f, RandomizerMod.GetSprite("UI.egg").texture.height / 1.65f), Vector2.zero, new Vector2(0.5f, 0.1075f), new Vector2(0.5f, 0.1075f)));
             CanvasGroup eggCG = egg.AddComponent<CanvasGroup>();
 
             eggCG.blocksRaycasts = false;
             eggCG.interactable = false;
             eggCG.alpha = 0;
 
-            //Should wait for one fade in, don't want to poll input immediately
+            // Should wait for one fade in, don't want to poll input immediately
             yield return FadeInCanvasGroup(eggCG);
 
-            //Stop doing things instantly before polling input
+            // Stop doing things instantly before polling input
             StopCoroutine(skipCoroutine);
             showInstantly = false;
 
-            //Save the coroutine to stop it later
+            // Save the coroutine to stop it later
             Coroutine coroutine = StartCoroutine(BlinkCanvasGroup(eggCG));
 
-            //Wait for the user to cancel the menu
+            // Wait for the user to cancel the menu
             while (true)
             {
                 HeroActions actions = GameManager.instance.inputHandler.inputActions;
-                if (actions.jump.WasPressed || actions.attack.WasPressed || actions.menuCancel.WasPressed) break;
+                if (actions.jump.WasPressed || actions.attack.WasPressed || actions.menuCancel.WasPressed)
+                {
+                    break;
+                }
+
                 yield return new WaitForEndOfFrame();
             }
 
-            //Fade out the full popup
+            // Fade out the full popup
             yield return FadeOutCanvasGroup(gameObject.GetComponent<CanvasGroup>());
 
-            //Small delay before hero control
+            // Small delay before hero control
             yield return WaitForSeconds(0.75f);
 
-            //Optionally send FSM event after finishing
+            // Optionally send FSM event after finishing
             if (fsmObj != null && fsmEvent != null)
             {
                 FSMUtility.SendEventToGameObject(fsmObj, fsmEvent);
             }
 
-            //Stop the egg routine and destroy everything
+            // Stop the egg routine and destroy everything
             StopCoroutine(coroutine);
             Destroy(gameObject);
         }
@@ -249,7 +242,7 @@ namespace RandomizerMod.Components
             while (timePassed < seconds && !showInstantly)
             {
                 timePassed += Time.deltaTime;
-                yield return null;
+                yield return new WaitForEndOfFrame();
             }
         }
 
@@ -263,11 +256,12 @@ namespace RandomizerMod.Components
                     showInstantly = true;
                     break;
                 }
+
                 yield return new WaitForEndOfFrame();
             }
         }
 
-        //Below functions ripped from CanvasUtil in order to change the speed
+        // Below functions ripped from CanvasUtil in order to change the speed
         private IEnumerator FadeInCanvasGroup(CanvasGroup cg)
         {
             float loopFailsafe = 0f;
@@ -282,19 +276,22 @@ namespace RandomizerMod.Components
                     cg.alpha = 1f;
                     break;
                 }
+
                 if (loopFailsafe >= 2f)
                 {
                     break;
                 }
-                yield return null;
+
+                yield return new WaitForEndOfFrame();
             }
+
             cg.alpha = 1f;
             cg.interactable = true;
             cg.gameObject.SetActive(true);
-            yield return null;
+            yield return new WaitForEndOfFrame();
         }
 
-        //Identical to CanvasUtil version except it doesn't randomly set the canvas object inactive at the end
+        // Identical to CanvasUtil version except it doesn't randomly set the canvas object inactive at the end
         private IEnumerator FadeOutCanvasGroup(CanvasGroup cg)
         {
             float loopFailsafe = 0f;
@@ -307,14 +304,17 @@ namespace RandomizerMod.Components
                 {
                     break;
                 }
+
                 if (loopFailsafe >= 2f)
                 {
                     break;
                 }
-                yield return null;
+
+                yield return new WaitForEndOfFrame();
             }
+
             cg.alpha = 0f;
-            yield return null;
+            yield return new WaitForEndOfFrame();
         }
     }
 }

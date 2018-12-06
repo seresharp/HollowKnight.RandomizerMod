@@ -1,8 +1,8 @@
 ﻿using System;
-using UnityEngine;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
+using UnityEngine;
 
 namespace RandomizerMod.Actions
 {
@@ -26,7 +26,7 @@ namespace RandomizerMod.Actions
         {
             if (GameManager.instance.GetSceneNameString() == sceneName)
             {
-                foreach (PlayMakerFSM fsm in fsmList)
+                foreach (PlayMakerFSM fsm in FsmList)
                 {
                     if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)
                     {
@@ -34,17 +34,17 @@ namespace RandomizerMod.Actions
                         FsmState charm = fsm.GetState("Charm?");
                         FsmState trinkFlash = fsm.GetState("Trink Flash");
 
-                        //Remove actions that stop shiny from spawning
+                        // Remove actions that stop shiny from spawning
                         pdBool.RemoveActionsOfType<PlayerDataBoolTest>();
                         pdBool.RemoveActionsOfType<StringCompare>();
 
-                        //Force the FSM to follow the path for the correct trinket
+                        // Force the FSM to follow the path for the correct trinket
                         charm.ClearTransitions();
                         charm.AddTransition("FINISHED", "Trink Flash");
                         trinkFlash.ClearTransitions();
                         trinkFlash.AddTransition("FINISHED", $"Trink {trinketNum}");
 
-                        //Changes have been made, stop looping
+                        // Changes have been made, stop looping
                         break;
                     }
                 }

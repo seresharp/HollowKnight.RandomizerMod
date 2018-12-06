@@ -53,7 +53,7 @@ namespace RandomizerMod.FsmStateActions
 
         public override void OnEnter()
         {
-            if ((playerdata && PlayerData.instance.GetBool(boolName)) || (!playerdata && RandomizerMod.instance.Settings.GetBool(false, boolName)))
+            if ((playerdata && PlayerData.instance.GetBool(boolName)) || (!playerdata && RandomizerMod.Instance.Settings.GetBool(false, boolName)))
             {
                 if (successEvent != null)
                 {

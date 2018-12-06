@@ -13,7 +13,7 @@ namespace RandomizerMod
 
         public static void LoadLanguageXML(Stream xmlStream)
         {
-            //Load XmlDocument from resource stream
+            // Load XmlDocument from resource stream
             XmlDocument xml = new XmlDocument();
             xml.Load(xmlStream);
             xmlStream.Dispose();
@@ -26,7 +26,7 @@ namespace RandomizerMod
                 SetString(sheet, key, node.InnerText.Replace("\\n", "\n"));
             }
 
-            RandomizerMod.instance.Log("Language xml processed");
+            RandomizerMod.Instance.Log("Language xml processed");
         }
 
         public static void SetString(string sheetName, string key, string text)
@@ -62,7 +62,7 @@ namespace RandomizerMod
         {
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(sheetTitle))
             {
-                return "";
+                return string.Empty;
             }
 
             if (DateTime.Now.Month == 4 && DateTime.Now.Day == 1)

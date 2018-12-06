@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using RandomizerMod.Actions;
-//using UnityEngine;
 
 using Random = System.Random;
 
@@ -19,54 +18,29 @@ namespace RandomizerMod.Randomization
         private static List<string> unobtainedItems;
         private static List<string> obtainedItems;
 
-        public static List<RandomizerAction> actions;
+        private static List<RandomizerAction> actions;
 
-        public static bool randomizeDone;
+        public static bool Done { get; private set; }
 
-        private static void SetupVariables()
-        {
-            nonShopItems = new Dictionary<string, string>();
-
-            shopItems = new Dictionary<string, List<string>>();
-            foreach (string shopName in LogicManager.ShopNames)
-            {
-                shopItems.Add(shopName, new List<string>());
-            }
-            //shopItems.Add("Lemm", new List<string>()); TODO: Custom shop component to handle lemm
-
-            unobtainedLocations = new List<string>();
-            foreach (string itemName in LogicManager.ItemNames)
-            {
-                if (LogicManager.GetItemDef(itemName).type != ItemType.Shop)
-                {
-                    unobtainedLocations.Add(itemName);
-                }
-            }
-
-            unobtainedLocations.AddRange(shopItems.Keys);
-            unobtainedItems = LogicManager.ItemNames.ToList();
-            obtainedItems = new List<string>();
-
-            randomizeDone = false;
-        }
+        public static RandomizerAction[] Actions => actions.ToArray();
 
         public static void Randomize()
         {
             SetupVariables();
 
-            RandomizerMod.instance.Log("Randomizing with seed: " + RandomizerMod.instance.Settings.Seed);
-            Random rand = new Random(RandomizerMod.instance.Settings.Seed);
+            RandomizerMod.Instance.Log("Randomizing with seed: " + RandomizerMod.Instance.Settings.Seed);
+            Random rand = new Random(RandomizerMod.Instance.Settings.Seed);
 
-            //For use in weighting item placement
+            // For use in weighting item placement
             Dictionary<string, int> locationDepths = new Dictionary<string, int>();
             int currentDepth = 1;
 
-            RandomizerMod.instance.Log("Beginning first pass of progression item placement");
+            RandomizerMod.Instance.Log("Beginning first pass of progression item placement");
 
-            //Choose where to place progression items
+            // Choose where to place progression items
             while (true)
             {
-                //Get currently reachable locations
+                // Get currently reachable locations
                 List<string> reachableLocations = new List<string>();
                 string[] obtained = obtainedItems.ToArray();
                 int reachableCount = 0;
@@ -80,7 +54,7 @@ namespace RandomizerMod.Randomization
                             locationDepths[unobtainedLocations[i]] = currentDepth;
                         }
 
-                        //This way further locations will be more likely to be picked
+                        // This way further locations will be more likely to be picked
                         for (int j = 0; j < currentDepth; j++)
                         {
                             reachableLocations.Add(unobtainedLocations[i]);
@@ -92,8 +66,8 @@ namespace RandomizerMod.Randomization
 
                 List<string> progressionItems = GetProgressionItems(reachableCount);
 
-                //We only need complex randomization until all progression items are placed
-                //After that everything can just be placed completely randomly
+                // We only need complex randomization until all progression items are placed
+                // After that everything can just be placed completely randomly
                 if (progressionItems.Count == 0)
                 {
                     break;
@@ -120,9 +94,9 @@ namespace RandomizerMod.Randomization
                 currentDepth++;
             }
 
-            RandomizerMod.instance.Log("Beginning second pass of progression item placement");
+            RandomizerMod.Instance.Log("Beginning second pass of progression item placement");
 
-            //Place remaining potential progression items
+            // Place remaining potential progression items
             List<string> unusedProgressionItems = new List<string>();
 
             foreach (string str in unobtainedItems)
@@ -135,14 +109,14 @@ namespace RandomizerMod.Randomization
 
             while (unusedProgressionItems.Count > 0)
             {
-                //TODO: Make extension to remove all of a string from a list so I don't have to recalculate this every time
+                // TODO: Make extension to remove all of a string from a list so I don't have to recalculate this every time
                 List<string> weightedLocations = new List<string>();
                 foreach (string str in unobtainedLocations)
                 {
-                    //Items tagged as requiring "EVERYTHING" will not be in this dict
+                    // Items tagged as requiring "EVERYTHING" will not be in this dict
                     if (locationDepths.ContainsKey(str))
                     {
-                        //Using weight^2 to heavily bias towards late locations
+                        // Using weight^2 to heavily bias towards late locations
                         for (int i = 0; i < locationDepths[str] * locationDepths[str]; i++)
                         {
                             weightedLocations.Add(str);
@@ -170,9 +144,9 @@ namespace RandomizerMod.Randomization
                 }
             }
 
-            RandomizerMod.instance.Log("Beginning placement of good items into remaining shops");
+            RandomizerMod.Instance.Log("Beginning placement of good items into remaining shops");
 
-            //Place good items into shops that lack progression items
+            // Place good items into shops that lack progression items
             List<string> goodItems = new List<string>();
             foreach (string str in unobtainedItems)
             {
@@ -198,9 +172,9 @@ namespace RandomizerMod.Randomization
                 }
             }
 
-            RandomizerMod.instance.Log("Beginning full random placement into remaining locations");
+            RandomizerMod.Instance.Log("Beginning full random placement into remaining locations");
 
-            //Randomly place into remaining locations
+            // Randomly place into remaining locations
             while (unobtainedLocations.Count > 0)
             {
                 string placeLocation = unobtainedLocations[rand.Next(unobtainedLocations.Count)];
@@ -222,11 +196,11 @@ namespace RandomizerMod.Randomization
                 }
             }
 
-            RandomizerMod.instance.Log("Beginning placement of leftover items into shops");
+            RandomizerMod.Instance.Log("Beginning placement of leftover items into shops");
 
             string[] shopNames = shopItems.Keys.ToArray();
 
-            //Put remaining items in shops
+            // Put remaining items in shops
             while (unobtainedItems.Count > 0)
             {
                 string placeLocation = shopNames[rand.Next(shopNames.Length)];
@@ -264,7 +238,7 @@ namespace RandomizerMod.Randomization
                     randomizerBoolName = newItem.boolName;
                 }
 
-                //Dream nail needs a special case
+                // Dream nail needs a special case
                 if (oldItem.boolName == "hasDreamNail")
                 {
                     actions.Add(new ChangeBoolTest("RestingGrounds_04", "Binding Shield Activate", "FSM", "Check", randomizerBoolName, playerdata));
@@ -274,7 +248,7 @@ namespace RandomizerMod.Randomization
                     actions.Add(new ChangeBoolTest("RestingGrounds_04", "PostDreamnail", "FSM", "Check", randomizerBoolName, playerdata));
                 }
 
-                //Good luck to anyone trying to figure out this horrifying switch
+                // Good luck to anyone trying to figure out this horrifying switch
                 switch (oldItem.type)
                 {
                     case ItemType.Charm:
@@ -288,6 +262,7 @@ namespace RandomizerMod.Randomization
                                 {
                                     actions.Add(new ChangeShinyIntoCharm(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItem.boolName));
                                 }
+
                                 break;
                             case ItemType.Big:
                             case ItemType.Spell:
@@ -298,10 +273,12 @@ namespace RandomizerMod.Randomization
                                 {
                                     actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItemsArray, randomizerBoolName, playerdata));
                                 }
+
                                 break;
                             default:
                                 throw new Exception("Unimplemented type in randomization: " + oldItem.type);
                         }
+
                         break;
                     default:
                         throw new Exception("Unimplemented type in randomization: " + oldItem.type);
@@ -311,8 +288,8 @@ namespace RandomizerMod.Randomization
             int shopAdditiveItems = 0;
             List<ChangeShopContents> shopActions = new List<ChangeShopContents>();
 
-            //TODO: Change to use additiveItems rather than hard coded
-            //No point rewriting this before making the shop component
+            // TODO: Change to use additiveItems rather than hard coded
+            // No point rewriting this before making the shop component
             foreach (KeyValuePair<string, List<string>> kvp in shopItems)
             {
                 string shopName = kvp.Key;
@@ -351,15 +328,15 @@ namespace RandomizerMod.Randomization
 
                     newShopItemStats.Add(new ShopItemDef()
                     {
-                        playerDataBoolName = newItem.boolName,
-                        nameConvo = newItem.nameKey,
-                        descConvo = newItem.shopDescKey,
-                        requiredPlayerDataBool = LogicManager.GetShopDef(shopName).requiredPlayerDataBool,
-                        removalPlayerDataBool = "",
-                        dungDiscount = LogicManager.GetShopDef(shopName).dungDiscount,
-                        notchCostBool = newItem.notchCost,
-                        cost = 100 + rand.Next(41) * 10,
-                        spriteName = newItem.shopSpriteKey
+                        PlayerDataBoolName = newItem.boolName,
+                        NameConvo = newItem.nameKey,
+                        DescConvo = newItem.shopDescKey,
+                        RequiredPlayerDataBool = LogicManager.GetShopDef(shopName).requiredPlayerDataBool,
+                        RemovalPlayerDataBool = string.Empty,
+                        DungDiscount = LogicManager.GetShopDef(shopName).dungDiscount,
+                        NotchCostBool = newItem.notchCost,
+                        Cost = 100 + (rand.Next(41) * 10),
+                        SpriteName = newItem.shopSpriteKey
                     });
                 }
 
@@ -377,8 +354,35 @@ namespace RandomizerMod.Randomization
 
             shopActions.ForEach(action => actions.Add(action));
 
-            randomizeDone = true;
-            RandomizerMod.instance.Log("Randomization done");
+            Done = true;
+            RandomizerMod.Instance.Log("Randomization done");
+        }
+
+        private static void SetupVariables()
+        {
+            nonShopItems = new Dictionary<string, string>();
+
+            shopItems = new Dictionary<string, List<string>>();
+            foreach (string shopName in LogicManager.ShopNames)
+            {
+                shopItems.Add(shopName, new List<string>());
+            }
+            ////shopItems.Add("Lemm", new List<string>()); TODO: Custom shop component to handle lemm
+
+            unobtainedLocations = new List<string>();
+            foreach (string itemName in LogicManager.ItemNames)
+            {
+                if (LogicManager.GetItemDef(itemName).type != ItemType.Shop)
+                {
+                    unobtainedLocations.Add(itemName);
+                }
+            }
+
+            unobtainedLocations.AddRange(shopItems.Keys);
+            unobtainedItems = LogicManager.ItemNames.ToList();
+            obtainedItems = new List<string>();
+
+            Done = false;
         }
 
         private static List<string> GetProgressionItems(int reachableCount)
@@ -402,7 +406,10 @@ namespace RandomizerMod.Randomization
                         }
                     }
 
-                    if (hypothetical > reachableCount) progression.Add(str);
+                    if (hypothetical > reachableCount)
+                    {
+                        progression.Add(str);
+                    }
                 }
             }
 
@@ -433,13 +440,13 @@ namespace RandomizerMod.Randomization
                     ReqDef item = LogicManager.GetItemDef(str);
                     itemDefs.Add(new BigItemDef()
                     {
-                        boolName = item.boolName,
-                        spriteKey = item.bigSpriteKey,
-                        takeKey = item.takeKey,
-                        nameKey = item.nameKey,
-                        buttonKey = item.buttonKey,
-                        descOneKey = item.descOneKey,
-                        descTwoKey = item.descTwoKey
+                        BoolName = item.boolName,
+                        SpriteKey = item.bigSpriteKey,
+                        TakeKey = item.takeKey,
+                        NameKey = item.nameKey,
+                        ButtonKey = item.buttonKey,
+                        DescOneKey = item.descOneKey,
+                        DescTwoKey = item.descTwoKey
                     });
                 }
 
@@ -452,13 +459,13 @@ namespace RandomizerMod.Randomization
                 {
                     new BigItemDef()
                     {
-                        boolName = item.boolName,
-                        spriteKey = item.bigSpriteKey,
-                        takeKey = item.takeKey,
-                        nameKey = item.nameKey,
-                        buttonKey = item.buttonKey,
-                        descOneKey = item.descOneKey,
-                        descTwoKey = item.descTwoKey
+                        BoolName = item.boolName,
+                        SpriteKey = item.bigSpriteKey,
+                        TakeKey = item.takeKey,
+                        NameKey = item.nameKey,
+                        ButtonKey = item.buttonKey,
+                        DescOneKey = item.descOneKey,
+                        DescTwoKey = item.descTwoKey
                     }
                 };
             }
@@ -487,9 +494,8 @@ namespace RandomizerMod.Randomization
 
         private static void LogItemPlacement(string item, string location)
         {
-            RandomizerMod.instance.Settings.itemPlacements.Add(item, location);
-            RandomizerMod.instance.Log($"Putting item {item} at {location}");
+            RandomizerMod.Instance.Settings.itemPlacements.Add(item, location);
+            RandomizerMod.Instance.Log($"Putting item {item} at {location}");
         }
     }
 }
- 

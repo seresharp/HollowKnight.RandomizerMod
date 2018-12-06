@@ -73,7 +73,7 @@ namespace RandomizerMod.Extensions
             }
             catch (Exception e)
             {
-                RandomizerMod.instance.Log("FindGameObject failed:\n" + e.Message);
+                RandomizerMod.Instance.Log("FindGameObject failed:\n" + e.Message);
             }
 
             return null;

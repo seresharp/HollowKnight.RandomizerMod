@@ -9,58 +9,41 @@ namespace RandomizerMod.Actions
     [Serializable]
     public struct ShopItemDef
     {
-        //Values from ShopItemStats
-        [SerializeField] public string playerDataBoolName;
-        [SerializeField] public string nameConvo;
-        [SerializeField] public string descConvo;
-        [SerializeField] public string requiredPlayerDataBool;
-        [SerializeField] public string removalPlayerDataBool;
-        [SerializeField] public bool dungDiscount;
-        [SerializeField] public string notchCostBool;
-        [SerializeField] public int cost;
+        // Values from ShopItemStats
+        [SerializeField] public string PlayerDataBoolName;
+        [SerializeField] public string NameConvo;
+        [SerializeField] public string DescConvo;
+        [SerializeField] public string RequiredPlayerDataBool;
+        [SerializeField] public string RemovalPlayerDataBool;
+        [SerializeField] public bool DungDiscount;
+        [SerializeField] public string NotchCostBool;
+        [SerializeField] public int Cost;
 
-        //Sprite name in resources
-        [SerializeField] public string spriteName;
+        // Sprite name in resources
+        [SerializeField] public string SpriteName;
     }
 
     [Serializable]
     public class ChangeShopContents : RandomizerAction, ISerializationCallbackReceiver
     {
-        //Variables that actually get used
-        [SerializeField] public string SceneName;
-        [SerializeField] public string ObjectName;
+        // Variables that actually get used
+        [SerializeField] private string sceneName;
+        [SerializeField] private string objectName;
         private ShopItemDef[] items;
 
-        //Variable for serialization hack
+        // Variable for serialization hack
         [SerializeField] private List<string> itemDefStrings;
-
-        public void OnBeforeSerialize()
-        {
-            itemDefStrings = new List<string>();
-            foreach (ShopItemDef item in items)
-            {
-                itemDefStrings.Add(JsonUtility.ToJson(item));
-            }
-        }
-
-        public void OnAfterDeserialize()
-        {
-            List<ShopItemDef> itemDefList = new List<ShopItemDef>();
-
-            foreach (string item in itemDefStrings)
-            {
-                itemDefList.Add(JsonUtility.FromJson<ShopItemDef>(item));
-            }
-
-            items = itemDefList.ToArray();
-        }
 
         public ChangeShopContents(string sceneName, string objectName, ShopItemDef[] items)
         {
-            SceneName = sceneName;
-            ObjectName = objectName;
+            this.sceneName = sceneName;
+            this.objectName = objectName;
             this.items = items;
         }
+
+        public string SceneName => sceneName;
+
+        public string ObjectName => objectName;
 
         public void AddItemDefs(ShopItemDef[] newItems)
         {
@@ -85,55 +68,55 @@ namespace RandomizerMod.Actions
         {
             if (GameManager.instance.GetSceneNameString() == SceneName)
             {
-                //Find the shop and save an item for use later
+                // Find the shop and save an item for use later
                 GameObject shopObj = GameObject.Find(ObjectName);
                 ShopMenuStock shop = shopObj.GetComponent<ShopMenuStock>();
                 GameObject itemPrefab = Object.Instantiate(shop.stock[0]);
                 itemPrefab.SetActive(false);
                 
-                //Remove all charm type items from the store
+                // Remove all charm type items from the store
                 List<GameObject> newStock = new List<GameObject>();
                 
                 foreach (ShopItemDef itemDef in items)
                 {
-                    //Create a new shop item for this item def
+                    // Create a new shop item for this item def
                     GameObject newItemObj = Object.Instantiate(itemPrefab);
                     newItemObj.SetActive(false);
 
-                    //Apply all the stored values
+                    // Apply all the stored values
                     ShopItemStats stats = newItemObj.GetComponent<ShopItemStats>();
-                    stats.playerDataBoolName = itemDef.playerDataBoolName;
-                    stats.nameConvo = itemDef.nameConvo;
-                    stats.descConvo = itemDef.descConvo;
-                    stats.requiredPlayerDataBool = itemDef.requiredPlayerDataBool;
-                    stats.removalPlayerDataBool = itemDef.removalPlayerDataBool;
-                    stats.dungDiscount = itemDef.dungDiscount;
-                    stats.notchCostBool = itemDef.notchCostBool;
-                    stats.cost = itemDef.cost;
+                    stats.playerDataBoolName = itemDef.PlayerDataBoolName;
+                    stats.nameConvo = itemDef.NameConvo;
+                    stats.descConvo = itemDef.DescConvo;
+                    stats.requiredPlayerDataBool = itemDef.RequiredPlayerDataBool;
+                    stats.removalPlayerDataBool = itemDef.RemovalPlayerDataBool;
+                    stats.dungDiscount = itemDef.DungDiscount;
+                    stats.notchCostBool = itemDef.NotchCostBool;
+                    stats.cost = itemDef.Cost;
 
-                    //Need to set all these to make sure the item doesn't break in one of various ways
-                    stats.priceConvo = "";
+                    // Need to set all these to make sure the item doesn't break in one of various ways
+                    stats.priceConvo = string.Empty;
                     stats.specialType = 2;
                     stats.charmsRequired = 0;
                     stats.relic = false;
                     stats.relicNumber = 0;
-                    stats.relicPDInt = "";
+                    stats.relicPDInt = string.Empty;
 
-                    //Apply the sprite for the UI
-                    stats.transform.Find("Item Sprite").gameObject.GetComponent<SpriteRenderer>().sprite = RandomizerMod.sprites[itemDef.spriteName];
+                    // Apply the sprite for the UI
+                    stats.transform.Find("Item Sprite").gameObject.GetComponent<SpriteRenderer>().sprite = RandomizerMod.GetSprite(itemDef.SpriteName);
 
                     newStock.Add(newItemObj);
                 }
 
-                //Save unchanged list for potential alt stock
+                // Save unchanged list for potential alt stock
                 List<GameObject> altStock = new List<GameObject>();
                 altStock.AddRange(newStock);
 
-                //Update normal stock
+                // Update normal stock
                 foreach (GameObject item in shop.stock)
                 {
-                    //It would be cleaner to destroy the unused objects, but that breaks the shop on subsequent loads
-                    //TC must be reusing the shop items rather than destroying them on load
+                    // It would be cleaner to destroy the unused objects, but that breaks the shop on subsequent loads
+                    // TC must be reusing the shop items rather than destroying them on load
                     if (item.GetComponent<ShopItemStats>().specialType != 2)
                     {
                         newStock.Add(item);
@@ -142,7 +125,7 @@ namespace RandomizerMod.Actions
 
                 shop.stock = newStock.ToArray();
 
-                //Update alt stock
+                // Update alt stock
                 if (shop.stockAlt != null)
                 {
                     foreach (GameObject item in shop.stockAlt)
@@ -156,6 +139,27 @@ namespace RandomizerMod.Actions
                     shop.stockAlt = altStock.ToArray();
                 }
             }
+        }
+
+        public void OnBeforeSerialize()
+        {
+            itemDefStrings = new List<string>();
+            foreach (ShopItemDef item in items)
+            {
+                itemDefStrings.Add(JsonUtility.ToJson(item));
+            }
+        }
+
+        public void OnAfterDeserialize()
+        {
+            List<ShopItemDef> itemDefList = new List<ShopItemDef>();
+
+            foreach (string item in itemDefStrings)
+            {
+                itemDefList.Add(JsonUtility.FromJson<ShopItemDef>(item));
+            }
+
+            items = itemDefList.ToArray();
         }
     }
 }
