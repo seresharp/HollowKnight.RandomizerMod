@@ -41,7 +41,7 @@ namespace RandomizerMod.Actions
             shinyPrefab = Object.Instantiate(obj);
             shinyPrefab.SetActive(false);
             shinyPrefab.name = "Randomizer Shiny";
-            Object.DontDestroyOnLoad(ShinyPrefab);
+            Object.DontDestroyOnLoad(shinyPrefab);
         }
 
         public static void AddToFsmList(PlayMakerFSM fsm)
