@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -72,21 +73,40 @@ namespace RandomizerMod.Randomization
 
         public static string[] AdditiveItemNames => additiveItems.Keys.ToArray();
 
-        public static void ParseXML(Stream xmlStream)
+        public static void ParseXML(object streamObj)
         {
-            XmlDocument xml = new XmlDocument();
-            xml.Load(xmlStream);
-            xmlStream.Dispose();
+            if (!(streamObj is Stream xmlStream))
+            {
+                RandomizerMod.Instance.LogWarn("Non-Stream object passed to ParseXML");
+                return;
+            }
 
-            macros = new Dictionary<string, string[]>();
-            additiveItems = new Dictionary<string, string[]>();
-            items = new Dictionary<string, ReqDef>();
-            shops = new Dictionary<string, ShopDef>();
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
 
-            ParseAdditiveItemXML(xml.SelectNodes("randomizer/additiveItemSet"));
-            ParseMacroXML(xml.SelectNodes("randomizer/macro"));
-            ParseItemXML(xml.SelectNodes("randomizer/item"));
-            ParseShopXML(xml.SelectNodes("randomizer/shop"));
+            try
+            {
+                XmlDocument xml = new XmlDocument();
+                xml.Load(xmlStream);
+                xmlStream.Dispose();
+
+                macros = new Dictionary<string, string[]>();
+                additiveItems = new Dictionary<string, string[]>();
+                items = new Dictionary<string, ReqDef>();
+                shops = new Dictionary<string, ShopDef>();
+
+                ParseAdditiveItemXML(xml.SelectNodes("randomizer/additiveItemSet"));
+                ParseMacroXML(xml.SelectNodes("randomizer/macro"));
+                ParseItemXML(xml.SelectNodes("randomizer/item"));
+                ParseShopXML(xml.SelectNodes("randomizer/shop"));
+            }
+            catch (Exception e)
+            {
+                RandomizerMod.Instance.LogError("Could not parse items.xml:\n" + e);
+            }
+
+            watch.Stop();
+            RandomizerMod.Instance.LogDebug("Parsed items.xml in " + watch.Elapsed.TotalSeconds + " seconds");
         }
 
         public static ReqDef GetItemDef(string name)

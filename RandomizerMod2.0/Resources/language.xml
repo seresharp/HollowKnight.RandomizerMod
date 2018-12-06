@@ -1,4 +1,6 @@
 <Language>
+    <entry sheet="UI" key="RANDOMIZER_EMPTY"></entry>
+    <entry sheet="Prompts" key="RANDOMIZER_EMPTY"></entry>
     <entry sheet="UI" key="RANDOMIZER_CHARM_DESC_1">Just think of all the time you could save collecting geo with this.\n\nTime is money, right? Definitely worth it.</entry>
     <entry sheet="UI" key="RANDOMIZER_CHARM_DESC_2">If you can't keep your bearings without this you should probably just stop playing randomizer.</entry>
     <entry sheet="UI" key="RANDOMIZER_CHARM_DESC_3">What's better than being rewarded for getting hit? Amazing charm if you suck.</entry>

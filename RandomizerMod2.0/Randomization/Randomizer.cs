@@ -29,6 +29,13 @@ namespace RandomizerMod.Randomization
             SetupVariables();
 
             RandomizerMod.Instance.Log("Randomizing with seed: " + RandomizerMod.Instance.Settings.Seed);
+            RandomizerMod.Instance.Log("Shade skips - " + RandomizerMod.Instance.Settings.ShadeSkips);
+            RandomizerMod.Instance.Log("Acid skips - " + RandomizerMod.Instance.Settings.AcidSkips);
+            RandomizerMod.Instance.Log("Spike tunnel skips - " + RandomizerMod.Instance.Settings.SpikeTunnels);
+            RandomizerMod.Instance.Log("Misc skips - " + RandomizerMod.Instance.Settings.MiscSkips);
+            RandomizerMod.Instance.Log("Fireball skips - " + RandomizerMod.Instance.Settings.FireballSkips);
+            RandomizerMod.Instance.Log("Mag skips - " + RandomizerMod.Instance.Settings.MagSkips);
+
             Random rand = new Random(RandomizerMod.Instance.Settings.Seed);
 
             // For use in weighting item placement
@@ -495,7 +502,7 @@ namespace RandomizerMod.Randomization
         private static void LogItemPlacement(string item, string location)
         {
             RandomizerMod.Instance.Settings.itemPlacements.Add(item, location);
-            RandomizerMod.Instance.Log($"Putting item {item} at {location}");
+            RandomizerMod.Instance.Log($"Putting item \"{item.Replace('_', ' ')}\" at \"{location.Replace('_', ' ')}\"");
         }
     }
 }

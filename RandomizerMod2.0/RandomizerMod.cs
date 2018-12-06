@@ -25,7 +25,7 @@ namespace RandomizerMod
 
         private static Dictionary<string, Sprite> sprites;
 
-        private Thread randomizeThread;
+        private static Thread logicParseThread;
 
         public static RandomizerMod Instance { get; private set; }
 
@@ -89,14 +89,9 @@ namespace RandomizerMod
                 }
                 else if (res.EndsWith("items.xml"))
                 {
-                    try
-                    {
-                        Randomization.LogicManager.ParseXML(randoDLL.GetManifestResourceStream(res));
-                    }
-                    catch (Exception e)
-                    {
-                        LogError("Could not process items xml:\n" + e);
-                    }
+                    // Thread the xml parsing because it's kinda slow
+                    logicParseThread = new Thread(new ParameterizedThreadStart(Randomization.LogicManager.ParseXML));
+                    logicParseThread.Start(randoDLL.GetManifestResourceStream(res));
                 }
                 else
                 {
@@ -118,6 +113,7 @@ namespace RandomizerMod
             On.HutongGames.PlayMaker.Actions.BoolTest.OnEnter += BenchHandler.HandleBenchBoolTest;
 
             // Preload shiny item
+            // Can't thread this because Unity sucks
             Components.ShinyPreloader.Preload();
 
             // Load fonts
@@ -134,10 +130,22 @@ namespace RandomizerMod
             return null;
         }
 
+        public static bool LoadComplete()
+        {
+            return logicParseThread == null || !logicParseThread.IsAlive;
+        }
+
         public void StartNewGame()
         {
             // Charm tutorial popup is annoying, get rid of it
             PlayerData.instance.hasCharm = true;
+
+            // Fast boss intros
+            PlayerData.instance.unchainedHollowKnight = true;
+            PlayerData.instance.encounteredMimicSpider = true;
+            PlayerData.instance.infectedKnightEncountered = true;
+            PlayerData.instance.mageLordEncountered = true;
+            PlayerData.instance.mageLordEncountered_2 = true;
 
             if (Settings.AllBosses)
             {
@@ -148,8 +156,22 @@ namespace RandomizerMod
 
             if (Settings.Randomizer)
             {
-                randomizeThread = new Thread(new ThreadStart(Randomization.Randomizer.Randomize));
-                randomizeThread.Start();
+                if (!LoadComplete())
+                {
+                    logicParseThread.Join();
+                }
+
+                try
+                {
+                    Randomization.Randomizer.Randomize();
+                }
+                catch (Exception e)
+                {
+                    LogError("Error in randomization:\n" + e);
+                }
+
+                Settings.actions = new List<Actions.RandomizerAction>();
+                Settings.actions.AddRange(Randomization.Randomizer.Actions);
             }
         }
 
@@ -439,24 +461,6 @@ namespace RandomizerMod
             {
                 try
                 {
-                    if (randomizeThread != null)
-                    {
-                        if (randomizeThread.IsAlive)
-                        {
-                            randomizeThread.Join();
-                        }
-
-                        if (Randomization.Randomizer.Done)
-                        {
-                            Settings.actions = new List<Actions.RandomizerAction>();
-                            Settings.actions.AddRange(Randomization.Randomizer.Actions);
-                        }
-                        else
-                        {
-                            LogWarn("Gameplay starting before randomization completed");
-                        }
-                    }
-
                     // This is called too late when unloading scenes with preloads
                     // Reload to fix this
                     if (SceneHasPreload(from.name) && WorldInfo.NameLooksLikeGameplayScene(to.name) && !string.IsNullOrEmpty(GameManager.instance.entryGateName))
