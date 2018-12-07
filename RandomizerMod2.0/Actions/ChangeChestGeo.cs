@@ -5,6 +5,8 @@ using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
 using UnityEngine;
 
+using Object = UnityEngine.Object;
+
 namespace RandomizerMod.Actions
 {
     [Serializable]
@@ -26,34 +28,29 @@ namespace RandomizerMod.Actions
             this.geoAmount = geoAmount;
         }
 
-        public override void Process()
+        public override ActionType Type => ActionType.PlayMakerFSM;
+
+        public override void Process(string scene, Object changeObj)
         {
-            if (GameManager.instance.GetSceneNameString() == sceneName)
+            if (scene != sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != fsmName || fsm.gameObject.name != objectName)
             {
-                foreach (PlayMakerFSM fsm in FsmList)
-                {
-                    if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)
-                    {
-                        // Remove actions that activate shiny item
-                        FsmState spawnItems = fsm.GetState("Spawn Items");
-                        spawnItems.RemoveActionsOfType<ActivateAllChildren>();
-                        fsm.GetState("Activated").RemoveActionsOfType<ActivateAllChildren>();
+                return;
+            }
 
-                        // Add geo to chest
-                        // Chest geo pool cannot be trusted, often spawns less than it should
-                        spawnItems.AddAction(new RandomizerAddGeo(fsm.gameObject, geoAmount));
+            // Remove actions that activate shiny item
+            FsmState spawnItems = fsm.GetState("Spawn Items");
+            spawnItems.RemoveActionsOfType<ActivateAllChildren>();
+            fsm.GetState("Activated").RemoveActionsOfType<ActivateAllChildren>();
 
-                        // Remove pre-existing geo from chest
-                        foreach (FlingObjectsFromGlobalPool fling in spawnItems.GetActionsOfType<FlingObjectsFromGlobalPool>())
-                        {
-                            fling.spawnMin = 0;
-                            fling.spawnMax = 0;
-                        }
+            // Add geo to chest
+            // Chest geo pool cannot be trusted, often spawns less than it should
+            spawnItems.AddAction(new RandomizerAddGeo(fsm.gameObject, geoAmount));
 
-                        // Changes have been made, stop looping
-                        break;
-                    }
-                }
+            // Remove pre-existing geo from chest
+            foreach (FlingObjectsFromGlobalPool fling in spawnItems.GetActionsOfType<FlingObjectsFromGlobalPool>())
+            {
+                fling.spawnMin = 0;
+                fling.spawnMax = 0;
             }
         }
     }

@@ -5,6 +5,8 @@ using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
 using UnityEngine;
 
+using Object = UnityEngine.Object;
+
 namespace RandomizerMod.Actions
 {
     [Serializable]
@@ -31,37 +33,32 @@ namespace RandomizerMod.Actions
             boolName = $"gotCharm_{charmNum}";
         }
 
-        public override void Process()
+        public override ActionType Type => ActionType.PlayMakerFSM;
+
+        public override void Process(string scene, Object changeObj)
         {
-            if (GameManager.instance.GetSceneNameString() == sceneName)
+            if (scene != sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != fsmName || fsm.gameObject.name != objectName)
             {
-                foreach (PlayMakerFSM fsm in FsmList)
-                {
-                    if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)
-                    {
-                        FsmState pdBool = fsm.GetState("PD Bool?");
-                        FsmState charm = fsm.GetState("Charm?");
-                        FsmState getCharm = fsm.GetState("Get Charm");
-
-                        // Remove actions that stop shiny from spawning
-                        pdBool.RemoveActionsOfType<PlayerDataBoolTest>();
-                        pdBool.RemoveActionsOfType<StringCompare>();
-
-                        // Add action to potentially despawn the object
-                        pdBool.AddAction(new RandomizerBoolTest(boolName, null, "COLLECTED", true));
-
-                        // Force the FSM into the charm state, set it to the correct charm
-                        charm.ClearTransitions();
-                        charm.AddTransition("FINISHED", "Get Charm");
-                        getCharm.RemoveActionsOfType<SetPlayerDataBool>();
-                        getCharm.AddAction(new RandomizerSetBool(boolName, true, true));
-                        fsm.GetState("Normal Msg").GetActionsOfType<SetFsmInt>()[0].setValue = charmNum;
-
-                        // Changes have been made, stop looping
-                        break;
-                    }
-                }
+                return;
             }
+
+            FsmState pdBool = fsm.GetState("PD Bool?");
+            FsmState charm = fsm.GetState("Charm?");
+            FsmState getCharm = fsm.GetState("Get Charm");
+
+            // Remove actions that stop shiny from spawning
+            pdBool.RemoveActionsOfType<PlayerDataBoolTest>();
+            pdBool.RemoveActionsOfType<StringCompare>();
+
+            // Add action to potentially despawn the object
+            pdBool.AddAction(new RandomizerBoolTest(boolName, null, "COLLECTED", true));
+
+            // Force the FSM into the charm state, set it to the correct charm
+            charm.ClearTransitions();
+            charm.AddTransition("FINISHED", "Get Charm");
+            getCharm.RemoveActionsOfType<SetPlayerDataBool>();
+            getCharm.AddAction(new RandomizerSetBool(boolName, true, true));
+            fsm.GetState("Normal Msg").GetActionsOfType<SetFsmInt>()[0].setValue = charmNum;
         }
     }
 }

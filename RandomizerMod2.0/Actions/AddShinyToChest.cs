@@ -24,45 +24,37 @@ namespace RandomizerMod.Actions
             this.newShinyName = newShinyName;
         }
 
-        public override void Process()
+        public override ActionType Type => ActionType.PlayMakerFSM;
+
+        public override void Process(string scene, Object changeObj)
         {
-            if (GameManager.instance.GetSceneNameString() == sceneName)
+            if (scene != sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != fsmName || fsm.gameObject.name != objectName)
             {
-                foreach (PlayMakerFSM fsm in FsmList)
-                {
-                    if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)
-                    {
-                        FsmState spawnItems = fsm.GetState("Spawn Items");
-
-                        // Remove geo from chest
-                        foreach (FlingObjectsFromGlobalPool fling in spawnItems.GetActionsOfType<FlingObjectsFromGlobalPool>())
-                        {
-                            fling.spawnMin = 0;
-                            fling.spawnMax = 0;
-                        }
-
-                        // Instantiate a new shiny and set the chest as its parent
-                        GameObject item = fsm.gameObject.transform.Find("Item").gameObject;
-                        GameObject shiny = ShinyPrefab;
-                        shiny.SetActive(false);
-                        shiny.transform.SetParent(item.transform);
-                        shiny.transform.position = item.transform.position;
-                        shiny.name = newShinyName;
-
-                        // Force the new shiny to fling out of the chest
-                        PlayMakerFSM shinyControl = FSMUtility.LocateFSM(shiny, "Shiny Control");
-                        FsmState shinyFling = shinyControl.GetState("Fling?");
-                        shinyFling.ClearTransitions();
-                        shinyFling.AddTransition("FINISHED", "Fling R");
-
-                        // Gotta put our new shiny into the fsm list
-                        AddToFsmList(FSMUtility.LocateFSM(shiny, "Shiny Control"));
-
-                        // Changes have been made, stop looping
-                        break;
-                    }
-                }
+                return;
             }
+
+            FsmState spawnItems = fsm.GetState("Spawn Items");
+
+            // Remove geo from chest
+            foreach (FlingObjectsFromGlobalPool fling in spawnItems.GetActionsOfType<FlingObjectsFromGlobalPool>())
+            {
+                fling.spawnMin = 0;
+                fling.spawnMax = 0;
+            }
+
+            // Instantiate a new shiny and set the chest as its parent
+            GameObject item = fsm.gameObject.transform.Find("Item").gameObject;
+            GameObject shiny = ShinyPrefab;
+            shiny.SetActive(false);
+            shiny.transform.SetParent(item.transform);
+            shiny.transform.position = item.transform.position;
+            shiny.name = newShinyName;
+
+            // Force the new shiny to fling out of the chest
+            PlayMakerFSM shinyControl = FSMUtility.LocateFSM(shiny, "Shiny Control");
+            FsmState shinyFling = shinyControl.GetState("Fling?");
+            shinyFling.ClearTransitions();
+            shinyFling.AddTransition("FINISHED", "Fling R");
         }
     }
 }

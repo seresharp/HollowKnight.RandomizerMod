@@ -112,6 +112,8 @@ namespace RandomizerMod
             On.PlayerData.SetBenchRespawn_string_string_int_bool += BenchHandler.HandleBenchSave;
             On.HutongGames.PlayMaker.Actions.BoolTest.OnEnter += BenchHandler.HandleBenchBoolTest;
 
+            On.PlayMakerFSM.OnEnable += Actions.RandomizerAction.ProcessFSM;
+
             // Preload shiny item
             // Can't thread this because Unity sucks
             Components.ShinyPreloader.Preload();
@@ -215,7 +217,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2b.9";
+            string ver = "2b.10";
             int minAPI = 45;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
@@ -227,35 +229,8 @@ namespace RandomizerMod
             return ver;
         }
 
-        private static bool SceneHasPreload(string sceneName)
-        {
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                return false;
-            }
-
-            sceneName = sceneName.ToLowerInvariant();
-
-            // Build scene list if necessary
-            if (sceneNames == null)
-            {
-                sceneNames = new List<string>();
-
-                for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings; i++)
-                {
-                    sceneNames.Add(Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i)).ToLowerInvariant());
-                }
-            }
-
-            // Check if scene has preload attached to it
-            if (sceneNames.Contains($"{sceneName}_preload") || sceneNames.Contains($"{sceneName}_boss") || sceneNames.Contains($"{sceneName}_boss_defeated"))
-            {
-                return true;
-            }
-
-            // Also check if the scene is a preload since this is also passed to activeSceneChanged sometimes
-            return sceneName.EndsWith("_preload") || sceneName.EndsWith("_boss") || sceneName.EndsWith("_boss_defeated");
-        }
+        // Deleting this would break another mod
+        private static bool SceneHasPreload(string sceneName) => false;
 
         private static GlobalEnums.GatePosition GetGatePosition(string name)
         {
@@ -461,15 +436,6 @@ namespace RandomizerMod
             {
                 try
                 {
-                    // This is called too late when unloading scenes with preloads
-                    // Reload to fix this
-                    if (SceneHasPreload(from.name) && WorldInfo.NameLooksLikeGameplayScene(to.name) && !string.IsNullOrEmpty(GameManager.instance.entryGateName))
-                    {
-                        Log($"Detected preload scene {from.name}, reloading {to.name} ({GameManager.instance.entryGateName})");
-                        ChangeToScene(to.name, GameManager.instance.entryGateName);
-                        return;
-                    }
-
                     // In rare cases, this is called before the previous scene has unloaded
                     // Deleting old randomizer shinies to prevent issues
                     GameObject oldShiny = GameObject.Find("Randomizer Shiny");
@@ -797,16 +763,20 @@ namespace RandomizerMod
 
         private void EditShinies(Scene to)
         {
-            Actions.RandomizerAction.FetchFSMList(to);
+            string scene = GameManager.instance.GetSceneNameString();
+
             foreach (Actions.RandomizerAction action in Settings.actions)
             {
-                try
+                if (action.Type == Actions.RandomizerAction.ActionType.GameObject)
                 {
-                    action.Process();
-                }
-                catch (Exception e)
-                {
-                    LogError($"Error processing action of type {action.GetType()}:\n{JsonUtility.ToJson(action)}\n{e}");
+                    try
+                    {
+                        action.Process(scene, null);
+                    }
+                    catch (Exception e)
+                    {
+                        LogError($"Error processing action of type {action.GetType()}:\n{JsonUtility.ToJson(action)}\n{e}");
+                    }
                 }
             }
         }

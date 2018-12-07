@@ -4,6 +4,8 @@ using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
 using UnityEngine;
 
+using Object = UnityEngine.Object;
+
 namespace RandomizerMod.Actions
 {
     [Serializable]
@@ -26,32 +28,26 @@ namespace RandomizerMod.Actions
             this.playerdata = playerdata;
         }
 
-        // Looping this much to change only one action is pretty bad
-        // Use this class sparingly
-        public override void Process()
+        public override ActionType Type => ActionType.PlayMakerFSM;
+
+        public override void Process(string scene, Object changeObj)
         {
-            if (GameManager.instance.GetSceneNameString() == sceneName)
+            if (scene != sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != fsmName || fsm.gameObject.name != objectName)
             {
-                foreach (PlayMakerFSM fsm in FsmList)
-                {
-                    if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)
-                    {
-                        PlayerDataBoolTest pdBoolTest = fsm.GetState(stateName).GetActionsOfType<PlayerDataBoolTest>()[0];
+                return;
+            }
 
-                        if (playerdata)
-                        {
-                            pdBoolTest.boolName = boolName;
-                        }
-                        else
-                        {
-                            RandomizerBoolTest boolTest = new RandomizerBoolTest(boolName, pdBoolTest.isFalse, pdBoolTest.isTrue);
-                            fsm.GetState(stateName).RemoveActionsOfType<PlayerDataBoolTest>();
-                            fsm.GetState(stateName).AddFirstAction(boolTest);
-                        }
+            PlayerDataBoolTest pdBoolTest = fsm.GetState(stateName).GetActionsOfType<PlayerDataBoolTest>()[0];
 
-                        break;
-                    }
-                }
+            if (playerdata)
+            {
+                pdBoolTest.boolName = boolName;
+            }
+            else
+            {
+                RandomizerBoolTest boolTest = new RandomizerBoolTest(boolName, pdBoolTest.isFalse, pdBoolTest.isTrue);
+                fsm.GetState(stateName).RemoveActionsOfType<PlayerDataBoolTest>();
+                fsm.GetState(stateName).AddFirstAction(boolTest);
             }
         }
     }

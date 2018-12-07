@@ -41,6 +41,8 @@ namespace RandomizerMod.Actions
             this.items = items;
         }
 
+        public override ActionType Type => ActionType.GameObject;
+
         public string SceneName => sceneName;
 
         public string ObjectName => objectName;
@@ -64,80 +66,82 @@ namespace RandomizerMod.Actions
             items = combined;
         }
 
-        public override void Process()
+        public override void Process(string scene, Object changeObj)
         {
-            if (GameManager.instance.GetSceneNameString() == SceneName)
+            if (scene != sceneName)
             {
-                // Find the shop and save an item for use later
-                GameObject shopObj = GameObject.Find(ObjectName);
-                ShopMenuStock shop = shopObj.GetComponent<ShopMenuStock>();
-                GameObject itemPrefab = Object.Instantiate(shop.stock[0]);
-                itemPrefab.SetActive(false);
+                return;
+            }
+
+            // Find the shop and save an item for use later
+            GameObject shopObj = GameObject.Find(objectName);
+            ShopMenuStock shop = shopObj.GetComponent<ShopMenuStock>();
+            GameObject itemPrefab = Object.Instantiate(shop.stock[0]);
+            itemPrefab.SetActive(false);
                 
-                // Remove all charm type items from the store
-                List<GameObject> newStock = new List<GameObject>();
+            // Remove all charm type items from the store
+            List<GameObject> newStock = new List<GameObject>();
                 
-                foreach (ShopItemDef itemDef in items)
+            foreach (ShopItemDef itemDef in items)
+            {
+                // Create a new shop item for this item def
+                GameObject newItemObj = Object.Instantiate(itemPrefab);
+                newItemObj.SetActive(false);
+
+                // Apply all the stored values
+                ShopItemStats stats = newItemObj.GetComponent<ShopItemStats>();
+                stats.playerDataBoolName = itemDef.PlayerDataBoolName;
+                stats.nameConvo = itemDef.NameConvo;
+                stats.descConvo = itemDef.DescConvo;
+                stats.requiredPlayerDataBool = itemDef.RequiredPlayerDataBool;
+                stats.removalPlayerDataBool = itemDef.RemovalPlayerDataBool;
+                stats.dungDiscount = itemDef.DungDiscount;
+                stats.notchCostBool = itemDef.NotchCostBool;
+                stats.cost = itemDef.Cost;
+
+                // Need to set all these to make sure the item doesn't break in one of various ways
+                stats.priceConvo = string.Empty;
+                stats.specialType = 2;
+                stats.charmsRequired = 0;
+                stats.relic = false;
+                stats.relicNumber = 0;
+                stats.relicPDInt = string.Empty;
+
+                // Apply the sprite for the UI
+                stats.transform.Find("Item Sprite").gameObject.GetComponent<SpriteRenderer>().sprite = RandomizerMod.GetSprite(itemDef.SpriteName);
+
+                newStock.Add(newItemObj);
+            }
+
+            // Save unchanged list for potential alt stock
+            List<GameObject> altStock = new List<GameObject>();
+            altStock.AddRange(newStock);
+
+            // Update normal stock
+            foreach (GameObject item in shop.stock)
+            {
+                // It would be cleaner to destroy the unused objects, but that breaks the shop on subsequent loads
+                // TC must be reusing the shop items rather than destroying them on load
+                if (item.GetComponent<ShopItemStats>().specialType != 2)
                 {
-                    // Create a new shop item for this item def
-                    GameObject newItemObj = Object.Instantiate(itemPrefab);
-                    newItemObj.SetActive(false);
-
-                    // Apply all the stored values
-                    ShopItemStats stats = newItemObj.GetComponent<ShopItemStats>();
-                    stats.playerDataBoolName = itemDef.PlayerDataBoolName;
-                    stats.nameConvo = itemDef.NameConvo;
-                    stats.descConvo = itemDef.DescConvo;
-                    stats.requiredPlayerDataBool = itemDef.RequiredPlayerDataBool;
-                    stats.removalPlayerDataBool = itemDef.RemovalPlayerDataBool;
-                    stats.dungDiscount = itemDef.DungDiscount;
-                    stats.notchCostBool = itemDef.NotchCostBool;
-                    stats.cost = itemDef.Cost;
-
-                    // Need to set all these to make sure the item doesn't break in one of various ways
-                    stats.priceConvo = string.Empty;
-                    stats.specialType = 2;
-                    stats.charmsRequired = 0;
-                    stats.relic = false;
-                    stats.relicNumber = 0;
-                    stats.relicPDInt = string.Empty;
-
-                    // Apply the sprite for the UI
-                    stats.transform.Find("Item Sprite").gameObject.GetComponent<SpriteRenderer>().sprite = RandomizerMod.GetSprite(itemDef.SpriteName);
-
-                    newStock.Add(newItemObj);
+                    newStock.Add(item);
                 }
+            }
 
-                // Save unchanged list for potential alt stock
-                List<GameObject> altStock = new List<GameObject>();
-                altStock.AddRange(newStock);
+            shop.stock = newStock.ToArray();
 
-                // Update normal stock
-                foreach (GameObject item in shop.stock)
+            // Update alt stock
+            if (shop.stockAlt != null)
+            {
+                foreach (GameObject item in shop.stockAlt)
                 {
-                    // It would be cleaner to destroy the unused objects, but that breaks the shop on subsequent loads
-                    // TC must be reusing the shop items rather than destroying them on load
                     if (item.GetComponent<ShopItemStats>().specialType != 2)
                     {
-                        newStock.Add(item);
+                        altStock.Add(item);
                     }
                 }
 
-                shop.stock = newStock.ToArray();
-
-                // Update alt stock
-                if (shop.stockAlt != null)
-                {
-                    foreach (GameObject item in shop.stockAlt)
-                    {
-                        if (item.GetComponent<ShopItemStats>().specialType != 2)
-                        {
-                            altStock.Add(item);
-                        }
-                    }
-
-                    shop.stockAlt = altStock.ToArray();
-                }
+                shop.stockAlt = altStock.ToArray();
             }
         }
 

@@ -4,6 +4,8 @@ using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using UnityEngine;
 
+using Object = UnityEngine.Object;
+
 namespace RandomizerMod.Actions
 {
     [Serializable]
@@ -22,33 +24,28 @@ namespace RandomizerMod.Actions
             this.trinketNum = trinketNum;
         }
 
-        public override void Process()
+        public override ActionType Type => ActionType.PlayMakerFSM;
+
+        public override void Process(string scene, Object changeObj)
         {
-            if (GameManager.instance.GetSceneNameString() == sceneName)
+            if (scene != sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != fsmName || fsm.gameObject.name != objectName)
             {
-                foreach (PlayMakerFSM fsm in FsmList)
-                {
-                    if (fsm.FsmName == fsmName && fsm.gameObject.name == objectName)
-                    {
-                        FsmState pdBool = fsm.GetState("PD Bool?");
-                        FsmState charm = fsm.GetState("Charm?");
-                        FsmState trinkFlash = fsm.GetState("Trink Flash");
-
-                        // Remove actions that stop shiny from spawning
-                        pdBool.RemoveActionsOfType<PlayerDataBoolTest>();
-                        pdBool.RemoveActionsOfType<StringCompare>();
-
-                        // Force the FSM to follow the path for the correct trinket
-                        charm.ClearTransitions();
-                        charm.AddTransition("FINISHED", "Trink Flash");
-                        trinkFlash.ClearTransitions();
-                        trinkFlash.AddTransition("FINISHED", $"Trink {trinketNum}");
-
-                        // Changes have been made, stop looping
-                        break;
-                    }
-                }
+                return;
             }
+
+            FsmState pdBool = fsm.GetState("PD Bool?");
+            FsmState charm = fsm.GetState("Charm?");
+            FsmState trinkFlash = fsm.GetState("Trink Flash");
+
+            // Remove actions that stop shiny from spawning
+            pdBool.RemoveActionsOfType<PlayerDataBoolTest>();
+            pdBool.RemoveActionsOfType<StringCompare>();
+
+            // Force the FSM to follow the path for the correct trinket
+            charm.ClearTransitions();
+            charm.AddTransition("FINISHED", "Trink Flash");
+            trinkFlash.ClearTransitions();
+            trinkFlash.AddTransition("FINISHED", $"Trink {trinketNum}");
         }
     }
 }

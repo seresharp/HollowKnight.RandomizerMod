@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using HutongGames.PlayMaker;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 using Object = UnityEngine.Object;
 
@@ -12,26 +8,35 @@ namespace RandomizerMod.Actions
     [Serializable]
     public abstract class RandomizerAction
     {
-        private static List<PlayMakerFSM> fsmList;
         private static GameObject shinyPrefab;
 
-        private static FieldInfo fsmStartState = typeof(Fsm).GetField("startState", BindingFlags.NonPublic | BindingFlags.Instance);
+        public enum ActionType
+        {
+            GameObject,
+            PlayMakerFSM
+        }
 
-        protected static PlayMakerFSM[] FsmList => fsmList.ToArray();
+        public abstract ActionType Type { get; }
 
         protected static GameObject ShinyPrefab => Object.Instantiate(shinyPrefab);
-        
-        // Always call before processing
-        // PlayMakerFSM.FsmList does not contain inactive FSMs
-        public static void FetchFSMList(Scene scene)
-        {
-            fsmList = new List<PlayMakerFSM>();
 
-            foreach (GameObject obj in scene.GetRootGameObjects())
+        public static void ProcessFSM(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM fsm)
+        {
+            orig(fsm);
+
+            string scene = fsm.gameObject.scene.name;
+            foreach (RandomizerAction action in RandomizerMod.Instance.Settings.actions)
             {
-                foreach (PlayMakerFSM fsm in obj.GetComponentsInChildren<PlayMakerFSM>(true))
+                if (action.Type == ActionType.PlayMakerFSM)
                 {
-                    AddToFsmList(fsm);
+                    try
+                    {
+                        action.Process(scene, fsm);
+                    }
+                    catch (Exception e)
+                    {
+                        RandomizerMod.Instance.LogError($"Error processing action of type {action.GetType()}:\n{JsonUtility.ToJson(action)}\n{e}");
+                    }
                 }
             }
         }
@@ -44,14 +49,6 @@ namespace RandomizerMod.Actions
             Object.DontDestroyOnLoad(shinyPrefab);
         }
 
-        public static void AddToFsmList(PlayMakerFSM fsm)
-        {
-            if (fsm != null && fsmList != null && !fsmList.Contains(fsm))
-            {
-                fsmList.Add(fsm);
-            }
-        }
-
-        public abstract void Process();
+        public abstract void Process(string scene, Object changeObj);
     }
 }
