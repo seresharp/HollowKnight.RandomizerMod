@@ -23,7 +23,7 @@
         <objectName>Shiny Item Stand</objectName>
         <fsmName>Shiny Control</fsmName>
         <replace>false</replace>
-        <logic>DASH | WINGS | CLAW | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS + SHADESKIPS) | (SUPERDASH + BALDURS + SHADESKIPS)</logic>
+        <logic>DASH | WINGS | CLAW | ACID | ((FIREBALL | (SCREAM + BALDURS)) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)</logic>
         <type>Big</type>
         <bigSpriteKey>Prompts.Walljump</bigSpriteKey>
         <takeKey>GET_ITEM_INTRO1</takeKey>
@@ -594,7 +594,7 @@
         <objectName>Shiny Item Stand</objectName>
         <fsmName>Shiny Control</fsmName>
         <replace>false</replace>
-        <logic>CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)</logic>
+        <logic>CLAW | DASH | WINGS | ACID | ((FIREBALL | (SCREAM + BALDURS)) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)</logic>
         <type>Charm</type>
         <nameKey>CHARM_NAME_31</nameKey>
         <shopDescKey>RANDOMIZER_CHARM_DESC_31</shopDescKey>
@@ -780,7 +780,7 @@
     <shop name="Leg_Eater">
         <sceneName>Fungus2_26</sceneName>
         <objectName>Shop Menu</objectName>
-        <logic>CLAW | DASH | WINGS | ACID | ((FIREBALL | SCREAM) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)</logic>
+        <logic>CLAW | DASH | WINGS | ACID | ((FIREBALL | (SCREAM + BALDURS)) + FIREBALLSKIPS) | (SUPERDASH + BALDURS)</logic>
         <requiredPlayerDataBool></requiredPlayerDataBool>
         <dungDiscount>true</dungDiscount>
     </shop>

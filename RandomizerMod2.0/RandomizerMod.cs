@@ -18,8 +18,6 @@ namespace RandomizerMod
 {
     public class RandomizerMod : Mod<SaveSettings>
     {
-        private static List<string> sceneNames;
-
         private static FieldInfo sceneLoad = typeof(GameManager).GetField("sceneLoad", BindingFlags.NonPublic | BindingFlags.Instance);
         private static FieldInfo sceneLoadRunner = typeof(SceneLoad).GetField("runner", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -113,6 +111,8 @@ namespace RandomizerMod
             On.HutongGames.PlayMaker.Actions.BoolTest.OnEnter += BenchHandler.HandleBenchBoolTest;
 
             On.PlayMakerFSM.OnEnable += Actions.RandomizerAction.ProcessFSM;
+
+            ModHooks.Instance.ObjectPoolSpawnHook += FixExplosionPogo;
 
             // Preload shiny item
             // Can't thread this because Unity sucks
@@ -260,6 +260,21 @@ namespace RandomizerMod
             }
 
             return GlobalEnums.GatePosition.unknown;
+        }
+
+        private GameObject FixExplosionPogo(GameObject go)
+        {
+            if (go.name.StartsWith("Gas Explosion Recycle M"))
+            {
+                go.layer = (int)GlobalEnums.PhysLayers.ENEMIES;
+                NonBouncer noFun = go.GetComponent<NonBouncer>();
+                if (noFun)
+                {
+                    noFun.active = false;
+                }
+            }
+
+            return go;
         }
 
         private void UpdateCharmNotches(PlayerData pd, HeroController controller)
