@@ -195,10 +195,10 @@ namespace RandomizerMod
                     HeroLeaveDirection = GetGatePosition(gateName),
                     EntryGateName = gateName,
                     EntryDelay = delay,
-                    PreventCameraFadeOut = true,
-                    WaitForSceneTransitionCameraFade = false,
+                    PreventCameraFadeOut = false,
+                    WaitForSceneTransitionCameraFade = true,
                     Visualization = GameManager.SceneLoadVisualizations.Default,
-                    AlwaysUnloadUnusedAssets = true
+                    AlwaysUnloadUnusedAssets = false
                 });
             };
 

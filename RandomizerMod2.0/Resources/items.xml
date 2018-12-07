@@ -461,7 +461,7 @@
         <objectName>Shiny Item</objectName>
         <fsmName>Shiny Control</fsmName>
         <replace>false</replace>
-        <logic>CLAW | BALDURS</logic>
+        <logic>CLAW | BALDURS | (WINGS + SHADESKIPS)</logic>
         <type>Charm</type>
         <nameKey>CHARM_NAME_20</nameKey>
         <shopDescKey>RANDOMIZER_CHARM_DESC_20</shopDescKey>
@@ -689,7 +689,7 @@
         <objectName>Shiny Item (1)</objectName>
         <fsmName>Shiny Control</fsmName>
         <replace>false</replace>
-        <logic>CLAW</logic>
+        <logic>CLAW | WINGS</logic>
         <type>Charm</type>
         <nameKey>CHARM_NAME_39</nameKey>
         <shopDescKey>RANDOMIZER_CHARM_DESC_39</shopDescKey>
@@ -805,7 +805,7 @@
     <macro name="ACID">Isma's_Tear</macro>
     <macro name="WINGS">Monarch_Wings</macro>
     <macro name="CLAW">Mantis_Claw</macro>
-    <macro name="BALDURS">FIREBALL | QUAKE | Grubberfly's_Elegy | Glowing_Womb | Spore_Shroom | Weaversong | Mark_of_Pride | Longnail | Cyclone_Slash | (Dash_Slash + DASH)</macro>
+    <macro name="BALDURS">FIREBALL | QUAKE | Grubberfly's_Elegy | Glowing_Womb | Spore_Shroom | Weaversong | Mark_of_Pride | Cyclone_Slash | (Longnail + MAGSKIPS) | (Dash_Slash + DASH)</macro>
     <macro name="SHARPSHADOW">Sharp_Shadow + SHADOWDASH</macro>
     <macro name="DASHMASTER">Dashmaster + DASH</macro>
 </randomizer>

@@ -31,7 +31,7 @@ namespace RandomizerMod
 
         public static void SetString(string sheetName, string key, string text)
         {
-            if (string.IsNullOrEmpty(sheetName) || string.IsNullOrEmpty(key) || string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty(sheetName) || string.IsNullOrEmpty(key) || text == null)
             {
                 return;
             }

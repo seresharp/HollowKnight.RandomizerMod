@@ -38,20 +38,20 @@ namespace RandomizerMod
 
             MenuButton backBtn = back.Clone("Back", MenuButton.MenuButtonType.Proceed, new Vector2(0, -100), "Back");
             
-            RandoMenuItem allBossesBtn = new RandoMenuItem(back, new Vector2(0, 850), "All Bosses", false, true);
-            RandoMenuItem allSkillsBtn = new RandoMenuItem(back, new Vector2(0, 760), "All Skills", false, true);
-            RandoMenuItem allCharmsBtn = new RandoMenuItem(back, new Vector2(0, 670), "All Charms", false, true);
+            RandoMenuItem<bool> allBossesBtn = new RandoMenuItem<bool>(back, new Vector2(0, 850), "All Bosses", false, true);
+            RandoMenuItem<bool> allSkillsBtn = new RandoMenuItem<bool>(back, new Vector2(0, 760), "All Skills", false, true);
+            RandoMenuItem<bool> allCharmsBtn = new RandoMenuItem<bool>(back, new Vector2(0, 670), "All Charms", false, true);
 
-            RandoMenuItem charmNotchBtn = new RandoMenuItem(back, new Vector2(900, 850), "Salubra Notches", true, false);
-            RandoMenuItem lemmBtn = new RandoMenuItem(back, new Vector2(900, 760), "Lemm Sell All", true, false);
+            RandoMenuItem<bool> charmNotchBtn = new RandoMenuItem<bool>(back, new Vector2(900, 850), "Salubra Notches", true, false);
+            RandoMenuItem<bool> lemmBtn = new RandoMenuItem<bool>(back, new Vector2(900, 760), "Lemm Sell All", true, false);
 
-            RandoMenuItem presetBtn = new RandoMenuItem(back, new Vector2(-900, 850), "Preset", "Easy", "Hard", "Moglar");
-            RandoMenuItem shadeSkipsBtn = new RandoMenuItem(back, new Vector2(-900, 760), "Shade Skips", false, true);
-            RandoMenuItem acidSkipsBtn = new RandoMenuItem(back, new Vector2(-900, 670), "Acid Skips", false, true);
-            RandoMenuItem spikeTunnelsBtn = new RandoMenuItem(back, new Vector2(-900, 580), "Spike Tunnels", false, true);
-            RandoMenuItem miscSkipsBtn = new RandoMenuItem(back, new Vector2(-900, 490), "Misc Skips", false, true);
-            RandoMenuItem fireballSkipsBtn = new RandoMenuItem(back, new Vector2(-900, 400), "Fireball Skips", false, true);
-            RandoMenuItem magolorBtn = new RandoMenuItem(back, new Vector2(-900, 310), "Mag Skips", false, true);
+            RandoMenuItem<string> presetBtn = new RandoMenuItem<string>(back, new Vector2(-900, 850), "Preset", "Easy", "Hard", "Moglar");
+            RandoMenuItem<bool> shadeSkipsBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 760), "Shade Skips", false, true);
+            RandoMenuItem<bool> acidSkipsBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 670), "Acid Skips", false, true);
+            RandoMenuItem<bool> spikeTunnelsBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 580), "Spike Tunnels", false, true);
+            RandoMenuItem<bool> miscSkipsBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 490), "Misc Skips", false, true);
+            RandoMenuItem<bool> fireballSkipsBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 400), "Fireball Skips", false, true);
+            RandoMenuItem<bool> magolorBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 310), "Mag Skips", false, true);
 
             // Create seed entry field
             GameObject seedGameObject = back.Clone("Seed", MenuButton.MenuButtonType.Activate, new Vector2(0, 1130), "Click to type a custom seed").gameObject;
@@ -121,34 +121,37 @@ namespace RandomizerMod
             magolorBtn.Button.SetNavigation(fireballSkipsBtn.Button, allCharmsBtn.Button, startNormalBtn, lemmBtn.Button);
 
             // Setup event for changing difficulty settings buttons
-            void UpdateButtons(RandoMenuItem item)
+            void UpdateButtons(RandoMenuItem<string> item)
             {
-                if (item.CurrentSelection.Equals("Easy"))
+                switch (item.CurrentSelection)
                 {
-                    shadeSkipsBtn.SetSelection(false);
-                    acidSkipsBtn.SetSelection(false);
-                    spikeTunnelsBtn.SetSelection(false);
-                    miscSkipsBtn.SetSelection(false);
-                    fireballSkipsBtn.SetSelection(false);
-                    magolorBtn.SetSelection(false);
-                }
-                else if (item.CurrentSelection.Equals("Hard"))
-                {
-                    shadeSkipsBtn.SetSelection(true);
-                    acidSkipsBtn.SetSelection(true);
-                    spikeTunnelsBtn.SetSelection(true);
-                    miscSkipsBtn.SetSelection(true);
-                    fireballSkipsBtn.SetSelection(true);
-                    magolorBtn.SetSelection(false);
-                }
-                else if (item.CurrentSelection.Equals("Moglar"))
-                {
-                    shadeSkipsBtn.SetSelection(true);
-                    acidSkipsBtn.SetSelection(true);
-                    spikeTunnelsBtn.SetSelection(true);
-                    miscSkipsBtn.SetSelection(true);
-                    fireballSkipsBtn.SetSelection(true);
-                    magolorBtn.SetSelection(true);
+                    case "Easy":
+                        shadeSkipsBtn.SetSelection(false);
+                        acidSkipsBtn.SetSelection(false);
+                        spikeTunnelsBtn.SetSelection(false);
+                        miscSkipsBtn.SetSelection(false);
+                        fireballSkipsBtn.SetSelection(false);
+                        magolorBtn.SetSelection(false);
+                        break;
+                    case "Hard":
+                        shadeSkipsBtn.SetSelection(true);
+                        acidSkipsBtn.SetSelection(true);
+                        spikeTunnelsBtn.SetSelection(true);
+                        miscSkipsBtn.SetSelection(true);
+                        fireballSkipsBtn.SetSelection(true);
+                        magolorBtn.SetSelection(false);
+                        break;
+                    case "Moglar":
+                        shadeSkipsBtn.SetSelection(true);
+                        acidSkipsBtn.SetSelection(true);
+                        spikeTunnelsBtn.SetSelection(true);
+                        miscSkipsBtn.SetSelection(true);
+                        fireballSkipsBtn.SetSelection(true);
+                        magolorBtn.SetSelection(true);
+                        break;
+                    default:
+                        RandomizerMod.Instance.LogWarn("Unknown value in preset button: " + item.CurrentSelection);
+                        break;
                 }
             }
 
@@ -157,23 +160,23 @@ namespace RandomizerMod
             // Setup start game button events
             void StartGame(bool rando)
             {
-                RandomizerMod.Instance.Settings.CharmNotch = (bool)charmNotchBtn.CurrentSelection;
-                RandomizerMod.Instance.Settings.Lemm = (bool)lemmBtn.CurrentSelection;
+                RandomizerMod.Instance.Settings.CharmNotch = charmNotchBtn.CurrentSelection;
+                RandomizerMod.Instance.Settings.Lemm = lemmBtn.CurrentSelection;
 
-                RandomizerMod.Instance.Settings.AllBosses = (bool)allBossesBtn.CurrentSelection;
-                RandomizerMod.Instance.Settings.AllCharms = (bool)allCharmsBtn.CurrentSelection;
-                RandomizerMod.Instance.Settings.AllSkills = (bool)allSkillsBtn.CurrentSelection;
+                RandomizerMod.Instance.Settings.AllBosses = allBossesBtn.CurrentSelection;
+                RandomizerMod.Instance.Settings.AllCharms = allCharmsBtn.CurrentSelection;
+                RandomizerMod.Instance.Settings.AllSkills = allSkillsBtn.CurrentSelection;
 
                 RandomizerMod.Instance.Settings.Randomizer = rando;
 
                 if (RandomizerMod.Instance.Settings.Randomizer)
                 {
-                    RandomizerMod.Instance.Settings.ShadeSkips = (bool)shadeSkipsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.AcidSkips = (bool)acidSkipsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.SpikeTunnels = (bool)spikeTunnelsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.MiscSkips = (bool)miscSkipsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.FireballSkips = (bool)fireballSkipsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.MagSkips = (bool)magolorBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.ShadeSkips = shadeSkipsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.AcidSkips = acidSkipsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.SpikeTunnels = spikeTunnelsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.MiscSkips = miscSkipsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.FireballSkips = fireballSkipsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.MagSkips = magolorBtn.CurrentSelection;
                 }
 
                 RandomizerMod.Instance.StartNewGame();
@@ -202,16 +205,16 @@ namespace RandomizerMod
             Object.Destroy(label.GetComponent<MenuButton>());
         }
 
-        private class RandoMenuItem
+        private class RandoMenuItem<T> where T : IEquatable<T>
         {
-            private object[] selections;
+            private T[] selections;
             private int currentSelection;
             private Text text;
             private FixVerticalAlign align;
 
-            public RandoMenuItem(MenuButton baseObj, Vector2 position, string name, params object[] values)
+            public RandoMenuItem(MenuButton baseObj, Vector2 position, string name, params T[] values)
             {
-                if (string.IsNullOrEmpty(name) || baseObj == null || values.Length == 0)
+                if (string.IsNullOrEmpty(name) || baseObj == null || values == null || values.Length == 0)
                 {
                     throw new ArgumentNullException("Null parameters in BoolMenuButton");
                 }
@@ -230,7 +233,7 @@ namespace RandomizerMod
                 RefreshText();
             }
 
-            public delegate void RandoMenuItemChanged(RandoMenuItem item);
+            public delegate void RandoMenuItemChanged(RandoMenuItem<T> item);
 
             public event RandoMenuItemChanged Changed
             {
@@ -240,13 +243,13 @@ namespace RandomizerMod
 
             private event RandoMenuItemChanged ChangedInternal;
 
-            public object CurrentSelection => selections[currentSelection];
+            public T CurrentSelection => selections[currentSelection];
 
             public MenuButton Button { get; private set; }
 
             public string Name { get; private set; }
 
-            public void SetSelection(object obj)
+            public void SetSelection(T obj)
             {
                 for (int i = 0; i < selections.Length; i++)
                 {
