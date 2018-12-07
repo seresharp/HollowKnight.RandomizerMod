@@ -461,7 +461,7 @@
         <objectName>Shiny Item</objectName>
         <fsmName>Shiny Control</fsmName>
         <replace>false</replace>
-        <logic></logic>
+        <logic>CLAW | BALDURS</logic>
         <type>Charm</type>
         <nameKey>CHARM_NAME_20</nameKey>
         <shopDescKey>RANDOMIZER_CHARM_DESC_20</shopDescKey>

@@ -28,7 +28,7 @@ namespace RandomizerMod.Extensions
             return null;
         }
 
-        public static void RemoveActionsOfType<T>(this FsmState self)
+        public static void RemoveActionsOfType<T>(this FsmState self) where T : FsmStateAction
         {
             List<FsmStateAction> actions = new List<FsmStateAction>();
 

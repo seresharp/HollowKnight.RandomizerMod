@@ -542,19 +542,6 @@ namespace RandomizerMod
                 {
                     switch (GameManager.instance.GetSceneNameString())
                     {
-                        case "Crossroads_ShamanTemple":
-                            // Remove gate in shaman hut
-                            // Will be unnecessary if I get around to patching spell FSMs
-                            Object.Destroy(GameObject.Find("Bone Gate"));
-
-                            // Stop baldur from closing
-                            PlayMakerFSM blocker = FSMUtility.LocateFSM(GameObject.Find("Blocker"), "Blocker Control");
-                            blocker.GetState("Idle").RemoveTransitionsTo("Close");
-                            blocker.GetState("Shot Anim End").RemoveTransitionsTo("Close");
-
-                            // Add hard save to shaman shiny
-                            FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerSetHardSave());
-                            break;
                         case "Abyss_10":
                             // Something might be required here after properly processing shade cloak
                             break;
@@ -626,6 +613,15 @@ namespace RandomizerMod
                             // Just in case something other than the "Ready To Leave" state controls this
                             PlayerData.instance.legEaterLeft = false;
                             break;
+                        case "Crossroads_ShamanTemple":
+                            // Remove gate in shaman hut
+                            Object.Destroy(GameObject.Find("Bone Gate"));
+
+                            // Add hard save to shaman shiny
+                            FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerSetHardSave());
+
+                            // Fall through to patch mound baldur as well
+                            goto case "Crossroads_11_alt";
                         case "Crossroads_11_alt":
                         case "Fungus1_28":
                             // Make baldurs always able to spit rollers
@@ -636,7 +632,7 @@ namespace RandomizerMod
                                     PlayMakerFSM fsm = FSMUtility.LocateFSM(obj, "Blocker Control");
                                     if (fsm != null)
                                     {
-                                        fsm.GetState("Can Roller?").RemoveTransitionsTo("Goop");
+                                        fsm.GetState("Can Roller?").RemoveActionsOfType<IntCompare>();
                                     }
                                 }
                             }

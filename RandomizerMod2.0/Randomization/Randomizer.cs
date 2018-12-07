@@ -238,7 +238,7 @@ namespace RandomizerMod.Randomization
                     oldItem.type = ItemType.Charm;
                 }
 
-                string randomizerBoolName = GetAdditiveBoolName(newItem.boolName);
+                string randomizerBoolName = GetAdditiveBoolName(newItemName);
                 bool playerdata = string.IsNullOrEmpty(randomizerBoolName);
                 if (playerdata)
                 {
