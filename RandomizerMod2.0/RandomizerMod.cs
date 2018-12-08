@@ -778,7 +778,7 @@ namespace RandomizerMod
                         case "Room_Sly_Storeroom":
                             // Make Sly pickup send Sly back upstairs
                             FsmState slyFinish = FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish");
-                            slyFinish.AddAction(new RandomizerSetBool("slyCharm", true));
+                            slyFinish.AddAction(new RandomizerSetBool("SlyCharm", true));
 
                             // The game breaks if you leave the storeroom after this, so just send the player out of the shop completely
                             // People will think it's an intentional feature to cut out pointless walking anyway

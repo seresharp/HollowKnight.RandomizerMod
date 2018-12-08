@@ -30,9 +30,22 @@ namespace RandomizerMod.FsmStateActions
             count -= medNum * 5;
             smallNum += count;
 
+            GameObject smallPrefab = ObjectCache.SmallGeo;
+            GameObject mediumPrefab = ObjectCache.MediumGeo;
+            GameObject largePrefab = ObjectCache.LargeGeo;
+
+            // Workaround because Spawn extension is slightly broken
+            smallPrefab.Spawn();
+            mediumPrefab.Spawn();
+            largePrefab.Spawn();
+
+            smallPrefab.SetActive(true);
+            mediumPrefab.SetActive(true);
+            largePrefab.SetActive(true);
+
             FlingUtils.Config flingConfig = new FlingUtils.Config()
             {
-                Prefab = ObjectCache.SmallGeo,
+                Prefab = smallPrefab,
                 AmountMin = smallNum,
                 AmountMax = smallNum,
                 SpeedMin = 15f,
@@ -41,13 +54,20 @@ namespace RandomizerMod.FsmStateActions
                 AngleMax = 115f
             };
 
+            // Special case for thorns of agony to stop geo from flying into unreachable spots
+            if (GameManager.instance.GetSceneNameString() == "Fungus1_14")
+            {
+                flingConfig.AngleMin = 90;
+                flingConfig.AngleMax = 90;
+            }
+
             FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
 
-            flingConfig.Prefab = ObjectCache.MediumGeo;
+            flingConfig.Prefab = mediumPrefab;
             flingConfig.AmountMin = flingConfig.AmountMax = medNum;
             FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
 
-            flingConfig.Prefab = ObjectCache.LargeGeo;
+            flingConfig.Prefab = largePrefab;
             flingConfig.AmountMin = flingConfig.AmountMax = largeNum;
             FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
 

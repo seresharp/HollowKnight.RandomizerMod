@@ -298,6 +298,9 @@
         <shopDescKey>RANDOMIZER_CHARM_DESC_6</shopDescKey>
         <shopSpriteKey>Charms.6</shopSpriteKey>
         <notchCost>charmCost_6</notchCost>
+        <inChest>true</inChest>
+        <chestName>Chest</chestName>
+        <chestFsmName>Chest Control</chestFsmName>
     </item>
     <item name="Quick_Focus">
         <boolName>gotCharm_7</boolName>
@@ -377,6 +380,9 @@
         <shopSpriteKey>Charms.13</shopSpriteKey>
         <notchCost>charmCost_13</notchCost>
         <progression>true</progression>
+        <inChest>true</inChest>
+        <chestName>Mantis Chest</chestName>
+        <chestFsmName>Chest Control</chestFsmName>
     </item>
     <item name="Steady_Body">
         <boolName>gotCharm_14</boolName>
@@ -749,10 +755,81 @@
         <progression>true</progression>
     </item>
     <!--TODO: Grimmchild-->
-    <!--TODO: Geo Chests-->
     <!--TODO: Relics-->
     <!--TODO: Keys-->
     <!--TODO: Ore-->
+    <item name="False_Knight_Chest">
+        <boolName>falseKnightGeo</boolName>
+        <sceneName>Crossroads_10</sceneName>
+        <objectName>Chest</objectName>
+        <fsmName>Chest Control</fsmName>
+        <logic></logic>
+        <type>Geo</type>
+        <geo>200</geo>
+    </item>
+    <item name="Soul_Master_Chest">
+        <boolName>soulMasterGeo</boolName>
+        <sceneName>Ruins1_32</sceneName>
+        <objectName>Chest</objectName>
+        <fsmName>Chest Control</fsmName>
+        <logic>((CLAW | WINGS) + SHADESKIPS) | (CLAW + (DASH | SUPERDASH | WINGS | ACID))</logic>
+        <type>Geo</type>
+        <geo>380</geo>
+    </item>
+    <item name="Watcher_Knights_Chest">
+        <boolName>watcherKnightsGeo</boolName>
+        <sceneName>Ruins2_03</sceneName>
+        <objectName>Chest</objectName>
+        <fsmName>Chest Control</fsmName>
+        <logic>CLAW</logic>
+        <type>Geo</type>
+        <geo>655</geo>
+    </item>
+    <item name="Greenpath_Chest">
+        <boolName>greenpathGeo</boolName>
+        <sceneName>Fungus1_13</sceneName>
+        <objectName>Chest</objectName>
+        <fsmName>Chest Control</fsmName>
+        <logic>DASH | WINGS | ((BALDURS | ACID | CLAW) + (SHADESKIPS | SUPERDASH))</logic>
+        <type>Geo</type>
+        <geo>85</geo>
+    </item>
+    <item name="Mantis_Lords_Chest">
+        <boolName>mantisLordsGeo</boolName>
+        <sceneName>Fungus2_31</sceneName>
+        <objectName>Mantis Chest (2)</objectName>
+        <fsmName>Chest Control</fsmName>
+        <logic>CLAW | (WINGS + MISCSKIPS)</logic>
+        <type>Geo</type>
+        <geo>620</geo>
+    </item>
+    <item name="Resting_Grounds_Chest">
+        <boolName>restingGroundsGeo</boolName>
+        <sceneName>RestingGrounds_10</sceneName>
+        <objectName>Chest</objectName>
+        <fsmName>Chest Control</fsmName>
+        <logic>(MISCSKIPS | CLAW) + QUAKE</logic>
+        <type>Geo</type>
+        <geo>150</geo>
+    </item>
+    <item name="Crystal_Peak_Chest">
+        <boolName>crystalPeakGeo</boolName>
+        <sceneName>Mines_37</sceneName>
+        <objectName>Chest</objectName>
+        <fsmName>Chest Control</fsmName>
+        <logic>CLAW + ((Sprintmaster + Dashmaster) | DASH | SUPERDASH)</logic>
+        <type>Geo</type>
+        <geo>80</geo>
+    </item>
+    <item name="Weavers_Den_Chest">
+        <boolName>weaversDenGeo</boolName>
+        <sceneName>Deepnest_45_v02</sceneName>
+        <objectName>Chest</objectName>
+        <fsmName>Chest Control</fsmName>
+        <logic>(WINGS + (DASH | SUPERDASH)) | (CLAW + SUPERDASH)</logic>
+        <type>Geo</type>
+        <geo>160</geo>
+    </item>
     <shop name="Sly">
         <sceneName>Room_shop</sceneName>
         <objectName>Shop Menu</objectName>

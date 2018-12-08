@@ -13,7 +13,8 @@ namespace RandomizerMod.Randomization
         Big,
         Charm,
         Shop,
-        Spell
+        Spell,
+        Geo
     }
 
 #pragma warning disable 0649 // Assigned via reflection
@@ -48,6 +49,13 @@ namespace RandomizerMod.Randomization
         // Item tier flags
         public bool progression;
         public bool isGoodItem;
+
+        // Geo flags
+        public bool inChest;
+        public int geo;
+
+        public string chestName;
+        public string chestFsmName;
     }
 
     internal struct ShopDef
@@ -408,6 +416,17 @@ namespace RandomizerMod.Randomization
                         catch
                         {
                             RandomizerMod.Instance.LogWarn($"Could not parse \"{fieldNode.InnerText}\" to ItemType");
+                        }
+                    }
+                    else if (field.FieldType == typeof(int))
+                    {
+                        if (int.TryParse(fieldNode.InnerText, out int xmlInt))
+                        {
+                            field.SetValue(def, xmlInt);
+                        }
+                        else
+                        {
+                            RandomizerMod.Instance.LogWarn($"Could not parse \"{fieldNode.InnerText}\" to int");
                         }
                     }
                     else

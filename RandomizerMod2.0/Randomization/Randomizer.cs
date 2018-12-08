@@ -176,7 +176,24 @@ namespace RandomizerMod.Randomization
                     LogItemPlacement(placeItem, shopName);
 
                     shopItems[shopName].Add(placeItem);
+                    unobtainedLocations.Remove(shopName);
                 }
+            }
+
+            // Place geo drops first to guarantee they don't end up in shops
+            RandomizerMod.Instance.Log("Beginning placement of geo drops");
+
+            List<string> geoItems = unobtainedItems.Where(name => LogicManager.GetItemDef(name).type == ItemType.Geo).ToList();
+            foreach (string geoItem in geoItems)
+            {
+                string placeLocation = unobtainedLocations[rand.Next(unobtainedLocations.Count)];
+
+                unobtainedLocations.Remove(placeLocation);
+                unobtainedItems.Remove(geoItem);
+                obtainedItems.Add(geoItem);
+
+                nonShopItems.Add(placeLocation, geoItem);
+                LogItemPlacement(geoItem, placeLocation);
             }
 
             RandomizerMod.Instance.Log("Beginning full random placement into remaining locations");
@@ -237,6 +254,13 @@ namespace RandomizerMod.Randomization
                     oldItem.fsmName = "Shiny Control";
                     oldItem.type = ItemType.Charm;
                 }
+                else if (oldItem.type == ItemType.Geo && newItem.type != ItemType.Geo)
+                {
+                    actions.Add(new AddShinyToChest(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, "Randomizer Chest Shiny"));
+                    oldItem.objectName = "Randomizer Chest Shiny";
+                    oldItem.fsmName = "Shiny Control";
+                    oldItem.type = ItemType.Charm;
+                }
 
                 string randomizerBoolName = GetAdditiveBoolName(newItemName);
                 bool playerdata = string.IsNullOrEmpty(randomizerBoolName);
@@ -281,6 +305,28 @@ namespace RandomizerMod.Randomization
                                     actions.Add(new ChangeShinyIntoBigItem(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItemsArray, randomizerBoolName, playerdata));
                                 }
 
+                                break;
+                            case ItemType.Geo:
+                                if (oldItem.inChest)
+                                {
+                                    actions.Add(new ChangeChestGeo(oldItem.sceneName, oldItem.chestName, oldItem.chestFsmName, newItem.geo));
+                                }
+                                else
+                                {
+                                    actions.Add(new AddGeoToShiny(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItem.boolName, newItem.geo));
+                                }
+
+                                break;
+                            default:
+                                throw new Exception("Unimplemented type in randomization: " + oldItem.type);
+                        }
+
+                        break;
+                    case ItemType.Geo:
+                        switch (newItem.type)
+                        {
+                            case ItemType.Geo:
+                                actions.Add(new ChangeChestGeo(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItem.geo));
                                 break;
                             default:
                                 throw new Exception("Unimplemented type in randomization: " + oldItem.type);
