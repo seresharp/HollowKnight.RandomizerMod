@@ -346,12 +346,6 @@ namespace RandomizerMod
             Justification = "Suppressing to turn into one warning. I'll deal with this mess later")]
         private void BoolSetOverride(string boolName, bool value)
         {
-            // Check for Salubra notches if it's a charm
-            if (boolName.StartsWith("gotCharm_"))
-            {
-                UpdateCharmNotches(PlayerData.instance, HeroController.instance);
-            }
-
             // For some reason these all have two bools
             if (boolName == "hasDash") PlayerData.instance.SetBool("canDash", value);
             else if (boolName == "hasShadowDash") PlayerData.instance.SetBool("canShadowDash", value);
@@ -404,6 +398,12 @@ namespace RandomizerMod
             }
 
             PlayerData.instance.SetBoolInternal(boolName, value);
+
+            // Check for Salubra notches if it's a charm
+            if (boolName.StartsWith("gotCharm_"))
+            {
+                UpdateCharmNotches(PlayerData.instance, HeroController.instance);
+            }
         }
 
         private int IntOverride(string intName)
