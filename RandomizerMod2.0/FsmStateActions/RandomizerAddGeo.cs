@@ -20,6 +20,15 @@ namespace RandomizerMod.FsmStateActions
 
         public override void OnEnter()
         {
+            // Special case for pickups where you don't have an opportunity to pick up the geo
+            string sceneName = GameManager.instance.GetSceneNameString();
+            if (sceneName == "Dream_Nailcollection" || sceneName == "Room_Sly_Storeroom")
+            {
+                HeroController.instance.AddGeo(count);
+                Finish();
+                return;
+            }
+
             System.Random random = new System.Random();
 
             int smallNum = random.Next(0, count / 10);
@@ -55,7 +64,7 @@ namespace RandomizerMod.FsmStateActions
             };
 
             // Special case for thorns of agony to stop geo from flying into unreachable spots
-            if (GameManager.instance.GetSceneNameString() == "Fungus1_14")
+            if (sceneName == "Fungus1_14")
             {
                 flingConfig.AngleMin = 90;
                 flingConfig.AngleMax = 90;
