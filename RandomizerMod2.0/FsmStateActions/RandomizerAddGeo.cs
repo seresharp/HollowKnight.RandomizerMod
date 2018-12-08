@@ -2,6 +2,8 @@
 using HutongGames.PlayMaker;
 using UnityEngine;
 
+using Object = UnityEngine.Object;
+
 namespace RandomizerMod.FsmStateActions
 {
     internal class RandomizerAddGeo : FsmStateAction
@@ -11,11 +13,18 @@ namespace RandomizerMod.FsmStateActions
 
         private GameObject gameObject;
         private int count;
+        private bool minimize;
 
-        public RandomizerAddGeo(GameObject baseObj, int amount)
+        public RandomizerAddGeo(GameObject baseObj, int amount, bool minimizeObjects = false)
         {
             count = amount;
             gameObject = baseObj;
+            minimize = minimizeObjects;
+        }
+
+        public void SetGeo(int geo)
+        {
+            count = geo;
         }
 
         public override void OnEnter()
@@ -29,24 +38,39 @@ namespace RandomizerMod.FsmStateActions
                 return;
             }
 
-            System.Random random = new System.Random();
+            int smallNum = 0;
+            int medNum = 0;
+            int largeNum = 0;
 
-            int smallNum = random.Next(0, count / 10);
-            count -= smallNum;
-            int largeNum = random.Next(count / (GEO_VALUE_LARGE * 2), (count / GEO_VALUE_LARGE) + 1);
-            count -= largeNum * GEO_VALUE_LARGE;
-            int medNum = count / GEO_VALUE_MEDIUM;
-            count -= medNum * 5;
-            smallNum += count;
+            if (!minimize)
+            {
+                System.Random random = new System.Random();
+
+                smallNum = random.Next(0, count / 10);
+                count -= smallNum;
+                largeNum = random.Next(count / (GEO_VALUE_LARGE * 2), (count / GEO_VALUE_LARGE) + 1);
+                count -= largeNum * GEO_VALUE_LARGE;
+                medNum = count / GEO_VALUE_MEDIUM;
+                count -= medNum * 5;
+                smallNum += count;
+            }
+            else
+            {
+                largeNum = count / GEO_VALUE_LARGE;
+                count -= largeNum * GEO_VALUE_LARGE;
+                medNum = count / GEO_VALUE_MEDIUM;
+                count -= medNum * GEO_VALUE_MEDIUM;
+                smallNum = count;
+            }
 
             GameObject smallPrefab = ObjectCache.SmallGeo;
             GameObject mediumPrefab = ObjectCache.MediumGeo;
             GameObject largePrefab = ObjectCache.LargeGeo;
 
             // Workaround because Spawn extension is slightly broken
-            smallPrefab.Spawn();
-            mediumPrefab.Spawn();
-            largePrefab.Spawn();
+            Object.Destroy(smallPrefab.Spawn());
+            Object.Destroy(mediumPrefab.Spawn());
+            Object.Destroy(largePrefab.Spawn());
 
             smallPrefab.SetActive(true);
             mediumPrefab.SetActive(true);
@@ -70,15 +94,28 @@ namespace RandomizerMod.FsmStateActions
                 flingConfig.AngleMax = 90;
             }
 
-            FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
+            if (smallNum > 0)
+            {
+                FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
+            }
 
-            flingConfig.Prefab = mediumPrefab;
-            flingConfig.AmountMin = flingConfig.AmountMax = medNum;
-            FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
+            if (medNum > 0)
+            {
+                flingConfig.Prefab = mediumPrefab;
+                flingConfig.AmountMin = flingConfig.AmountMax = medNum;
+                FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
+            }
 
-            flingConfig.Prefab = largePrefab;
-            flingConfig.AmountMin = flingConfig.AmountMax = largeNum;
-            FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
+            if (largeNum > 0)
+            {
+                flingConfig.Prefab = largePrefab;
+                flingConfig.AmountMin = flingConfig.AmountMax = largeNum;
+                FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
+            }
+
+            smallPrefab.SetActive(false);
+            mediumPrefab.SetActive(false);
+            largePrefab.SetActive(false);
 
             Finish();
         }

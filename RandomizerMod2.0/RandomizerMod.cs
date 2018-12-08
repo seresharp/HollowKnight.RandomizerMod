@@ -593,6 +593,33 @@ namespace RandomizerMod
                             // Just in case something other than the "Ready To Leave" state controls this
                             PlayerData.instance.legEaterLeft = false;
                             break;
+                        case "Crossroads_38":
+                            // Faster daddy
+                            PlayMakerFSM grubDaddy = FSMUtility.LocateFSM(GameObject.Find("Grub King"), "King Control");
+                            grubDaddy.GetState("Final Reward?").RemoveTransitionsTo("Recover");
+                            grubDaddy.GetState("Final Reward?").AddTransition("FINISHED", "Recheck");
+                            grubDaddy.GetState("Recheck").RemoveTransitionsTo("Gift Anim");
+                            grubDaddy.GetState("Recheck").AddTransition("FINISHED", "Activate Reward");
+
+                            // Terrible code to make a terrible fsm work not terribly
+                            int geoTotal = 0;
+                            grubDaddy.GetState("All Given").AddAction(new RandomizerAddGeo(grubDaddy.gameObject, 0, true));
+                            grubDaddy.GetState("Recheck").AddAction(new RandomizerExecuteLambda(() => grubDaddy.GetState("All Given").GetActionsOfType<RandomizerAddGeo>()[0].SetGeo(geoTotal)));
+
+                            foreach (PlayMakerFSM grubFsm in grubDaddy.gameObject.GetComponentsInChildren<PlayMakerFSM>(true))
+                            {
+                                if (grubFsm.FsmName == "grub_reward_geo")
+                                {
+                                    FsmState grubGeoState = grubFsm.GetState("Remaining?");
+                                    int geo = grubGeoState.GetActionsOfType<IntCompare>()[0].integer1.Value;
+
+                                    grubGeoState.RemoveActionsOfType<FsmStateAction>();
+                                    grubGeoState.AddAction(new RandomizerExecuteLambda(() => geoTotal += geo));
+                                    grubGeoState.AddTransition("FINISHED", "End");
+                                }
+                            }
+
+                            break;
                         case "Crossroads_ShamanTemple":
                             // Remove gate in shaman hut
                             Object.Destroy(GameObject.Find("Bone Gate"));
@@ -670,7 +697,7 @@ namespace RandomizerMod
 
                                     // Spawn extension does not work the first time it is called
                                     // Need to call it once here so that the TinkEffect component works on the first try
-                                    spikeTink.blockEffect.Spawn();
+                                    Object.Destroy(spikeTink.blockEffect.Spawn());
                                 }
                             }
 

@@ -86,6 +86,7 @@
     <Compile Include="Components\Shop.cs" />
     <Compile Include="Extensions\ModCommonTheft.cs" />
     <Compile Include="FontManager.cs" />
+    <Compile Include="FsmStateActions\RandomizerExecuteLambda.cs" />
     <Compile Include="FsmStateActions\RandomizerTakeGeo.cs" />
     <Compile Include="FsmStateActions\RandomizerSellRelics.cs" />
     <Compile Include="Actions\ReplaceObjectWithShiny.cs" />
