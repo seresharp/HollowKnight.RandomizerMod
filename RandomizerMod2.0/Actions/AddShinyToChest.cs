@@ -44,7 +44,7 @@ namespace RandomizerMod.Actions
 
             // Instantiate a new shiny and set the chest as its parent
             GameObject item = fsm.gameObject.transform.Find("Item").gameObject;
-            GameObject shiny = ShinyPrefab;
+            GameObject shiny = ObjectCache.ShinyItem;
             shiny.SetActive(false);
             shiny.transform.SetParent(item.transform);
             shiny.transform.position = item.transform.position;

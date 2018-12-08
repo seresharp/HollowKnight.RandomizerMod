@@ -99,7 +99,6 @@ namespace RandomizerMod
 
             // Add hooks
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += HandleSceneChanges;
-            ModHooks.Instance.OnEnableEnemyHook += RandomizerAddGeo.GetGeoPrefabs;
             ModHooks.Instance.LanguageGetHook += LanguageStringManager.GetLanguageString;
             ModHooks.Instance.GetPlayerIntHook += IntOverride;
             ModHooks.Instance.GetPlayerBoolHook += BoolGetOverride;
@@ -116,7 +115,7 @@ namespace RandomizerMod
 
             // Preload shiny item
             // Can't thread this because Unity sucks
-            Components.ShinyPreloader.Preload();
+            Components.Preloader.Preload();
 
             // Load fonts
             FontManager.LoadFonts();
@@ -655,6 +654,24 @@ namespace RandomizerMod
                             foreach (GameObject toll in tolls)
                             {
                                 Object.Destroy(FSMUtility.LocateFSM(toll, "Disable if No Lantern"));
+                            }
+
+                            break;
+                        case "Mines_35":
+                            foreach (NonBouncer nonBounce in Object.FindObjectsOfType<NonBouncer>())
+                            {
+                                if (nonBounce.gameObject.name.StartsWith("Spike Collider"))
+                                {
+                                    nonBounce.active = false;
+                                    TinkEffect spikeTink = nonBounce.gameObject.AddComponent<TinkEffect>();
+                                    spikeTink.blockEffect = Object.Instantiate(ObjectCache.TinkEffect);
+                                    spikeTink.blockEffect.transform.SetParent(nonBounce.transform);
+                                    spikeTink.useNailPosition = true;
+
+                                    // Spawn extension does not work the first time it is called
+                                    // Need to call it once here so that the TinkEffect component works on the first try
+                                    spikeTink.blockEffect.Spawn();
+                                }
                             }
 
                             break;

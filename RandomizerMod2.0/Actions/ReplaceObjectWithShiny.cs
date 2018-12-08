@@ -36,7 +36,7 @@ namespace RandomizerMod.Actions
             GameObject obj = currentScene.FindGameObject(objectName);
 
             // Put a shiny in the same location as the original
-            GameObject shiny = ShinyPrefab;
+            GameObject shiny = ObjectCache.ShinyItem;
             shiny.name = newShinyName;
             if (obj.transform.parent != null)
             {

@@ -8,8 +8,6 @@ namespace RandomizerMod.Actions
     [Serializable]
     public abstract class RandomizerAction
     {
-        private static GameObject shinyPrefab;
-
         public enum ActionType
         {
             GameObject,
@@ -17,8 +15,6 @@ namespace RandomizerMod.Actions
         }
 
         public abstract ActionType Type { get; }
-
-        protected static GameObject ShinyPrefab => Object.Instantiate(shinyPrefab);
 
         public static void ProcessFSM(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM fsm)
         {
@@ -39,14 +35,6 @@ namespace RandomizerMod.Actions
                     }
                 }
             }
-        }
-
-        public static void SetShinyPrefab(GameObject obj)
-        {
-            shinyPrefab = Object.Instantiate(obj);
-            shinyPrefab.SetActive(false);
-            shinyPrefab.name = "Randomizer Shiny";
-            Object.DontDestroyOnLoad(shinyPrefab);
         }
 
         public abstract void Process(string scene, Object changeObj);
