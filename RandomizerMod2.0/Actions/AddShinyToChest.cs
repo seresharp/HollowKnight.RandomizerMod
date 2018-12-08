@@ -42,6 +42,13 @@ namespace RandomizerMod.Actions
                 fling.spawnMax = 0;
             }
 
+            // Need to check SpawnFromPool action too because of Mantis Lords chest
+            foreach (SpawnFromPool spawn in spawnItems.GetActionsOfType<SpawnFromPool>())
+            {
+                spawn.spawnMin = 0;
+                spawn.spawnMax = 0;
+            }
+
             // Instantiate a new shiny and set the chest as its parent
             GameObject item = fsm.gameObject.transform.Find("Item").gameObject;
             GameObject shiny = ObjectCache.ShinyItem;

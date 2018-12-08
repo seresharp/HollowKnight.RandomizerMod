@@ -52,6 +52,13 @@ namespace RandomizerMod.Actions
                 fling.spawnMin = 0;
                 fling.spawnMax = 0;
             }
+
+            // Need to check SpawnFromPool action too because of Mantis Lords chest
+            foreach (SpawnFromPool spawn in spawnItems.GetActionsOfType<SpawnFromPool>())
+            {
+                spawn.spawnMin = 0;
+                spawn.spawnMax = 0;
+            }
         }
     }
 }

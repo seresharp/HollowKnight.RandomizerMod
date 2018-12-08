@@ -42,6 +42,18 @@ namespace RandomizerMod.Randomization
             Dictionary<string, int> locationDepths = new Dictionary<string, int>();
             int currentDepth = 1;
 
+            // Early game sucks too much if you don't get any geo, and the fury spot is weird anyway
+            // Two birds with one stone
+            RandomizerMod.Instance.Log("Placing initial geo pickup");
+
+            string[] furyGeoContenders = unobtainedItems.Where(item => LogicManager.GetItemDef(item).type == ItemType.Geo && LogicManager.GetItemDef(item).geo > 100).ToArray();
+            string furyGeoItem = furyGeoContenders[rand.Next(furyGeoContenders.Length)];
+
+            unobtainedItems.Remove(furyGeoItem);
+            unobtainedLocations.Remove("Fury_of_the_Fallen");
+            nonShopItems.Add("Fury_of_the_Fallen", furyGeoItem);
+            LogItemPlacement(furyGeoItem, "Fury_of_the_Fallen");
+
             RandomizerMod.Instance.Log("Beginning first pass of progression item placement");
 
             // Choose where to place progression items
