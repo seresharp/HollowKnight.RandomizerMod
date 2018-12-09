@@ -1,14 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using HutongGames.PlayMaker.Actions;
 
 namespace RandomizerMod
 {
     internal static class BenchHandler
     {
-        public static void HandleBenchSave(On.PlayerData.orig_SetBenchRespawn_RespawnMarker_string_int orig, PlayerData self, RespawnMarker spawnMarker, string sceneName, int spawnType)
+        public static void Hook()
+        {
+            UnHook();
+
+            On.PlayerData.SetBenchRespawn_RespawnMarker_string_int += HandleBenchSave;
+            On.PlayerData.SetBenchRespawn_string_string_bool += HandleBenchSave;
+            On.PlayerData.SetBenchRespawn_string_string_int_bool += HandleBenchSave;
+            On.HutongGames.PlayMaker.Actions.BoolTest.OnEnter += HandleBenchBoolTest;
+        }
+
+        public static void UnHook()
+        {
+            On.PlayerData.SetBenchRespawn_RespawnMarker_string_int -= HandleBenchSave;
+            On.PlayerData.SetBenchRespawn_string_string_bool -= HandleBenchSave;
+            On.PlayerData.SetBenchRespawn_string_string_int_bool -= HandleBenchSave;
+            On.HutongGames.PlayMaker.Actions.BoolTest.OnEnter -= HandleBenchBoolTest;
+        }
+
+        private static void HandleBenchSave(On.PlayerData.orig_SetBenchRespawn_RespawnMarker_string_int orig, PlayerData self, RespawnMarker spawnMarker, string sceneName, int spawnType)
         {
             if (CanSaveInRoom(sceneName))
             {
@@ -16,7 +31,7 @@ namespace RandomizerMod
             }
         }
 
-        public static void HandleBenchSave(On.PlayerData.orig_SetBenchRespawn_string_string_bool orig, PlayerData self, string spawnMarker, string sceneName, bool facingRight)
+        private static void HandleBenchSave(On.PlayerData.orig_SetBenchRespawn_string_string_bool orig, PlayerData self, string spawnMarker, string sceneName, bool facingRight)
         {
             if (CanSaveInRoom(sceneName))
             {
@@ -24,7 +39,7 @@ namespace RandomizerMod
             }
         }
 
-        public static void HandleBenchSave(On.PlayerData.orig_SetBenchRespawn_string_string_int_bool orig, PlayerData self, string spawnMarker, string sceneName, int spawnType, bool facingRight)
+        private static void HandleBenchSave(On.PlayerData.orig_SetBenchRespawn_string_string_int_bool orig, PlayerData self, string spawnMarker, string sceneName, int spawnType, bool facingRight)
         {
             if (CanSaveInRoom(sceneName))
             {
@@ -32,7 +47,7 @@ namespace RandomizerMod
             }
         }
 
-        public static void HandleBenchBoolTest(On.HutongGames.PlayMaker.Actions.BoolTest.orig_OnEnter orig, BoolTest self)
+        private static void HandleBenchBoolTest(On.HutongGames.PlayMaker.Actions.BoolTest.orig_OnEnter orig, BoolTest self)
         {
             if (self.State?.Name == "Rest Burst" && self.boolVariable?.Name == "Set Respawn")
             {
@@ -48,13 +63,13 @@ namespace RandomizerMod
             
             switch (sceneName)
             {
-                case "Abyss_18": // Basin bench
-                case "GG_Waterways": // Godhome
-                case "Room_Colosseum_02": // Colo bench
+                case SceneNames.Abyss_18: // Basin bench
+                case SceneNames.GG_Waterways: // Godhome
+                case SceneNames.Room_Colosseum_02: // Colo bench
                     return pd.hasWalljump;
-                case "Room_Slug_Shrine": // Unn bench
+                case SceneNames.Room_Slug_Shrine: // Unn bench
                     return pd.hasDash || pd.hasDoubleJump || (pd.hasAcidArmour && pd.hasWalljump);
-                case "Waterways_02": // Waterways bench
+                case SceneNames.Waterways_02: // Waterways bench
                     return pd.hasWalljump || pd.hasDoubleJump;
                 default:
                     return true;

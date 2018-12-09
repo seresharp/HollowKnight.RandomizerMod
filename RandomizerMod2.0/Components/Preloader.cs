@@ -21,14 +21,14 @@ namespace RandomizerMod.Components
 
         private IEnumerator PreloadCoroutine()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Tutorial_01", LoadSceneMode.Additive);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(SceneNames.Tutorial_01, LoadSceneMode.Additive);
 
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
 
             ObjectCache.GetPrefabs();
 
-            UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(UnityEngine.SceneManagement.SceneManager.GetSceneByName("Tutorial_01"));
+            UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(UnityEngine.SceneManagement.SceneManager.GetSceneByName(SceneNames.Tutorial_01));
             Destroy(gameObject);
         }
     }

@@ -4,11 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
 using Modding;
-using RandomizerMod.Extensions;
-using RandomizerMod.FsmStateActions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,9 +14,6 @@ namespace RandomizerMod
 {
     public class RandomizerMod : Mod<SaveSettings>
     {
-        private static FieldInfo sceneLoad = typeof(GameManager).GetField("sceneLoad", BindingFlags.NonPublic | BindingFlags.Instance);
-        private static FieldInfo sceneLoadRunner = typeof(SceneLoad).GetField("runner", BindingFlags.NonPublic | BindingFlags.Instance);
-
         private static Dictionary<string, Sprite> sprites;
 
         private static Thread logicParseThread;
@@ -88,7 +81,7 @@ namespace RandomizerMod
                 else if (res.EndsWith("items.xml"))
                 {
                     // Thread the xml parsing because it's kinda slow
-                    logicParseThread = new Thread(new ParameterizedThreadStart(Randomization.LogicManager.ParseXML));
+                    logicParseThread = new Thread(Randomization.LogicManager.ParseXML);
                     logicParseThread.Start(randoDLL.GetManifestResourceStream(res));
                 }
                 else
@@ -104,14 +97,10 @@ namespace RandomizerMod
             ModHooks.Instance.GetPlayerBoolHook += BoolGetOverride;
             ModHooks.Instance.SetPlayerBoolHook += BoolSetOverride;
 
-            On.PlayerData.SetBenchRespawn_RespawnMarker_string_int += BenchHandler.HandleBenchSave;
-            On.PlayerData.SetBenchRespawn_string_string_bool += BenchHandler.HandleBenchSave;
-            On.PlayerData.SetBenchRespawn_string_string_int_bool += BenchHandler.HandleBenchSave;
-            On.HutongGames.PlayMaker.Actions.BoolTest.OnEnter += BenchHandler.HandleBenchBoolTest;
-
             On.PlayMakerFSM.OnEnable += Actions.RandomizerAction.ProcessFSM;
 
-            ModHooks.Instance.ObjectPoolSpawnHook += FixExplosionPogo;
+            BenchHandler.Hook();
+            MiscSceneChanges.Hook();
 
             // Preload shiny item
             // Can't thread this because Unity sucks
@@ -176,47 +165,9 @@ namespace RandomizerMod
             }
         }
 
-        public void ChangeToScene(string sceneName, string gateName, float delay = 0f)
-        {
-            if (string.IsNullOrEmpty(sceneName) || string.IsNullOrEmpty(gateName))
-            {
-                Log("Empty string passed into ChangeToScene, ignoring");
-                return;
-            }
-
-            SceneLoad.FinishDelegate loadScene = () =>
-            {
-                GameManager.instance.StopAllCoroutines();
-                sceneLoad.SetValue(GameManager.instance, null);
-
-                GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo()
-                {
-                    IsFirstLevelForPlayer = false,
-                    SceneName = sceneName,
-                    HeroLeaveDirection = GetGatePosition(gateName),
-                    EntryGateName = gateName,
-                    EntryDelay = delay,
-                    PreventCameraFadeOut = false,
-                    WaitForSceneTransitionCameraFade = true,
-                    Visualization = GameManager.SceneLoadVisualizations.Default,
-                    AlwaysUnloadUnusedAssets = false
-                });
-            };
-
-            SceneLoad load = (SceneLoad)sceneLoad.GetValue(GameManager.instance);
-            if (load != null)
-            {
-                load.Finish += loadScene;
-            }
-            else
-            {
-                loadScene.Invoke();
-            }
-        }
-
         public override string GetVersion()
         {
-            string ver = "2b.11";
+            string ver = "2b.12";
             int minAPI = 45;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
@@ -230,51 +181,6 @@ namespace RandomizerMod
 
         // Deleting this would break another mod
         private static bool SceneHasPreload(string sceneName) => false;
-
-        private static GlobalEnums.GatePosition GetGatePosition(string name)
-        {
-            if (name.Contains("top"))
-            {
-                return GlobalEnums.GatePosition.top;
-            }
-
-            if (name.Contains("bot"))
-            {
-                return GlobalEnums.GatePosition.bottom;
-            }
-
-            if (name.Contains("left"))
-            {
-                return GlobalEnums.GatePosition.left;
-            }
-
-            if (name.Contains("right"))
-            {
-                return GlobalEnums.GatePosition.right;
-            }
-
-            if (name.Contains("door"))
-            {
-                return GlobalEnums.GatePosition.door;
-            }
-
-            return GlobalEnums.GatePosition.unknown;
-        }
-
-        private GameObject FixExplosionPogo(GameObject go)
-        {
-            if (go.name.StartsWith("Gas Explosion Recycle M"))
-            {
-                go.layer = (int)GlobalEnums.PhysLayers.ENEMIES;
-                NonBouncer noFun = go.GetComponent<NonBouncer>();
-                if (noFun)
-                {
-                    noFun.active = false;
-                }
-            }
-
-            return go;
-        }
 
         private void UpdateCharmNotches(PlayerData pd, HeroController controller)
         {
@@ -292,29 +198,29 @@ namespace RandomizerMod
 
                 if (!pd.salubraNotch1 && charms >= 5)
                 {
-                    pd.SetBool("salubraNotch1", true);
+                    pd.SetBool(nameof(PlayerData.salubraNotch1), true);
                     notches++;
                 }
 
                 if (!pd.salubraNotch2 && charms >= 10)
                 {
-                    pd.SetBool("salubraNotch2", true);
+                    pd.SetBool(nameof(PlayerData.salubraNotch2), true);
                     notches++;
                 }
 
                 if (!pd.salubraNotch3 && charms >= 18)
                 {
-                    pd.SetBool("salubraNotch3", true);
+                    pd.SetBool(nameof(PlayerData.salubraNotch3), true);
                     notches++;
                 }
 
                 if (!pd.salubraNotch4 && charms >= 25)
                 {
-                    pd.SetBool("salubraNotch4", true);
+                    pd.SetBool(nameof(PlayerData.salubraNotch4), true);
                     notches++;
                 }
 
-                pd.SetInt("charmSlots", notches);
+                pd.SetInt(nameof(PlayerData.charmSlots), notches);
                 GameManager.instance.RefreshOvercharm();
             }
         }
@@ -418,7 +324,7 @@ namespace RandomizerMod
 
         private void HandleSceneChanges(Scene from, Scene to)
         {
-            if (GameManager.instance.GetSceneNameString() == Constants.MENU_SCENE)
+            if (GameManager.instance.GetSceneNameString() == SceneNames.Menu_Title)
             {
                 try
                 {
@@ -429,7 +335,7 @@ namespace RandomizerMod
                     LogError("Error editing menu:\n" + e);
                 }
             }
-            else if (GameManager.instance.GetSceneNameString() == Constants.END_CREDITS && Settings != null && Settings.Randomizer && Settings.itemPlacements.Count != 0)
+            else if (GameManager.instance.GetSceneNameString() == SceneNames.End_Credits && Settings != null && Settings.Randomizer && Settings.itemPlacements.Count != 0)
             {
 #warning Unfinished functionality here
                 /*foreach (GameObject obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
@@ -468,351 +374,7 @@ namespace RandomizerMod
 
             try
             {
-                // These changes should always be applied
-                switch (GameManager.instance.GetSceneNameString())
-                {
-                    case "Room_temple":
-                        // Handle completion restrictions
-                        RestrictionManager.ProcessRestrictions();
-                        break;
-                    case "Room_Final_Boss_Core":
-                        // Trigger Radiance fight without requiring dream nail hit
-                        // Prevents skipping the fight in all bosses mode
-                        if (Settings.AllBosses)
-                        {
-                            PlayMakerFSM dreamFSM = FSMUtility.LocateFSM(to.FindGameObject("Dream Enter"), "Control");
-                            SendEvent enterRadiance = new SendEvent
-                            {
-                                eventTarget = new FsmEventTarget()
-                                {
-                                    target = FsmEventTarget.EventTarget.FSMComponent,
-                                    fsmComponent = dreamFSM
-                                },
-                                sendEvent = FsmEvent.FindEvent("NAIL HIT"),
-                                delay = 0,
-                                everyFrame = false
-                            };
-
-                            PlayMakerFSM bossFSM = FSMUtility.LocateFSM(to.FindGameObject("Hollow Knight Boss"), "Control");
-                            bossFSM.GetState("H Collapsed").AddAction(enterRadiance);
-                        }
-
-                        break;
-                    case "Cliffs_06":
-                        // Prevent banish ending in all bosses
-                        if (Settings.AllBosses)
-                        {
-                            Object.Destroy(GameObject.Find("Brumm Lantern NPV"));
-                        }
-
-                        break;
-                    case "Ruins1_05b":
-                        // Lemm sell all
-                        if (Settings.Lemm)
-                        {
-                            PlayMakerFSM lemm = FSMUtility.LocateFSM(GameObject.Find("Relic Dealer"), "npc_control");
-                            lemm.GetState("Convo End").AddAction(new RandomizerSellRelics());
-                        }
-
-                        break;
-                }
-
-                // These ones are randomizer specific
-                if (Settings.Randomizer)
-                {
-                    switch (GameManager.instance.GetSceneNameString())
-                    {
-                        case "Abyss_10":
-                            // Something might be required here after properly processing shade cloak
-                            break;
-                        case "Abyss_12":
-                            // Destroy shriek pickup if the player doesn't have wraiths
-                            if (PlayerData.instance.screamLevel == 0)
-                            {
-                                Object.Destroy(GameObject.Find("Randomizer Shiny"));
-                            }
-
-                            break;
-                        case "Ruins1_32":
-                            // Platform after soul master
-                            if (!PlayerData.instance.hasWalljump)
-                            {
-                                GameObject plat = Object.Instantiate(GameObject.Find("ruind_int_plat_float_02 (3)"));
-                                plat.SetActive(true);
-                                plat.transform.position = new Vector2(40.5f, 72f);
-                            }
-
-                            // Fall through because there's quake floors to remove here
-                            goto case "Ruins1_30";
-                        case "Ruins1_30":
-                        case "Ruins1_23":
-                            // Remove quake floors
-                            if (PlayerData.instance.quakeLevel <= 0 && PlayerData.instance.killedMageLord)
-                            {
-                                foreach (GameObject obj in to.GetRootGameObjects())
-                                {
-                                    if (obj.name.Contains("Quake Floor") || obj.name.Contains("Quake Window"))
-                                    {
-                                        Object.Destroy(obj);
-                                    }
-                                }
-                            }
-
-                            break;
-                        case "Ruins2_04":
-                            // Shield husk doesn't walk as far as on old patches, making something pogoable to make up for this
-                            if (!PlayerData.instance.hasWalljump && !PlayerData.instance.hasDoubleJump)
-                            {
-                                GameObject.Find("Direction Pole White Palace").GetComponent<NonBouncer>().active = false;
-                            }
-
-                            break;
-                        case "Fungus2_21":
-                            // Remove city crest gate
-                            if (PlayerData.instance.hasCityKey)
-                            {
-                                Object.Destroy(GameObject.Find("City Gate Control"));
-                                Object.Destroy(GameObject.Find("Ruins_front_gate"));
-                            }
-
-                            break;
-                        case "Fungus2_26":
-                            // Prevent leg eater from doing anything but opening the shop
-                            PlayMakerFSM legEater = FSMUtility.LocateFSM(GameObject.Find("Leg Eater"), "Conversation Control");
-                            FsmState legEaterChoice = legEater.GetState("Convo Choice");
-                            legEaterChoice.RemoveTransitionsTo("Convo 1");
-                            legEaterChoice.RemoveTransitionsTo("Convo 2");
-                            legEaterChoice.RemoveTransitionsTo("Convo 3");
-                            legEaterChoice.RemoveTransitionsTo("Infected Crossroad");
-                            legEaterChoice.RemoveTransitionsTo("Bought Charm");
-                            legEaterChoice.RemoveTransitionsTo("Gold Convo");
-                            legEaterChoice.RemoveTransitionsTo("All Gold");
-                            legEaterChoice.RemoveTransitionsTo("Ready To Leave");
-                            legEater.GetState("All Gold?").RemoveTransitionsTo("No Shop");
-
-                            // Just in case something other than the "Ready To Leave" state controls this
-                            PlayerData.instance.legEaterLeft = false;
-                            break;
-                        case "Crossroads_38":
-                            // Faster daddy
-                            PlayMakerFSM grubDaddy = FSMUtility.LocateFSM(GameObject.Find("Grub King"), "King Control");
-                            grubDaddy.GetState("Final Reward?").RemoveTransitionsTo("Recover");
-                            grubDaddy.GetState("Final Reward?").AddTransition("FINISHED", "Recheck");
-                            grubDaddy.GetState("Recheck").RemoveTransitionsTo("Gift Anim");
-                            grubDaddy.GetState("Recheck").AddTransition("FINISHED", "Activate Reward");
-
-                            // Terrible code to make a terrible fsm work not terribly
-                            int geoTotal = 0;
-                            grubDaddy.GetState("All Given").AddAction(new RandomizerAddGeo(grubDaddy.gameObject, 0, true));
-                            grubDaddy.GetState("Recheck").AddAction(new RandomizerExecuteLambda(() => grubDaddy.GetState("All Given").GetActionsOfType<RandomizerAddGeo>()[0].SetGeo(geoTotal)));
-
-                            foreach (PlayMakerFSM grubFsm in grubDaddy.gameObject.GetComponentsInChildren<PlayMakerFSM>(true))
-                            {
-                                if (grubFsm.FsmName == "grub_reward_geo")
-                                {
-                                    FsmState grubGeoState = grubFsm.GetState("Remaining?");
-                                    int geo = grubGeoState.GetActionsOfType<IntCompare>()[0].integer1.Value;
-
-                                    grubGeoState.RemoveActionsOfType<FsmStateAction>();
-                                    grubGeoState.AddAction(new RandomizerExecuteLambda(() => geoTotal += geo));
-                                    grubGeoState.AddTransition("FINISHED", "End");
-                                }
-                            }
-
-                            break;
-                        case "Crossroads_ShamanTemple":
-                            // Remove gate in shaman hut
-                            Object.Destroy(GameObject.Find("Bone Gate"));
-
-                            // Add hard save to shaman shiny
-                            FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerSetHardSave());
-
-                            // Fall through to patch mound baldur as well
-                            goto case "Crossroads_11_alt";
-                        case "Crossroads_11_alt":
-                        case "Fungus1_28":
-                            // Make baldurs always able to spit rollers
-                            foreach (GameObject obj in Object.FindObjectsOfType<GameObject>())
-                            {
-                                if (obj.name.Contains("Blocker"))
-                                {
-                                    PlayMakerFSM fsm = FSMUtility.LocateFSM(obj, "Blocker Control");
-                                    if (fsm != null)
-                                    {
-                                        fsm.GetState("Can Roller?").RemoveActionsOfType<IntCompare>();
-                                    }
-                                }
-                            }
-
-                            break;
-                        case "Ruins1_01":
-                            // Add platform to stop quirrel bench soft lock
-                            if (!PlayerData.instance.hasWalljump)
-                            {
-                                GameObject plat2 = Object.Instantiate(GameObject.Find("ruind_int_plat_float_01"));
-                                plat2.SetActive(true);
-                                plat2.transform.position = new Vector2(116, 14);
-                            }
-
-                            break;
-                        case "Ruins1_02":
-                            // Add platform to stop quirrel bench soft lock
-                            if (!PlayerData.instance.hasWalljump)
-                            {
-                                GameObject plat3 = Object.Instantiate(GameObject.Find("ruind_int_plat_float_01"));
-                                plat3.SetActive(true);
-                                plat3.transform.position = new Vector2(2, 61.5f);
-                            }
-
-                            break;
-                        case "Ruins1_05":
-                            // Slight adjustment to breakable so wings is enough to progress, just like on old patches
-                            if (!PlayerData.instance.hasWalljump)
-                            {
-                                GameObject chandelier = GameObject.Find("ruind_dressing_light_02 (10)");
-                                chandelier.transform.SetPositionX(chandelier.transform.position.x - 2);
-                                chandelier.GetComponent<NonBouncer>().active = false;
-                            }
-
-                            break;
-                        case "Mines_33":
-                            // Make tolls always interactable
-                            GameObject[] tolls = new GameObject[] { GameObject.Find("Toll Gate Machine"), GameObject.Find("Toll Gate Machine (1)") };
-                            foreach (GameObject toll in tolls)
-                            {
-                                Object.Destroy(FSMUtility.LocateFSM(toll, "Disable if No Lantern"));
-                            }
-
-                            break;
-                        case "Mines_35":
-                            foreach (NonBouncer nonBounce in Object.FindObjectsOfType<NonBouncer>())
-                            {
-                                if (nonBounce.gameObject.name.StartsWith("Spike Collider"))
-                                {
-                                    nonBounce.active = false;
-                                    TinkEffect spikeTink = nonBounce.gameObject.AddComponent<TinkEffect>();
-                                    spikeTink.blockEffect = Object.Instantiate(ObjectCache.TinkEffect);
-                                    spikeTink.blockEffect.transform.SetParent(nonBounce.transform);
-                                    spikeTink.useNailPosition = true;
-
-                                    // Spawn extension does not work the first time it is called
-                                    // Need to call it once here so that the TinkEffect component works on the first try
-                                    Object.Destroy(spikeTink.blockEffect.Spawn());
-                                }
-                            }
-
-                            break;
-                        case "Fungus1_04":
-                            // Open gates after Hornet fight
-                            foreach (PlayMakerFSM childFSM in GameObject.Find("Cloak Corpse").GetComponentsInChildren<PlayMakerFSM>(true))
-                            {
-                                if (childFSM.FsmName == "Shiny Control")
-                                {
-                                    SendEvent openGate = new SendEvent
-                                    {
-                                        eventTarget = new FsmEventTarget()
-                                        {
-                                            target = FsmEventTarget.EventTarget.BroadcastAll,
-                                            excludeSelf = true
-                                        },
-                                        sendEvent = FsmEvent.FindEvent("BG OPEN"),
-                                        delay = 0,
-                                        everyFrame = false
-                                    };
-                                    childFSM.GetState("Destroy").AddFirstAction(openGate);
-                                    childFSM.GetState("Finish").AddFirstAction(openGate);
-
-                                    break;
-                                }
-                            }
-
-                            // Destroy everything relating to the dreamer cutscene
-                            // This stuff is in another scene and doesn't exist immediately, so I can't use Object.Destroy
-                            Components.ObjectDestroyer.Destroy("Dreamer Scene 1");
-                            Components.ObjectDestroyer.Destroy("Hornet Saver");
-                            Components.ObjectDestroyer.Destroy("Cutscene Dreamer");
-                            Components.ObjectDestroyer.Destroy("Dream Scene Activate");
-
-                            // Fix the camera lock zone by removing the FSM that destroys it
-                            if (!PlayerData.instance.hornet1Defeated)
-                            {
-                                Object.Destroy(FSMUtility.LocateFSM(GameObject.Find("Camera Locks Boss"), "FSM"));
-                            }
-
-                            break;
-                        case "Ruins1_24":
-                            // Pickup (Quake Pickup) -> Idle -> GetPlayerDataInt (quakeLevel)
-                            // Quake (Quake Item) -> Get -> SetPlayerDataInt (quakeLevel)
-                            // Stop spell container from destroying itself
-                            PlayMakerFSM quakePickup = FSMUtility.LocateFSM(GameObject.Find("Quake Pickup"), "Pickup");
-                            quakePickup.GetState("Idle").RemoveActionsOfType<IntCompare>();
-
-                            foreach (PlayMakerFSM childFSM in quakePickup.gameObject.GetComponentsInChildren<PlayMakerFSM>(true))
-                            {
-                                if (childFSM.FsmName == "Shiny Control")
-                                {
-                                    // Make spell container spawn shiny instead
-                                    quakePickup.GetState("Appear").GetActionsOfType<ActivateGameObject>()[1].gameObject.GameObject.Value = childFSM.gameObject;
-
-                                    // Make shiny open gates on pickup/destroy
-                                    SendEvent openGate = new SendEvent
-                                    {
-                                        eventTarget = new FsmEventTarget()
-                                        {
-                                            target = FsmEventTarget.EventTarget.BroadcastAll,
-                                            excludeSelf = true
-                                        },
-                                        sendEvent = FsmEvent.FindEvent("BG OPEN"),
-                                        delay = 0,
-                                        everyFrame = false
-                                    };
-                                    childFSM.GetState("Destroy").AddFirstAction(openGate);
-                                    childFSM.GetState("Finish").AddFirstAction(openGate);
-
-                                    // Add hard save after picking up item
-                                    childFSM.GetState("Finish").AddFirstAction(new RandomizerSetHardSave());
-
-                                    break;
-                                }
-
-                                // Stop the weird invisible floor from appearing if dive has been obtained
-                                // I don't think it really serves any purpose, so destroying it should be fine
-                                if (PlayerData.instance.quakeLevel > 0)
-                                {
-                                    Object.Destroy(GameObject.Find("Roof Collider Battle"));
-                                }
-                            }
-
-                            break;
-                        case "Dream_Nailcollection":
-                            // Make picking up shiny load new scene
-                            FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerChangeScene("RestingGrounds_07", "right1"));
-                            break;
-                        case "Room_nailmaster_03":
-                            // Dash slash room
-                            // Remove pickup if the player doesn't have enough geo for it
-                            if (PlayerData.instance.geo < 800)
-                            {
-                                Object.Destroy(GameObject.Find("Randomizer Shiny"));
-                            }
-                            else
-                            {
-                                // Otherwise, make them lose the geo on picking it up
-                                FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerTakeGeo(800));
-                            }
-
-                            break;
-                        case "Room_Sly_Storeroom":
-                            // Make Sly pickup send Sly back upstairs
-                            FsmState slyFinish = FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish");
-                            slyFinish.AddAction(new RandomizerSetBool("SlyCharm", true));
-
-                            // The game breaks if you leave the storeroom after this, so just send the player out of the shop completely
-                            // People will think it's an intentional feature to cut out pointless walking anyway
-                            slyFinish.AddAction(new RandomizerChangeScene("Town", "door_sly"));
-                            break;
-                    }
-                }
+                MiscSceneChanges.SceneChanged(to);
             }
             catch (Exception e)
             {

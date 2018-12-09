@@ -50,6 +50,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
@@ -105,6 +109,7 @@
     <Compile Include="FsmStateActions\RandomizerBoolTest.cs" />
     <Compile Include="Actions\RandomizerAction.cs" />
     <Compile Include="MenuChanger.cs" />
+    <Compile Include="MiscSceneChanges.cs" />
     <Compile Include="ObjectCache.cs" />
     <Compile Include="Randomization\LogicManager.cs" />
     <Compile Include="RandomizerMod.cs" />
@@ -112,6 +117,7 @@
     <Compile Include="Randomization\Randomizer.cs" />
     <Compile Include="RestrictionManager.cs" />
     <Compile Include="SaveSettings.cs" />
+    <Compile Include="SceneNames.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Prompts\Dash.png" />

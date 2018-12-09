@@ -4,6 +4,9 @@ using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
+using Object = UnityEngine.Object;
 
 namespace RandomizerMod
 {
@@ -64,7 +67,42 @@ namespace RandomizerMod
             bosses.Add("killedZote", "Zote");
         }
 
-        public static void ProcessRestrictions()
+        public static void ChangeScene(Scene newScene)
+        {
+            switch (newScene.name)
+            {
+                case SceneNames.Room_temple:
+                    // Handle completion restrictions
+                    ProcessRestrictions();
+                    break;
+                case SceneNames.Room_Final_Boss_Core when RandomizerMod.Instance.Settings.AllBosses:
+                    // Trigger Radiance fight without requiring dream nail hit
+                    // Prevents skipping the fight in all bosses mode
+                    PlayMakerFSM dreamFSM = FSMUtility.LocateFSM(newScene.FindGameObject("Dream Enter"), "Control");
+                    SendEvent enterRadiance = new SendEvent
+                    {
+                        eventTarget = new FsmEventTarget()
+                        {
+                            target = FsmEventTarget.EventTarget.FSMComponent,
+                            fsmComponent = dreamFSM
+                        },
+                        sendEvent = FsmEvent.FindEvent("NAIL HIT"),
+                        delay = 0,
+                        everyFrame = false
+                    };
+
+                    PlayMakerFSM bossFSM = FSMUtility.LocateFSM(newScene.FindGameObject("Hollow Knight Boss"), "Control");
+                    bossFSM.GetState("H Collapsed").AddAction(enterRadiance);
+
+                    break;
+                case SceneNames.Cliffs_06 when RandomizerMod.Instance.Settings.AllBosses:
+                    // Prevent banish ending in all bosses
+                    Object.Destroy(GameObject.Find("Brumm Lantern NPV"));
+                    break;
+            }
+        }
+
+        private static void ProcessRestrictions()
         {
             if (RandomizerMod.Instance.Settings.AllBosses || RandomizerMod.Instance.Settings.AllCharms || RandomizerMod.Instance.Settings.AllSkills)
             {

@@ -34,7 +34,7 @@ namespace RandomizerMod
             FieldInfo mediumGeoPrefabField = typeof(HealthManager).GetField("mediumGeoPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
             FieldInfo largeGeoPrefabField = typeof(HealthManager).GetField("largeGeoPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
 
-            Scene kp = UnityEngine.SceneManagement.SceneManager.GetSceneByName("Tutorial_01");
+            Scene kp = UnityEngine.SceneManagement.SceneManager.GetSceneByName(SceneNames.Tutorial_01);
 
             GameObject shiny = kp.FindGameObject("Shiny Item (1)");
 
