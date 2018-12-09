@@ -16,6 +16,18 @@ namespace RandomizerMod.Actions
 
         public abstract ActionType Type { get; }
 
+        public static void Hook()
+        {
+            UnHook();
+
+            On.PlayMakerFSM.OnEnable += ProcessFSM;
+        }
+
+        public static void UnHook()
+        {
+            On.PlayMakerFSM.OnEnable -= ProcessFSM;
+        }
+
         public static void ProcessFSM(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM fsm)
         {
             orig(fsm);

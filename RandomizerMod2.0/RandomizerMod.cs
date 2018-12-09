@@ -97,8 +97,7 @@ namespace RandomizerMod
             ModHooks.Instance.GetPlayerBoolHook += BoolGetOverride;
             ModHooks.Instance.SetPlayerBoolHook += BoolSetOverride;
 
-            On.PlayMakerFSM.OnEnable += Actions.RandomizerAction.ProcessFSM;
-
+            Actions.RandomizerAction.Hook();
             BenchHandler.Hook();
             MiscSceneChanges.Hook();
 
@@ -239,7 +238,10 @@ namespace RandomizerMod
             if (boolName == "hasDescendingDark") return PlayerData.instance.quakeLevel > 1;
             if (boolName == "hasHowlingWraiths") return PlayerData.instance.screamLevel > 0;
             if (boolName == "hasAbyssShriek") return PlayerData.instance.screamLevel > 1;
-            if (boolName == "gotSlyCharm") return Settings.SlyCharm;
+
+            // This variable is incredibly stubborn, not worth the effort to make it cooperate
+            // Just override it completely
+            if (boolName == nameof(PlayerData.gotSlyCharm)) return Settings.SlyCharm;
 
             if (boolName.StartsWith("RandomizerMod.")) return Settings.GetBool(false, boolName.Substring(14));
 

@@ -284,14 +284,7 @@ namespace RandomizerMod
                         if (nonBounce.gameObject.name.StartsWith("Spike Collider"))
                         {
                             nonBounce.active = false;
-                            TinkEffect spikeTink = nonBounce.gameObject.AddComponent<TinkEffect>();
-                            spikeTink.blockEffect = Object.Instantiate(ObjectCache.TinkEffect);
-                            spikeTink.blockEffect.transform.SetParent(nonBounce.transform);
-                            spikeTink.useNailPosition = true;
-
-                            // Spawn extension does not work the first time it is called
-                            // Need to call it once here so that the TinkEffect component works on the first try
-                            Object.Destroy(spikeTink.blockEffect.Spawn());
+                            nonBounce.gameObject.AddComponent<Components.RandomizerTinkEffect>();
                         }
                     }
 
