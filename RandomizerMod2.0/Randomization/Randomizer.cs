@@ -275,10 +275,11 @@ namespace RandomizerMod.Randomization
                 }
 
                 string randomizerBoolName = GetAdditiveBoolName(newItemName);
-                bool playerdata = string.IsNullOrEmpty(randomizerBoolName);
-                if (playerdata)
+                bool playerdata = false;
+                if (string.IsNullOrEmpty(randomizerBoolName))
                 {
                     randomizerBoolName = newItem.boolName;
+                    playerdata = newItem.type != ItemType.Geo;
                 }
 
                 // Dream nail needs a special case

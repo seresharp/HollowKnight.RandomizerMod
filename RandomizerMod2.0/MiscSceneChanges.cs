@@ -98,6 +98,10 @@ namespace RandomizerMod
                     FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerSetHardSave());
 
                     break;
+                case SceneNames.Dream_Nailcollection:
+                    // Make picking up shiny load new scene
+                    FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerChangeScene("RestingGrounds_07", "right1"));
+                    break;
                 case SceneNames.Fungus2_21 when PlayerData.instance.hasCityKey:
                     // Remove city crest gate
                     Object.Destroy(GameObject.Find("City Gate Control"));
@@ -129,6 +133,29 @@ namespace RandomizerMod
                         Object.Destroy(FSMUtility.LocateFSM(toll, "Disable if No Lantern"));
                     }
 
+                    break;
+                case SceneNames.Room_nailmaster_03:
+                    // Dash slash room
+                    // Remove pickup if the player doesn't have enough geo for it
+                    if (PlayerData.instance.geo < 800)
+                    {
+                        Object.Destroy(GameObject.Find("Randomizer Shiny"));
+                    }
+                    else
+                    {
+                        // Otherwise, make them lose the geo on picking it up
+                        FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerTakeGeo(800));
+                    }
+
+                    break;
+                case SceneNames.Room_Sly_Storeroom:
+                    // Make Sly pickup send Sly back upstairs
+                    FsmState slyFinish = FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish");
+                    slyFinish.AddAction(new RandomizerSetBool("SlyCharm", true));
+
+                    // The game breaks if you leave the storeroom after this, so just send the player out of the shop completely
+                    // People will think it's an intentional feature to cut out pointless walking anyway
+                    slyFinish.AddAction(new RandomizerChangeScene("Town", "door_sly"));
                     break;
                 case SceneNames.Ruins1_01 when !PlayerData.instance.hasWalljump:
                     // Add platform to stop quirrel bench soft lock

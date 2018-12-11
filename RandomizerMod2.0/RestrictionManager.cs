@@ -67,7 +67,7 @@ namespace RandomizerMod
             bosses.Add("killedZote", "Zote");
         }
 
-        public static void ChangeScene(Scene newScene)
+        public static void SceneChanged(Scene newScene)
         {
             switch (newScene.name)
             {

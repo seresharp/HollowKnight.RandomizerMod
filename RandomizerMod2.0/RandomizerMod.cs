@@ -376,6 +376,7 @@ namespace RandomizerMod
 
             try
             {
+                RestrictionManager.SceneChanged(to);
                 MiscSceneChanges.SceneChanged(to);
             }
             catch (Exception e)
