@@ -252,6 +252,37 @@ namespace RandomizerMod
                     }
 
                     break;
+                case SceneNames.Deepnest_East_16:
+                    // Great Hopper%
+                    GameObject hopper1 = newScene.FindGameObject("Giant Hopper");
+                    GameObject hopper2 = newScene.FindGameObject("Giant Hopper (1)");
+
+                    for (int i = 0; i < 10; i++)
+                    {
+                        GameObject newHopper1 = Object.Instantiate(hopper1, hopper1.transform.parent);
+                        GameObject newHopper2 = Object.Instantiate(hopper2, hopper2.transform.parent);
+
+                        // Don't want people abusing the easter egg as a geo farm
+                        newHopper1.GetComponent<HealthManager>().SetGeoSmall(0);
+                        newHopper1.GetComponent<HealthManager>().SetGeoMedium(0);
+                        newHopper1.GetComponent<HealthManager>().SetGeoLarge(0);
+
+                        newHopper2.GetComponent<HealthManager>().SetGeoSmall(0);
+                        newHopper2.GetComponent<HealthManager>().SetGeoMedium(0);
+                        newHopper2.GetComponent<HealthManager>().SetGeoLarge(0);
+
+                        newHopper1.transform.localPosition = new Vector3(
+                            newHopper1.transform.localPosition.x + rnd.Next(5),
+                            newHopper1.transform.localPosition.y,
+                            newHopper1.transform.localPosition.z);
+
+                        newHopper2.transform.localPosition = new Vector3(
+                            newHopper2.transform.localPosition.x + rnd.Next(5) - 4,
+                            newHopper2.transform.localPosition.y,
+                            newHopper2.transform.localPosition.z);
+                    }
+
+                    break;
                 case SceneNames.Fungus1_04:
                     // Open gates after Hornet fight
                     foreach (PlayMakerFSM childFSM in GameObject.Find("Cloak Corpse").GetComponentsInChildren<PlayMakerFSM>(true))
