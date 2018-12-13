@@ -100,6 +100,7 @@ namespace RandomizerMod.Actions
             // Exit the fsm after the popup
             bigGetFlash.ClearTransitions();
             bigGetFlash.AddTransition("GET ITEM MSG END", "Hero Up");
+            bigGetFlash.AddTransition("HERO DAMAGED", "Finish");
         }
 
         public void OnBeforeSerialize()

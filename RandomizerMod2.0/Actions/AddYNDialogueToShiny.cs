@@ -79,6 +79,7 @@ namespace RandomizerMod.Actions
             string yesState = charm.Transitions[0].ToState;
             charm.ClearTransitions();
 
+            charm.AddTransition("HERO DAMAGED", noState.Name);
             charm.AddTransition("NO", noState.Name);
             charm.AddTransition("YES", yesState);
 
