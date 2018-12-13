@@ -675,6 +675,7 @@
         <shopDescKey>RANDOMIZER_CHARM_DESC_37</shopDescKey>
         <shopSpriteKey>Charms.37</shopSpriteKey>
         <notchCost>charmCost_37</notchCost>
+        <progression>true</progression>
     </item>
     <item name="Dreamshield">
         <boolName>gotCharm_38</boolName>
@@ -736,6 +737,7 @@
         <shopDescKey>INV_DESC_ART_UPPER</shopDescKey>
         <shopSpriteKey>ShopIcons.DashSlash</shopSpriteKey>
         <progression>true</progression>
+        <cost>800</cost>
     </item>
     <item name="Great_Slash">
         <boolName>hasDashSlash</boolName>

@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 namespace RandomizerMod.Actions
 {
     [Serializable]
-    public class AddGeoToShiny : RandomizerAction
+    public class ChangeShinyIntoGeo : RandomizerAction
     {
         [SerializeField] private string sceneName;
         [SerializeField] private string objectName;
@@ -18,7 +18,7 @@ namespace RandomizerMod.Actions
         [SerializeField] private string boolName;
         [SerializeField] private int geoAmount;
 
-        public AddGeoToShiny(string sceneName, string objectName, string fsmName, string boolName, int geoAmount)
+        public ChangeShinyIntoGeo(string sceneName, string objectName, string fsmName, string boolName, int geoAmount)
         {
             this.sceneName = sceneName;
             this.objectName = objectName;

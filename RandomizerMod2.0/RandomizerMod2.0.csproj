@@ -77,7 +77,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\AddGeoToShiny.cs" />
+    <Compile Include="Actions\AddYNDialogueToShiny.cs" />
+    <Compile Include="Actions\ChangeShinyIntoGeo.cs" />
     <Compile Include="Actions\AddShinyToChest.cs" />
     <Compile Include="Actions\ChangeBoolTest.cs" />
     <Compile Include="Actions\ChangeShinyIntoBigItem.cs" />

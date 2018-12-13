@@ -134,20 +134,6 @@ namespace RandomizerMod
                     }
 
                     break;
-                case SceneNames.Room_nailmaster_03:
-                    // Dash slash room
-                    // Remove pickup if the player doesn't have enough geo for it
-                    if (PlayerData.instance.geo < 800)
-                    {
-                        Object.Destroy(GameObject.Find("Randomizer Shiny"));
-                    }
-                    else
-                    {
-                        // Otherwise, make them lose the geo on picking it up
-                        FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerTakeGeo(800));
-                    }
-
-                    break;
                 case SceneNames.Room_Sly_Storeroom:
                     // Make Sly pickup send Sly back upstairs
                     FsmState slyFinish = FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish");

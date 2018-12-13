@@ -56,6 +56,9 @@ namespace RandomizerMod.Randomization
 
         public string chestName;
         public string chestFsmName;
+
+        // For pricey items such as dash slash location
+        public int cost;
     }
 
     internal struct ShopDef

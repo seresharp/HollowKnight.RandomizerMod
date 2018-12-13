@@ -9,10 +9,20 @@ namespace RandomizerMod.Extensions
     internal static class PlayMakerFSMExtensions
     {
         private static FieldInfo fsmStringParams = typeof(ActionData).GetField("fsmStringParams", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static FieldInfo playMakerFSMfsm = typeof(PlayMakerFSM).GetField("fsm", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static FieldInfo fsmStates = typeof(Fsm).GetField("states", BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static List<FsmString> GetStringParams(this ActionData self)
         {
             return (List<FsmString>)fsmStringParams.GetValue(self);
+        }
+
+        public static void AddState(this PlayMakerFSM self, FsmState state)
+        {
+            Fsm fsm = (Fsm)playMakerFSMfsm.GetValue(self);
+            List<FsmState> states = ((FsmState[])fsmStates.GetValue(fsm)).ToList();
+            states.Add(state);
+            fsmStates.SetValue(fsm, states.ToArray());
         }
 
         public static FsmState GetState(this PlayMakerFSM self, string name)

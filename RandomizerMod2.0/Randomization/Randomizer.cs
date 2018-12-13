@@ -196,11 +196,14 @@ namespace RandomizerMod.Randomization
             RandomizerMod.Instance.Log("Beginning placement of geo drops");
 
             List<string> geoItems = unobtainedItems.Where(name => LogicManager.GetItemDef(name).type == ItemType.Geo).ToList();
+            List<string> geoLocations = unobtainedLocations.Where(name => LogicManager.GetItemDef(name).cost == 0).ToList();
             foreach (string geoItem in geoItems)
             {
-                string placeLocation = unobtainedLocations[rand.Next(unobtainedLocations.Count)];
+                string placeLocation = geoLocations[rand.Next(geoLocations.Count)];
 
                 unobtainedLocations.Remove(placeLocation);
+                geoLocations.Remove(placeLocation);
+
                 unobtainedItems.Remove(geoItem);
                 obtainedItems.Add(geoItem);
 
@@ -326,7 +329,7 @@ namespace RandomizerMod.Randomization
                                 }
                                 else
                                 {
-                                    actions.Add(new AddGeoToShiny(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItem.boolName, newItem.geo));
+                                    actions.Add(new ChangeShinyIntoGeo(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItem.boolName, newItem.geo));
                                 }
 
                                 break;
@@ -348,6 +351,11 @@ namespace RandomizerMod.Randomization
                         break;
                     default:
                         throw new Exception("Unimplemented type in randomization: " + oldItem.type);
+                }
+
+                if (oldItem.cost != 0)
+                {
+                    actions.Add(new AddYNDialogueToShiny(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItem.nameKey, oldItem.cost));
                 }
             }
 
