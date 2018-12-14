@@ -134,6 +134,15 @@ namespace RandomizerMod
                     }
 
                     break;
+                case SceneNames.RestingGrounds_07:
+                    // Make Moth NPC not give items since those are now shinies
+                    PlayerData.instance.dreamReward4 = true;
+                    PlayerData.instance.dreamReward5b = true;
+
+                    PlayMakerFSM moth = FSMUtility.LocateFSM(GameObject.Find("Dream Moth"), "Conversation Control");
+                    moth.FsmVariables.GetFsmBool("Got Reward 4").Value = true;
+                    moth.FsmVariables.GetFsmBool("Got Reward 5b").Value = true;
+                    break;
                 case SceneNames.Room_Sly_Storeroom:
                     // Make Sly pickup send Sly back upstairs
                     FsmState slyFinish = FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish");

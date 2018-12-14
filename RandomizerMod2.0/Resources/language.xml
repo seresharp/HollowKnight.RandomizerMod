@@ -49,6 +49,7 @@
     <entry sheet="Prompts" key="RANDOMIZER_EMPTY"></entry>
     <entry sheet="Prompts" key="JIJI_DOOR_KEY">This key may be required to enter waterways. Think hard before opening! Use simple key?</entry>
     <entry sheet="Prompts" key="BATH_HOUSE_KEY">This key may be required to enter waterways. Think hard before opening! Use simple key?</entry>
+    <entry sheet="Prompts" key="NOT_ENOUGH_GEO">Not enough.</entry>
     <entry sheet="Elderbug" key="ELDERBUG_FLOWER_REQUEST">F-for me..? Senpai you're so kind.</entry>
     <entry sheet="Elderbug" key="ELDERBUG_FLOWER_REREQUEST">F-for me..? Senpai you're so kind.</entry>
     <entry sheet="Elderbug" key="ELDERBUG_FLOWER_ACCEPT">Thank you senpai!</entry>

@@ -120,8 +120,27 @@
         <shopSpriteKey>ShopIcons.Dreamnail</shopSpriteKey>
         <progression>true</progression>
     </item>
-    <!--TODO: Dream Gate-->
+    <item name="Dream_Gate">
+        <boolName>hasDreamGate</boolName>
+        <sceneName>RestingGrounds_07</sceneName>
+        <newShiny>true</newShiny>
+        <x>30</x>
+        <y>10</y>
+        <logic>DREAMNAIL + (CLAW | WINGS)</logic>
+        <type>Big</type>
+        <bigSpriteKey>Prompts.Dream Gate</bigSpriteKey>
+        <takeKey>GET_ITEM_INTRO5</takeKey>
+        <nameKey>INV_NAME_DREAMGATE</nameKey>
+        <buttonKey>RANDOMIZER_BUTTON_DESC</buttonKey>
+        <descOneKey>GET_DREAMGATE_1</descOneKey>
+        <descTwoKey>GET_DREAMGATE_2</descTwoKey>
+        <shopDescKey>INV_DESC_DREAMGATE</shopDescKey>
+        <shopSpriteKey>ShopIcons.Dreamnail</shopSpriteKey>
+        <progression>true</progression>
+        <cost>900</cost>
+    </item>
     <!--TODO: Awoken Dream Nail-->
+    <!--Maybe not? People don't seem to like the idea of 3 dream nail pickups-->
     <item name="Vengeful_Spirit">
         <boolName>hasVengefulSpirit</boolName>
         <sceneName>Crossroads_ShamanTemple</sceneName>
@@ -593,7 +612,20 @@
         <shopSpriteKey>Charms.29</shopSpriteKey>
         <notchCost>charmCost_29</notchCost>
     </item>
-    <!--TODO: Dream Wielder-->
+    <item name="Dream_Wielder">
+        <boolName>gotCharm_30</boolName>
+        <sceneName>RestingGrounds_07</sceneName>
+        <newShiny>true</newShiny>
+        <x>27</x>
+        <y>10</y>
+        <logic>DREAMNAIL + (CLAW | WINGS)</logic>
+        <type>Charm</type>
+        <nameKey>CHARM_NAME_30</nameKey>
+        <shopDescKey>RANDOMIZER_CHARM_DESC_30</shopDescKey>
+        <shopSpriteKey>Charms.30</shopSpriteKey>
+        <notchCost>charmCost_30</notchCost>
+        <cost>500</cost>
+    </item>
     <item name="Dashmaster">
         <boolName>gotCharm_31</boolName>
         <sceneName>Fungus2_23</sceneName>
@@ -878,6 +910,10 @@
     <additiveItemSet name="SCREAM">
         <itemName>Howling_Wraiths</itemName>
         <itemName>Abyss_Shriek</itemName>
+    </additiveItemSet>
+    <additiveItemSet name="DREAMNAIL">
+        <itemName>Dream_Nail</itemName>
+        <itemName>Dream_Gate</itemName>
     </additiveItemSet>
     <macro name="SHADOWDASH">Mothwing_Cloak + Shade_Cloak</macro>
     <macro name="SUPERDASH">Crystal_Heart</macro>

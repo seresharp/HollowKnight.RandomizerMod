@@ -31,6 +31,10 @@ namespace RandomizerMod.Randomization
 
         public ItemType type;
 
+        public bool newShiny;
+        public int x;
+        public int y;
+
         // Big item variables
         public string bigSpriteKey;
         public string takeKey;

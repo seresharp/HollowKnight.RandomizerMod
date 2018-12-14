@@ -300,12 +300,29 @@ namespace RandomizerMod
                         PlayerData.instance.SetBool("hasDash", true);
                     }
                 }
+                else if (boolName.StartsWith("ShopDreamNail"))
+                {
+                    if (PlayerData.instance.hasDreamNail)
+                    {
+                        PlayerData.instance.SetBool(nameof(PlayerData.hasDreamGate), true);
+                    }
+                    else
+                    {
+                        PlayerData.instance.SetBool(nameof(PlayerData.hasDreamNail), true);
+                    }
+                }
 
                 Settings.SetBool(value, boolName);
                 return;
             }
 
             PlayerData.instance.SetBoolInternal(boolName, value);
+
+            // Make sure the player can actually use dream gate after getting it
+            if (boolName == nameof(PlayerData.hasDreamGate))
+            {
+                FSMUtility.LocateFSM(HeroController.instance.gameObject, "Dream Nail").FsmVariables.GetFsmBool("Dream Warp Allowed").Value = true;
+            }
 
             // Check for Salubra notches if it's a charm
             if (boolName.StartsWith("gotCharm_"))

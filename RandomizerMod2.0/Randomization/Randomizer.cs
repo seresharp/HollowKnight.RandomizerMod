@@ -42,6 +42,11 @@ namespace RandomizerMod.Randomization
             Dictionary<string, int> locationDepths = new Dictionary<string, int>();
             int currentDepth = 1;
 
+            unobtainedItems.Remove("Wayward_Compass");
+            unobtainedLocations.Remove("Grubberfly's_Elegy");
+            nonShopItems.Add("Grubberfly's_Elegy", "Wayward_Compass");
+            LogItemPlacement("Wayward_Compass", "Grubberfly's_Elegy");
+
             // Early game sucks too much if you don't get any geo, and the fury spot is weird anyway
             // Two birds with one stone
             RandomizerMod.Instance.Log("Placing initial geo pickup");
@@ -254,6 +259,7 @@ namespace RandomizerMod.Randomization
             }
 
             actions = new List<RandomizerAction>();
+            int newShinies = 0;
 
             foreach (KeyValuePair<string, string> kvp in nonShopItems)
             {
@@ -266,6 +272,14 @@ namespace RandomizerMod.Randomization
                 {
                     actions.Add(new ReplaceObjectWithShiny(oldItem.sceneName, oldItem.objectName, "Randomizer Shiny"));
                     oldItem.objectName = "Randomizer Shiny";
+                    oldItem.fsmName = "Shiny Control";
+                    oldItem.type = ItemType.Charm;
+                }
+                else if (oldItem.newShiny)
+                {
+                    string newShinyName = "New Shiny " + newShinies++;
+                    actions.Add(new CreateNewShiny(oldItem.sceneName, oldItem.x, oldItem.y, newShinyName));
+                    oldItem.objectName = newShinyName;
                     oldItem.fsmName = "Shiny Control";
                     oldItem.type = ItemType.Charm;
                 }
@@ -355,7 +369,13 @@ namespace RandomizerMod.Randomization
 
                 if (oldItem.cost != 0)
                 {
-                    actions.Add(new AddYNDialogueToShiny(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItem.nameKey, oldItem.cost));
+                    actions.Add(new AddYNDialogueToShiny(
+                        oldItem.sceneName,
+                        oldItem.objectName,
+                        oldItem.fsmName,
+                        newItem.nameKey,
+                        oldItem.cost,
+                        oldItem.sceneName == SceneNames.RestingGrounds_07 ? AddYNDialogueToShiny.TYPE_ESSENCE : AddYNDialogueToShiny.TYPE_GEO));
                 }
             }
 
@@ -398,6 +418,10 @@ namespace RandomizerMod.Randomization
                     else if (newItem.boolName == "hasDash" || newItem.boolName == "hasShadowDash")
                     {
                         newItem.boolName = "RandomizerMod.ShopDash" + shopAdditiveItems++;
+                    }
+                    else if (newItem.boolName == nameof(PlayerData.hasDreamNail) || newItem.boolName == nameof(PlayerData.hasDreamGate))
+                    {
+                        newItem.boolName = "RandomizerMod.ShopDreamNail" + shopAdditiveItems++;
                     }
 
                     newShopItemStats.Add(new ShopItemDef()

@@ -85,7 +85,7 @@ namespace RandomizerMod.Actions
             // Set bool and show the popup after the flash
             bigGetFlash.AddAction(new RandomizerCallStaticMethod(
                 typeof(BigItemPopup),
-                "ShowAdditive",
+                nameof(BigItemPopup.ShowAdditive),
                 itemDefs,
                 fsm.gameObject,
                 "GET ITEM MSG END"));
