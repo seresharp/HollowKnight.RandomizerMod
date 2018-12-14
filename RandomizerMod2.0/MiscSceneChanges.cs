@@ -55,9 +55,12 @@ namespace RandomizerMod
             // Remove quake floors in Soul Sanctum to prevent soft locks
             if (PlayerData.instance.quakeLevel <= 0 && PlayerData.instance.killedMageLord && (sceneName == SceneNames.Ruins1_23 || sceneName == SceneNames.Ruins1_30 || sceneName == SceneNames.Ruins1_32))
             {
+                PlayerData.instance.SetBool(nameof(PlayerData.brokenMageWindow), true);
+                PlayerData.instance.SetBool(nameof(PlayerData.brokenMageWindowGlass), true);
+
                 foreach (GameObject obj in newScene.GetRootGameObjects())
                 {
-                    if (obj.name.Contains("Quake Floor") || obj.name.Contains("Quake Window"))
+                    if (obj.name.Contains("Quake Floor"))
                     {
                         Object.Destroy(obj);
                     }
@@ -210,15 +213,19 @@ namespace RandomizerMod
 
                             break;
                         }
-
-                        // Stop the weird invisible floor from appearing if dive has been obtained
-                        // I don't think it really serves any purpose, so destroying it should be fine
-                        if (PlayerData.instance.quakeLevel > 0)
-                        {
-                            Object.Destroy(GameObject.Find("Roof Collider Battle"));
-                        }
                     }
 
+                    // Stop the weird invisible floor from appearing if dive has been obtained
+                    // I don't think it really serves any purpose, so destroying it should be fine
+                    if (PlayerData.instance.quakeLevel > 0)
+                    {
+                        Object.Destroy(GameObject.Find("Roof Collider Battle"));
+                    }
+
+                    // Change battle gate to be destroyed if Soul Master is dead instead of it the player has quake
+                    FsmState checkQuake = FSMUtility.LocateFSM(GameObject.Find("Battle Gate (1)"), "Destroy if Quake").GetState("Check");
+                    checkQuake.RemoveActionsOfType<FsmStateAction>();
+                    checkQuake.AddAction(new RandomizerBoolTest(nameof(PlayerData.killedMageLord), null, "DESTROY", true));
                     break;
                 case SceneNames.Ruins1_32 when !PlayerData.instance.hasWalljump:
                     // Platform after soul master
