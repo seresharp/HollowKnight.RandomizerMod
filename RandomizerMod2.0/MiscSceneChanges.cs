@@ -102,11 +102,14 @@ namespace RandomizerMod
                     // Make picking up shiny load new scene
                     FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish").AddAction(new RandomizerChangeScene("RestingGrounds_07", "right1"));
                     break;
-                case SceneNames.Fungus2_21 when PlayerData.instance.hasCityKey:
-                    // Remove city crest gate
-                    Object.Destroy(GameObject.Find("City Gate Control"));
-                    Object.Destroy(GameObject.Find("Ruins_front_gate"));
+                case SceneNames.Fungus2_21:
+                    // Make city crest gate openable infinite times and not hard save
+                    FSMUtility.LocateFSM(GameObject.Find("City Gate Control"), "Conversation Control").GetState("Activate").RemoveActionsOfType<SetPlayerDataBool>();
 
+                    FsmState gateSlam = FSMUtility.LocateFSM(GameObject.Find("Ruins_gate_main"), "Open").GetState("Slam");
+                    gateSlam.RemoveActionsOfType<SetPlayerDataBool>();
+                    gateSlam.RemoveActionsOfType<CallMethodProper>();
+                    gateSlam.RemoveActionsOfType<SendMessage>();
                     break;
                 case SceneNames.Fungus2_26:
                     // Prevent leg eater from doing anything but opening the shop
