@@ -23,12 +23,14 @@ namespace RandomizerMod
 
             ModHooks.Instance.ObjectPoolSpawnHook += FixExplosionPogo;
             On.EnemyHitEffectsArmoured.RecieveHitEffect += FalseKnightNoises;
+            On.PlayMakerFSM.OnEnable += FixDreamNail;
         }
 
         public static void UnHook()
         {
             ModHooks.Instance.ObjectPoolSpawnHook -= FixExplosionPogo;
             On.EnemyHitEffectsArmoured.RecieveHitEffect -= FalseKnightNoises;
+            On.PlayMakerFSM.OnEnable -= FixDreamNail;
         }
 
         public static void SceneChanged(Scene newScene)
@@ -389,6 +391,19 @@ namespace RandomizerMod
             }
 
             return go;
+        }
+
+        private static void FixDreamNail(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
+        {
+            orig(self);
+
+            if (self.gameObject.name == "Knight" && self.FsmName == "Dream Nail")
+            {
+                self.GetState("Cancelable").GetActionsOfType<ListenForDreamNail>()[0].activeBool = true;
+                self.GetState("Cancelable Dash").GetActionsOfType<ListenForDreamNail>()[0].activeBool = true;
+                self.GetState("Queuing").GetActionsOfType<ListenForDreamNail>()[0].activeBool = true;
+                self.GetState("Queuing").RemoveActionsOfType<BoolTest>();
+            }
         }
     }
 }
