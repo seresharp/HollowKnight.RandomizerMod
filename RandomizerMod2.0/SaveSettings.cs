@@ -99,6 +99,12 @@ namespace RandomizerMod
             set => SetInt(value);
         }
 
+        public bool NoClaw
+        {
+            get => GetBool(false);
+            set => SetBool(value);
+        }
+
         // Serialize actions list into string dict because Unity serializer can't handle inheritance
         public void OnBeforeSerialize()
         {

@@ -43,6 +43,11 @@ namespace RandomizerMod
             {
                 ApplyRandomizerChanges(newScene);
             }
+
+            if (RandomizerMod.Instance.Settings.NoClaw)
+            {
+                ApplyNoClawChanges(newScene);
+            }
         }
 
         private static void RecalculateRandom()
@@ -159,20 +164,6 @@ namespace RandomizerMod
                     // The game breaks if you leave the storeroom after this, so just send the player out of the shop completely
                     // People will think it's an intentional feature to cut out pointless walking anyway
                     slyFinish.AddAction(new RandomizerChangeScene("Town", "door_sly"));
-                    break;
-                case SceneNames.Ruins1_01 when !PlayerData.instance.hasWalljump:
-                    // Add platform to stop quirrel bench soft lock
-                    GameObject plat2 = Object.Instantiate(GameObject.Find("ruind_int_plat_float_01"));
-                    plat2.SetActive(true);
-                    plat2.transform.position = new Vector2(116, 14);
-
-                    break;
-                case SceneNames.Ruins1_02 when !PlayerData.instance.hasWalljump:
-                    // Add platform to stop quirrel bench soft lock
-                    GameObject plat3 = Object.Instantiate(GameObject.Find("ruind_int_plat_float_01"));
-                    plat3.SetActive(true);
-                    plat3.transform.position = new Vector2(2, 61.5f);
-
                     break;
                 case SceneNames.Ruins1_05:
                     // Slight adjustment to breakable so wings is enough to progress, just like on old patches
@@ -358,6 +349,40 @@ namespace RandomizerMod
                     // Lemm sell all
                     PlayMakerFSM lemm = FSMUtility.LocateFSM(GameObject.Find("Relic Dealer"), "npc_control");
                     lemm.GetState("Convo End").AddAction(new RandomizerSellRelics());
+                    break;
+            }
+        }
+
+        private static void ApplyNoClawChanges(Scene newScene)
+        {
+            switch (newScene.name)
+            {
+                case SceneNames.Mines_37:
+                    GameObject wallClimbCPeak = new GameObject();
+                    wallClimbCPeak.layer = 8;
+                    wallClimbCPeak.transform.position = new Vector3(0.7f, 8.5f, 0.5f);
+                    wallClimbCPeak.AddComponent<BoxCollider2D>().size = new Vector2(2.6f, 2f);
+                    wallClimbCPeak.AddComponent<Components.StickyWall>();
+                    break;
+                case SceneNames.Town:
+                    GameObject wallClimbTown = new GameObject();
+                    wallClimbTown.layer = 8;
+                    wallClimbTown.transform.position = new Vector3(11.66f, 26.3f, 0.5f);
+                    wallClimbTown.AddComponent<BoxCollider2D>().size = new Vector2(2.6f, 30.8f);
+                    wallClimbTown.AddComponent<Components.StickyWall>();
+                    break;
+                case SceneNames.Tutorial_01:
+                    GameObject wallClimbTut = new GameObject();
+                    wallClimbTut.layer = 8;
+                    wallClimbTut.transform.position = new Vector3(5.7f, 18f, 0.5f);
+                    wallClimbTut.AddComponent<BoxCollider2D>().size = new Vector2(2.6f, 2f);
+                    wallClimbTut.AddComponent<Components.StickyWall>();
+
+                    GameObject wallClimbTut2 = new GameObject();
+                    wallClimbTut2.layer = 8;
+                    wallClimbTut2.transform.position = new Vector3(3.75f, 41.5f, 0.5f);
+                    wallClimbTut2.AddComponent<BoxCollider2D>().size = new Vector2(2.6f, 2f);
+                    wallClimbTut2.AddComponent<Components.StickyWall>();
                     break;
             }
         }

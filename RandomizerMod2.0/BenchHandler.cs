@@ -69,6 +69,7 @@ namespace RandomizerMod
                     return pd.hasWalljump;
                 case SceneNames.Room_Slug_Shrine: // Unn bench
                     return pd.hasDash || pd.hasDoubleJump || (pd.hasAcidArmour && pd.hasWalljump);
+                case SceneNames.Ruins1_02: // Quirrel bench
                 case SceneNames.Waterways_02: // Waterways bench
                     return pd.hasWalljump || pd.hasDoubleJump;
                 default:

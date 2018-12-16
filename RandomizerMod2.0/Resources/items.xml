@@ -273,7 +273,7 @@
         <objectName>Shiny Item Grubsong</objectName>
         <fsmName>Shiny Control</fsmName>
         <replace>false</replace>
-        <logic>CLAW</logic>
+        <logic>CLAW | WINGS</logic>
         <type>Charm</type>
         <nameKey>CHARM_NAME_3</nameKey>
         <shopDescKey>RANDOMIZER_CHARM_DESC_3</shopDescKey>

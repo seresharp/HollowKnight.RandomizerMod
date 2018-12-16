@@ -166,7 +166,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2b.14";
+            string ver = "2b.15";
             int minAPI = 45;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
@@ -345,6 +345,9 @@ namespace RandomizerMod
         {
             if (GameManager.instance.GetSceneNameString() == SceneNames.Menu_Title)
             {
+                // Reset settings on menu load
+                Settings = new SaveSettings();
+
                 try
                 {
                     MenuChanger.EditUI();

@@ -91,6 +91,9 @@
     <Compile Include="Components\Preloader.cs" />
     <Compile Include="Components\RandomizerTinkEffect.cs" />
     <Compile Include="Components\Shop.cs" />
+    <Compile Include="Components\StickyWall.cs">
+      <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
+    </Compile>
     <Compile Include="Extensions\ModCommonTheft.cs" />
     <Compile Include="FontManager.cs" />
     <Compile Include="FsmStateActions\RandomizerExecuteLambda.cs" />
