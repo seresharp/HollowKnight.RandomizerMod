@@ -15,6 +15,7 @@ namespace RandomizerMod
     public class RandomizerMod : Mod<SaveSettings>
     {
         private static Dictionary<string, Sprite> sprites;
+        private static Dictionary<string, string> secondaryBools;
 
         private static Thread logicParseThread;
 
@@ -57,7 +58,7 @@ namespace RandomizerMod
 
                     // Create texture from bytes
                     Texture2D tex = new Texture2D(1, 1);
-                    tex.LoadImage(buffer);
+                    tex.LoadImage(buffer, true);
 
                     // Create sprite from texture
                     sprites.Add(
@@ -107,6 +108,19 @@ namespace RandomizerMod
 
             // Load fonts
             FontManager.LoadFonts();
+
+            // Some items have two bools for no reason, gotta deal with that
+            secondaryBools = new Dictionary<string, string>();
+
+            secondaryBools.Add(nameof(PlayerData.hasDash), nameof(PlayerData.canDash));
+            secondaryBools.Add(nameof(PlayerData.hasShadowDash), nameof(PlayerData.canShadowDash));
+            secondaryBools.Add(nameof(PlayerData.hasSuperDash), nameof(PlayerData.canSuperDash));
+            secondaryBools.Add(nameof(PlayerData.hasWalljump), nameof(PlayerData.canWallJump));
+
+            // Marking unbreakable charms as secondary too to make shade skips viable
+            secondaryBools.Add(nameof(PlayerData.gotCharm_23), nameof(PlayerData.fragileHealth_unbreakable));
+            secondaryBools.Add(nameof(PlayerData.gotCharm_24), nameof(PlayerData.fragileGreed_unbreakable));
+            secondaryBools.Add(nameof(PlayerData.gotCharm_25), nameof(PlayerData.fragileStrength_unbreakable));
         }
 
         public static Sprite GetSprite(string name)
@@ -177,9 +191,6 @@ namespace RandomizerMod
 
             return ver;
         }
-
-        // Deleting this would break another mod
-        private static bool SceneHasPreload(string sceneName) => false;
 
         private void UpdateCharmNotches(PlayerData pd, HeroController controller)
         {
@@ -254,61 +265,47 @@ namespace RandomizerMod
             Justification = "Suppressing to turn into one warning. I'll deal with this mess later")]
         private void BoolSetOverride(string boolName, bool value)
         {
-            // For some reason these all have two bools
-            if (boolName == "hasDash") PlayerData.instance.SetBool("canDash", value);
-            else if (boolName == "hasShadowDash") PlayerData.instance.SetBool("canShadowDash", value);
-            else if (boolName == "hasSuperDash") PlayerData.instance.SetBool("canSuperDash", value);
-            else if (boolName == "hasWalljump") PlayerData.instance.SetBool("canWallJump", value);
-            else if (boolName == "gotCharm_23") PlayerData.instance.SetBool("fragileHealth_unbreakable", value); // Shade skips make these charms not viable, unbreakable is a nice fix for that
-            else if (boolName == "gotCharm_24") PlayerData.instance.SetBool("fragileGreed_unbreakable", value);
-            else if (boolName == "gotCharm_25") PlayerData.instance.SetBool("fragileStrength_unbreakable", value);
-            else if (boolName == "hasAcidArmour" && value) PlayMakerFSM.BroadcastEvent("GET ACID ARMOUR"); // Gotta update the acid pools after getting this
-            else if (boolName == "hasCyclone" || boolName == "hasUpwardSlash" || boolName == "hasDashSlash")
-            {
-                // Make nail arts work
-                PlayerData.instance.SetBoolInternal(boolName, value);
-                PlayerData.instance.hasNailArt = PlayerData.instance.hasCyclone || PlayerData.instance.hasUpwardSlash || PlayerData.instance.hasDashSlash;
-                PlayerData.instance.hasAllNailArts = PlayerData.instance.hasCyclone && PlayerData.instance.hasUpwardSlash && PlayerData.instance.hasDashSlash;
-                return;
-            }
-            else if (boolName == "hasVengefulSpirit" && value && PlayerData.instance.fireballLevel <= 0) PlayerData.instance.SetInt("fireballLevel", 1); // It's just way easier if I can treat spells as bools
-            else if (boolName == "hasVengefulSpirit" && !value) PlayerData.instance.SetInt("fireballLevel", 0);
-            else if (boolName == "hasShadeSoul" && value) PlayerData.instance.SetInt("fireballLevel", 2);
-            else if (boolName == "hasShadeSoul" && !value && PlayerData.instance.fireballLevel >= 2) PlayerData.instance.SetInt("fireballLevel", 1);
-            else if (boolName == "hasDesolateDive" && value && PlayerData.instance.quakeLevel <= 0) PlayerData.instance.SetInt("quakeLevel", 1);
-            else if (boolName == "hasDesolateDive" && !value) PlayerData.instance.SetInt("quakeLevel", 0);
-            else if (boolName == "hasDescendingDark" && value) PlayerData.instance.SetInt("quakeLevel", 2);
-            else if (boolName == "hasDescendingDark" && !value && PlayerData.instance.quakeLevel >= 2) PlayerData.instance.SetInt("quakeLevel", 1);
-            else if (boolName == "hasHowlingWraiths" && value && PlayerData.instance.screamLevel <= 0) PlayerData.instance.SetInt("screamLevel", 1);
-            else if (boolName == "hasHowlingWraiths" && !value) PlayerData.instance.SetInt("screamLevel", 0);
-            else if (boolName == "hasAbyssShriek" && value) PlayerData.instance.SetInt("screamLevel", 2);
-            else if (boolName == "hasAbyssShriek" && !value && PlayerData.instance.screamLevel >= 2) PlayerData.instance.SetInt("screamLevel", 1);
+            PlayerData pd = PlayerData.instance;
+
+            // It's just way easier if I can treat spells as bools
+            if (boolName == "hasVengefulSpirit" && value && pd.fireballLevel <= 0) pd.SetInt("fireballLevel", 1);
+            else if (boolName == "hasVengefulSpirit" && !value) pd.SetInt("fireballLevel", 0);
+            else if (boolName == "hasShadeSoul" && value) pd.SetInt("fireballLevel", 2);
+            else if (boolName == "hasShadeSoul" && !value && pd.fireballLevel >= 2) pd.SetInt("fireballLevel", 1);
+            else if (boolName == "hasDesolateDive" && value && pd.quakeLevel <= 0) pd.SetInt("quakeLevel", 1);
+            else if (boolName == "hasDesolateDive" && !value) pd.SetInt("quakeLevel", 0);
+            else if (boolName == "hasDescendingDark" && value) pd.SetInt("quakeLevel", 2);
+            else if (boolName == "hasDescendingDark" && !value && pd.quakeLevel >= 2) pd.SetInt("quakeLevel", 1);
+            else if (boolName == "hasHowlingWraiths" && value && pd.screamLevel <= 0) pd.SetInt("screamLevel", 1);
+            else if (boolName == "hasHowlingWraiths" && !value) pd.SetInt("screamLevel", 0);
+            else if (boolName == "hasAbyssShriek" && value) pd.SetInt("screamLevel", 2);
+            else if (boolName == "hasAbyssShriek" && !value && pd.screamLevel >= 2) pd.SetInt("screamLevel", 1);
             else if (boolName.StartsWith("RandomizerMod."))
             {
                 boolName = boolName.Substring(14);
-                if (boolName.StartsWith("ShopFireball")) PlayerData.instance.IncrementInt("fireballLevel");
-                else if (boolName.StartsWith("ShopQuake")) PlayerData.instance.IncrementInt("quakeLevel");
-                else if (boolName.StartsWith("ShopScream")) PlayerData.instance.IncrementInt("screamLevel");
+                if (boolName.StartsWith("ShopFireball")) pd.IncrementInt("fireballLevel");
+                else if (boolName.StartsWith("ShopQuake")) pd.IncrementInt("quakeLevel");
+                else if (boolName.StartsWith("ShopScream")) pd.IncrementInt("screamLevel");
                 else if (boolName.StartsWith("ShopDash"))
                 {
-                    if (PlayerData.instance.hasDash)
+                    if (pd.hasDash)
                     {
-                        PlayerData.instance.SetBool("hasShadowDash", true);
+                        pd.SetBool("hasShadowDash", true);
                     }
                     else
                     {
-                        PlayerData.instance.SetBool("hasDash", true);
+                        pd.SetBool("hasDash", true);
                     }
                 }
                 else if (boolName.StartsWith("ShopDreamNail"))
                 {
-                    if (PlayerData.instance.hasDreamNail)
+                    if (pd.hasDreamNail)
                     {
-                        PlayerData.instance.SetBool(nameof(PlayerData.hasDreamGate), true);
+                        pd.SetBool(nameof(PlayerData.hasDreamGate), true);
                     }
                     else
                     {
-                        PlayerData.instance.SetBool(nameof(PlayerData.hasDreamNail), true);
+                        pd.SetBool(nameof(PlayerData.hasDreamNail), true);
                     }
                 }
 
@@ -316,18 +313,39 @@ namespace RandomizerMod
                 return;
             }
 
-            PlayerData.instance.SetBoolInternal(boolName, value);
+            // Send the set through to the actual set
+            pd.SetBoolInternal(boolName, value);
 
-            // Make sure the player can actually use dream gate after getting it
-            if (boolName == nameof(PlayerData.hasDreamGate))
+            // Check if there is a secondary bool for this item
+            if (secondaryBools.TryGetValue(boolName, out string secondaryBoolName))
             {
-                FSMUtility.LocateFSM(HeroController.instance.gameObject, "Dream Nail").FsmVariables.GetFsmBool("Dream Warp Allowed").Value = true;
+                pd.SetBool(secondaryBoolName, value);
             }
 
-            // Check for Salubra notches if it's a charm
-            if (boolName.StartsWith("gotCharm_"))
+            if (boolName == nameof(PlayerData.hasCyclone) || boolName == nameof(PlayerData.hasUpwardSlash) || boolName == nameof(PlayerData.hasDashSlash))
             {
-                UpdateCharmNotches(PlayerData.instance, HeroController.instance);
+                // Make nail arts work
+                bool hasCyclone = pd.GetBool(nameof(PlayerData.hasCyclone));
+                bool hasUpwardSlash = pd.GetBool(nameof(PlayerData.hasUpwardSlash));
+                bool hasDashSlash = pd.GetBool(nameof(PlayerData.hasDashSlash));
+
+                pd.SetBool(nameof(PlayerData.hasNailArt), hasCyclone || hasUpwardSlash || hasDashSlash);
+                pd.SetBool(nameof(PlayerData.hasAllNailArts), hasCyclone && hasUpwardSlash && hasDashSlash);
+            }
+            else if (boolName == nameof(PlayerData.hasDreamGate))
+            {
+                // Make sure the player can actually use dream gate after getting it
+                FSMUtility.LocateFSM(HeroController.instance.gameObject, "Dream Nail").FsmVariables.GetFsmBool("Dream Warp Allowed").Value = true;
+            }
+            else if (boolName == nameof(PlayerData.hasAcidArmour) && value)
+            {
+                // Gotta update the acid pools after getting this
+                PlayMakerFSM.BroadcastEvent("GET ACID ARMOUR");
+            }
+            else if (boolName.StartsWith("gotCharm_"))
+            {
+                // Check for Salubra notches if it's a charm
+                UpdateCharmNotches(pd, HeroController.instance);
             }
         }
 
