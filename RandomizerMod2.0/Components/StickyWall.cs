@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Reflection;
 using Modding;
+using RandomizerMod.Extensions;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace RandomizerMod.Components
 {
@@ -12,9 +12,17 @@ namespace RandomizerMod.Components
         private static MethodInfo hcWallJump = typeof(HeroController).GetMethod("DoWallJump", BindingFlags.Instance | BindingFlags.NonPublic);
         private static MethodInfo hcCanDoubleJump = typeof(HeroController).GetMethod("CanDoubleJump", BindingFlags.Instance | BindingFlags.NonPublic);
 
-        private RectTransform canvasRect;
         private BoxCollider2D box;
         private bool wallRunning;
+
+        public static void Create(float x, float y, float w, float h)
+        {
+            GameObject wallClimb = new GameObject();
+            wallClimb.layer = 8;
+            wallClimb.transform.position = new Vector3(x, y, 0.5f);
+            wallClimb.AddComponent<BoxCollider2D>().size = new Vector2(w, h);
+            wallClimb.AddComponent<StickyWall>();
+        }
 
         public void Awake()
         {
@@ -24,13 +32,15 @@ namespace RandomizerMod.Components
             // Store box collider because it has the size of the wall
             box = GetComponent<BoxCollider2D>();
 
-            // Create canvas for drawing the rectangle
-#warning TODO: Figure out how the hell mesh renderers work and/or switch this to a sprite renderer
-            GameObject parent = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(Screen.width, Screen.height));
-            GameObject canvas = CanvasUtil.CreateImagePanel(parent, CanvasUtil.NullSprite(new byte[] { 0x88, 0xFF, 0x88, 0xFF }), GetRectData());
-            canvas.GetComponent<Image>().preserveAspect = false;
-
-            canvasRect = canvas.GetComponent<RectTransform>();
+            // Create line renderer for drawing the rectangle
+            LineRenderer lineRend = gameObject.AddComponent<LineRenderer>();
+            lineRend.positionCount = 2;
+            lineRend.SetPositions(new Vector3[] { box.bounds.center + new Vector3(0, box.bounds.extents.y, -1), box.bounds.center - new Vector3(0, box.bounds.extents.y, 1) });
+            lineRend.startWidth = box.bounds.size.x;
+            lineRend.endWidth = box.bounds.size.x;
+            lineRend.sharedMaterial = new Material(Shader.Find("Particles/Additive"));
+            lineRend.startColor = new Color(0x88, 0xFF, 0x88, 0xFF);
+            lineRend.endColor = new Color(0x88, 0xFF, 0x88, 0xFF);
         }
 
         public void OnDisable()
@@ -84,14 +94,6 @@ namespace RandomizerMod.Components
 
         public void Update()
         {
-            // Move the graphic to the correct location every frame
-            CanvasUtil.RectData rect = GetRectData();
-            canvasRect.anchorMax = rect.AnchorMax;
-            canvasRect.anchorMin = rect.AnchorMin;
-            canvasRect.pivot = rect.AnchorPivot;
-            canvasRect.sizeDelta = rect.RectSizeDelta;
-            canvasRect.anchoredPosition = rect.AnchorPosition;
-
             // Jump off the wall if the player presses jump
             if (wallRunning && GameManager.instance.inputHandler.inputActions.jump.WasPressed)
             {
@@ -113,20 +115,30 @@ namespace RandomizerMod.Components
                 hc.FaceLeft();
                 hc.gameObject.transform.SetPositionX(transform.position.x + box.size.x + .15f);
 
-                hc.gameObject.transform.SetPositionY(hc.gameObject.transform.position.y + (hc.RUN_SPEED * Time.deltaTime));
-                hc.GetComponent<tk2dSpriteAnimator>().Play("Run");
+                hc.gameObject.transform.SetPositionY(hc.gameObject.transform.position.y + (hc.GetRunSpeed() * Time.deltaTime));
+                hc.GetComponent<tk2dSpriteAnimator>().Play(hc.GetRunAnimName());
             }
             else if (hc.transform.position.y > (transform.position.y - (box.size.y / 2)) && GameManager.instance.inputHandler.inputActions.right.IsPressed)
             {
                 hc.FaceRight();
                 hc.gameObject.transform.SetPositionX(transform.position.x + box.size.x + .15f);
 
-                hc.gameObject.transform.SetPositionY(hc.gameObject.transform.position.y - (hc.RUN_SPEED * Time.deltaTime));
-                hc.GetComponent<tk2dSpriteAnimator>().Play("Run");
+                hc.gameObject.transform.SetPositionY(hc.gameObject.transform.position.y - (hc.GetRunSpeed() * Time.deltaTime));
+                hc.GetComponent<tk2dSpriteAnimator>().Play(hc.GetRunAnimName());
+            }
+            else if (GameManager.instance.inputHandler.inputActions.left.WasReleased || GameManager.instance.inputHandler.inputActions.right.WasReleased)
+            {
+                hc.GetComponent<tk2dSpriteAnimator>().Play("Run To Idle");
+                hc.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
             }
             else
             {
-                hc.GetComponent<tk2dSpriteAnimator>().Play("Idle");
+                string animName = hc.GetComponent<tk2dSpriteAnimator>().CurrentClip.name;
+                if (animName != "Run To Idle")
+                {
+                    hc.GetComponent<tk2dSpriteAnimator>().Play("Idle");
+                }
+
                 hc.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
             }
         }
@@ -141,7 +153,6 @@ namespace RandomizerMod.Components
 
             // Completely remove control of the character from the game
             hc.RelinquishControl();
-            hc.GetComponent<HeroAnimationController>().PlayClip("Run");
             hc.GetComponent<HeroAnimationController>().StopControl();
             hc.AffectedByGravity(false);
 
@@ -209,23 +220,14 @@ namespace RandomizerMod.Components
             }
         }
 
-        // Returns the world location of the collider as screen coordinates
-        private CanvasUtil.RectData GetRectData()
-        {
-            Vector2 camMin = GameCameras.instance.tk2dCam.ScreenCamera.WorldToScreenPoint(box.bounds.min);
-            Vector2 camMax = GameCameras.instance.tk2dCam.ScreenCamera.WorldToScreenPoint(box.bounds.max);
-
-            return new CanvasUtil.RectData(
-                Vector2.zero,
-                Vector2.zero,
-                new Vector2(camMin.x / Screen.width, camMin.y / Screen.height),
-                new Vector2(camMax.x / Screen.width, camMax.y / Screen.height));
-        }
-
         // Undo all the wall run stuff on getting hit
         private int DamageTaken(ref int hazardType, int damage)
         {
-            FixHero(HeroController.instance);
+            if (wallRunning)
+            {
+                FixHero(HeroController.instance);
+            }
+
             return damage;
         }
 

@@ -45,13 +45,15 @@ namespace RandomizerMod
             RandoMenuItem<bool> charmNotchBtn = new RandoMenuItem<bool>(back, new Vector2(900, 850), "Salubra Notches", true, false);
             RandoMenuItem<bool> lemmBtn = new RandoMenuItem<bool>(back, new Vector2(900, 760), "Lemm Sell All", true, false);
 
-            RandoMenuItem<string> presetBtn = new RandoMenuItem<string>(back, new Vector2(-900, 850), "Preset", "Easy", "Hard", "Moglar");
+            RandoMenuItem<string> presetBtn = new RandoMenuItem<string>(back, new Vector2(-900, 850), "Preset", "Easy", "Hard", "Moglar", "Custom");
             RandoMenuItem<bool> shadeSkipsBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 760), "Shade Skips", false, true);
             RandoMenuItem<bool> acidSkipsBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 670), "Acid Skips", false, true);
             RandoMenuItem<bool> spikeTunnelsBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 580), "Spike Tunnels", false, true);
             RandoMenuItem<bool> miscSkipsBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 490), "Misc Skips", false, true);
             RandoMenuItem<bool> fireballSkipsBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 400), "Fireball Skips", false, true);
             RandoMenuItem<bool> magolorBtn = new RandoMenuItem<bool>(back, new Vector2(-900, 310), "Mag Skips", false, true);
+
+            RandoMenuItem<string> modeBtn = new RandoMenuItem<string>(back, new Vector2(0, 1040), "Mode", "Standard", "No Claw");
 
             // Create seed entry field
             GameObject seedGameObject = back.Clone("Seed", MenuButton.MenuButtonType.Activate, new Vector2(0, 1130), "Click to type a custom seed").gameObject;
@@ -106,19 +108,20 @@ namespace RandomizerMod
             // Apply navigation info (up, right, down, left)
             startNormalBtn.SetNavigation(magolorBtn.Button, startRandoBtn, backBtn, startRandoBtn);
             startRandoBtn.SetNavigation(lemmBtn.Button, startNormalBtn, backBtn, startNormalBtn);
-            backBtn.SetNavigation(startNormalBtn, backBtn, allBossesBtn.Button, backBtn);
-            allBossesBtn.Button.SetNavigation(backBtn, charmNotchBtn.Button, allSkillsBtn.Button, presetBtn.Button);
+            backBtn.SetNavigation(startNormalBtn, backBtn, modeBtn.Button, backBtn);
+            allBossesBtn.Button.SetNavigation(modeBtn.Button, charmNotchBtn.Button, allSkillsBtn.Button, presetBtn.Button);
             allSkillsBtn.Button.SetNavigation(allBossesBtn.Button, lemmBtn.Button, allCharmsBtn.Button, shadeSkipsBtn.Button);
             allCharmsBtn.Button.SetNavigation(allSkillsBtn.Button, lemmBtn.Button, startNormalBtn, acidSkipsBtn.Button);
-            charmNotchBtn.Button.SetNavigation(backBtn, presetBtn.Button, lemmBtn.Button, allBossesBtn.Button);
+            charmNotchBtn.Button.SetNavigation(modeBtn.Button, presetBtn.Button, lemmBtn.Button, allBossesBtn.Button);
             lemmBtn.Button.SetNavigation(charmNotchBtn.Button, shadeSkipsBtn.Button, startRandoBtn, allSkillsBtn.Button);
-            presetBtn.Button.SetNavigation(backBtn, allBossesBtn.Button, shadeSkipsBtn.Button, charmNotchBtn.Button);
+            presetBtn.Button.SetNavigation(modeBtn.Button, allBossesBtn.Button, shadeSkipsBtn.Button, charmNotchBtn.Button);
             shadeSkipsBtn.Button.SetNavigation(presetBtn.Button, allSkillsBtn.Button, acidSkipsBtn.Button, lemmBtn.Button);
             acidSkipsBtn.Button.SetNavigation(shadeSkipsBtn.Button, allCharmsBtn.Button, spikeTunnelsBtn.Button, lemmBtn.Button);
             spikeTunnelsBtn.Button.SetNavigation(acidSkipsBtn.Button, allCharmsBtn.Button, miscSkipsBtn.Button, lemmBtn.Button);
             miscSkipsBtn.Button.SetNavigation(spikeTunnelsBtn.Button, allCharmsBtn.Button, fireballSkipsBtn.Button, lemmBtn.Button);
             fireballSkipsBtn.Button.SetNavigation(miscSkipsBtn.Button, allCharmsBtn.Button, magolorBtn.Button, lemmBtn.Button);
             magolorBtn.Button.SetNavigation(fireballSkipsBtn.Button, allCharmsBtn.Button, startNormalBtn, lemmBtn.Button);
+            modeBtn.Button.SetNavigation(backBtn, modeBtn.Button, allBossesBtn.Button, modeBtn.Button);
 
             // Setup event for changing difficulty settings buttons
             void UpdateButtons(RandoMenuItem<string> item)
@@ -132,6 +135,7 @@ namespace RandomizerMod
                         miscSkipsBtn.SetSelection(false);
                         fireballSkipsBtn.SetSelection(false);
                         magolorBtn.SetSelection(false);
+                        modeBtn.SetSelection("Standard");
                         break;
                     case "Hard":
                         shadeSkipsBtn.SetSelection(true);
@@ -149,13 +153,56 @@ namespace RandomizerMod
                         fireballSkipsBtn.SetSelection(true);
                         magolorBtn.SetSelection(true);
                         break;
+                    case "Custom":
+                        item.SetSelection("Easy");
+                        goto case "Easy";
                     default:
                         RandomizerMod.Instance.LogWarn("Unknown value in preset button: " + item.CurrentSelection);
                         break;
                 }
             }
 
+            // Event for setting stuff to hard mode on no claw selected
+            void SetNoClaw(RandoMenuItem<string> item)
+            {
+                if (item.CurrentSelection == "No Claw")
+                {
+                    shadeSkipsBtn.SetSelection(true);
+                    acidSkipsBtn.SetSelection(true);
+                    spikeTunnelsBtn.SetSelection(true);
+                    miscSkipsBtn.SetSelection(true);
+                    fireballSkipsBtn.SetSelection(true);
+
+                    if (magolorBtn.CurrentSelection)
+                    {
+                        presetBtn.SetSelection("Moglar");
+                    }
+                    else
+                    {
+                        presetBtn.SetSelection("Hard");
+                    }
+                }
+            }
+
+            void SettingChanged(RandoMenuItem<bool> item)
+            {
+                presetBtn.SetSelection("Custom");
+
+                if (!item.CurrentSelection && item.Name != "Mag Skips")
+                {
+                    modeBtn.SetSelection("Standard");
+                }
+            }
+
             presetBtn.Changed += UpdateButtons;
+            modeBtn.Changed += SetNoClaw;
+
+            shadeSkipsBtn.Changed += SettingChanged;
+            acidSkipsBtn.Changed += SettingChanged;
+            spikeTunnelsBtn.Changed += SettingChanged;
+            miscSkipsBtn.Changed += SettingChanged;
+            fireballSkipsBtn.Changed += SettingChanged;
+            magolorBtn.Changed += SettingChanged;
 
             // Setup start game button events
             void StartGame(bool rando)
@@ -171,6 +218,8 @@ namespace RandomizerMod
 
                 if (RandomizerMod.Instance.Settings.Randomizer)
                 {
+                    RandomizerMod.Instance.Settings.NoClaw = modeBtn.CurrentSelection == "No Claw";
+
                     RandomizerMod.Instance.Settings.ShadeSkips = shadeSkipsBtn.CurrentSelection;
                     RandomizerMod.Instance.Settings.AcidSkips = acidSkipsBtn.CurrentSelection;
                     RandomizerMod.Instance.Settings.SpikeTunnels = spikeTunnelsBtn.CurrentSelection;
@@ -260,7 +309,7 @@ namespace RandomizerMod
                     }
                 }
 
-                RefreshText();
+                RefreshText(false);
             }
 
             private void GotoNext(BaseEventData data = null)
@@ -274,11 +323,15 @@ namespace RandomizerMod
                 RefreshText();
             }
 
-            private void RefreshText()
+            private void RefreshText(bool invokeEvent = true)
             {
                 text.text = Name + ": " + selections[currentSelection].ToString();
                 align.AlignText();
-                ChangedInternal?.Invoke(this);
+
+                if (invokeEvent)
+                {
+                    ChangedInternal?.Invoke(this);
+                }
             }
         }
     }

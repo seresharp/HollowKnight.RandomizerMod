@@ -578,7 +578,7 @@
         <objectName>Shiny Item Stand</objectName>
         <fsmName>Shiny Control</fsmName>
         <replace>false</replace>
-        <logic>CLAW</logic>
+        <logic>CLAW | (NOCLAW + WINGS)</logic>
         <type>Charm</type>
         <nameKey>CHARM_NAME_27</nameKey>
         <shopDescKey>RANDOMIZER_CHARM_DESC_27</shopDescKey>
@@ -741,7 +741,7 @@
         <sceneName>Room_nailmaster</sceneName>
         <objectName>NM Mato NPC</objectName>
         <replace>true</replace>
-        <logic>CLAW</logic>
+        <logic>CLAW | (NOCLAW + WINGS)</logic>
         <type>Big</type>
         <bigSpriteKey>Prompts.CycloneSlash</bigSpriteKey>
         <takeKey>GET_ITEM_INTRO3</takeKey>
@@ -776,7 +776,7 @@
         <sceneName>Room_nailmaster_02</sceneName>
         <objectName>NM Sheo NPC</objectName>
         <replace>true</replace>
-        <logic>CLAW + ((DASH + (SUPERDASH | WINGS)) | (WINGS + SUPERDASH))</logic>
+        <logic>(CLAW + ((DASH + (SUPERDASH | WINGS)) | (WINGS + SUPERDASH))) | (NOCLAW + WINGS + DASH)</logic>
         <type>Big</type>
         <bigSpriteKey>Prompts.GreatSlash</bigSpriteKey>
         <takeKey>GET_ITEM_INTRO3</takeKey>
@@ -815,7 +815,7 @@
         <sceneName>Ruins2_03</sceneName>
         <objectName>Chest</objectName>
         <fsmName>Chest Control</fsmName>
-        <logic>CLAW</logic>
+        <logic>CLAW | (NOCLAW + WINGS)</logic>
         <type>Geo</type>
         <geo>655</geo>
     </item>
@@ -851,7 +851,7 @@
         <sceneName>Mines_37</sceneName>
         <objectName>Chest</objectName>
         <fsmName>Chest Control</fsmName>
-        <logic>CLAW + ((Sprintmaster + Dashmaster) | DASH | SUPERDASH)</logic>
+        <logic>(CLAW | (NOCLAW + WINGS + SPIKETUNNELS + (DASH | FIREBALL | SCREAM))) + ((Sprintmaster + Dashmaster) | DASH | SUPERDASH)</logic>
         <type>Geo</type>
         <geo>80</geo>
     </item>

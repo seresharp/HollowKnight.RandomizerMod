@@ -156,6 +156,14 @@ namespace RandomizerMod
                     moth.FsmVariables.GetFsmBool("Got Reward 4").Value = true;
                     moth.FsmVariables.GetFsmBool("Got Reward 5b").Value = true;
                     break;
+                case SceneNames.Room_Colosseum_02:
+                    // Move the upward loads in colo downward to prevent bench soft lock
+                    GameObject coloTransition1 = GameObject.Find("top1");
+                    GameObject coloTransition2 = GameObject.Find("top2");
+
+                    coloTransition1.transform.SetPositionY(coloTransition1.transform.position.y - 9f);
+                    coloTransition2.transform.SetPositionY(coloTransition2.transform.position.y - 9f);
+                    break;
                 case SceneNames.Room_Sly_Storeroom:
                     // Make Sly pickup send Sly back upstairs
                     FsmState slyFinish = FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control").GetState("Finish");
@@ -357,32 +365,44 @@ namespace RandomizerMod
         {
             switch (newScene.name)
             {
-                case SceneNames.Mines_37:
-                    GameObject wallClimbCPeak = new GameObject();
-                    wallClimbCPeak.layer = 8;
-                    wallClimbCPeak.transform.position = new Vector3(0.7f, 8.5f, 0.5f);
-                    wallClimbCPeak.AddComponent<BoxCollider2D>().size = new Vector2(2.6f, 2f);
-                    wallClimbCPeak.AddComponent<Components.StickyWall>();
+                case SceneNames.Abyss_04: // Hidden Station
+                    GameObject.Find("Direction Pole White Palace (1)").GetComponent<NonBouncer>().active = false;
                     break;
-                case SceneNames.Town:
-                    GameObject wallClimbTown = new GameObject();
-                    wallClimbTown.layer = 8;
-                    wallClimbTown.transform.position = new Vector3(11.66f, 26.3f, 0.5f);
-                    wallClimbTown.AddComponent<BoxCollider2D>().size = new Vector2(2.6f, 30.8f);
-                    wallClimbTown.AddComponent<Components.StickyWall>();
+                case SceneNames.Deepnest_Spider_Town: // Beast's Den
+                    Components.StickyWall.Create(26.75f, 70f, 2.6f, 15f);
+                    Components.StickyWall.Create(5.75f, 92f, 2.6f, 3f);
+                    Components.StickyWall.Create(15.75f, 105f, 2.6f, 3f);
+                    Components.StickyWall.Create(2.7f, 125f, 2.6f, 10f);
+                    Components.StickyWall.Create(15.7f, 145f, 2.6f, 5f);
+                    Components.StickyWall.Create(79.85f, 75f, 2.6f, 2f);
                     break;
-                case SceneNames.Tutorial_01:
-                    GameObject wallClimbTut = new GameObject();
-                    wallClimbTut.layer = 8;
-                    wallClimbTut.transform.position = new Vector3(5.7f, 18f, 0.5f);
-                    wallClimbTut.AddComponent<BoxCollider2D>().size = new Vector2(2.6f, 2f);
-                    wallClimbTut.AddComponent<Components.StickyWall>();
+                case SceneNames.Fungus1_09: // Great slash
+                    Object.Instantiate(GameObject.Find("fung_plat_float_05")).transform.position = new Vector3(205f, 11f, 0f);
+                    Object.Instantiate(GameObject.Find("fung_plat_float_05")).transform.position = new Vector3(175f, 12.25f, 0f);
+                    Object.Instantiate(GameObject.Find("fung_plat_float_05")).transform.position = new Vector3(116.5f, 12f, 0f);
+                    Object.Instantiate(GameObject.Find("fung_plat_float_05")).transform.position = new Vector3(4.75f, 17f, 0f);
+                    break;
+                case SceneNames.Fungus3_archive_02: // Monomon
+                    Components.StickyWall.Create(49.75f, 55f, 2.6f, 5f);
+                    Components.StickyWall.Create(76.75f, 78.5f, 2.6f, 50f);
+                    Components.StickyWall.Create(49.75f, 140f, 2.6f, 5f);
+                    break;
+                case SceneNames.Mines_37: // Crystal peak chest
+                    Components.StickyWall.Create(0.7f, 8.5f, 2.6f, 2f);
+                    break;
+                case SceneNames.Ruins2_03: // Watcher Knights
+                    Components.StickyWall.Create(67.9f, 90f, 2.6f, 25f);
 
-                    GameObject wallClimbTut2 = new GameObject();
-                    wallClimbTut2.layer = 8;
-                    wallClimbTut2.transform.position = new Vector3(3.75f, 41.5f, 0.5f);
-                    wallClimbTut2.AddComponent<BoxCollider2D>().size = new Vector2(2.6f, 2f);
-                    wallClimbTut2.AddComponent<Components.StickyWall>();
+                    // Add a platform in addition to the sticky wall to get up to Lurien
+                    GameObject plat = Object.Instantiate(GameObject.Find("ruins_mage_building_0011_a_royal_plat"));
+                    plat.transform.position = new Vector3(44f, 112f, plat.transform.position.z);
+                    break;
+                case SceneNames.Town: // Dirtmouth
+                    Components.StickyWall.Create(11.66f, 26.3f, 2.6f, 30.8f);
+                    break;
+                case SceneNames.Tutorial_01: // King's Pass
+                    Components.StickyWall.Create(5.7f, 18f, 2.6f, 2f);
+                    Components.StickyWall.Create(3.75f, 41.5f, 2.6f, 2f);
                     break;
             }
         }

@@ -64,8 +64,8 @@ namespace RandomizerMod
             switch (sceneName)
             {
                 case SceneNames.Abyss_18: // Basin bench
+                    return pd.hasWalljump || (RandomizerMod.Instance.Settings.NoClaw && pd.hasDoubleJump);
                 case SceneNames.GG_Waterways: // Godhome
-                case SceneNames.Room_Colosseum_02: // Colo bench
                     return pd.hasWalljump;
                 case SceneNames.Room_Slug_Shrine: // Unn bench
                     return pd.hasDash || pd.hasDoubleJump || (pd.hasAcidArmour && pd.hasWalljump);

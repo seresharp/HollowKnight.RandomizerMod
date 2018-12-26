@@ -209,6 +209,9 @@ namespace RandomizerMod.Randomization
                     case "MAGSKIPS":
                         stack.Push(RandomizerMod.Instance.Settings.MagSkips);
                         break;
+                    case "NOCLAW":
+                        stack.Push(RandomizerMod.Instance.Settings.NoClaw);
+                        break;
                     case "EVERYTHING":
                         stack.Push(false);
                         break;

@@ -94,6 +94,7 @@
     <Compile Include="Components\StickyWall.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
+    <Compile Include="Extensions\HeroControllerExtensions.cs" />
     <Compile Include="Extensions\ModCommonTheft.cs" />
     <Compile Include="FontManager.cs" />
     <Compile Include="FsmStateActions\RandomizerExecuteLambda.cs" />

@@ -29,6 +29,7 @@ namespace RandomizerMod.Randomization
             SetupVariables();
 
             RandomizerMod.Instance.Log("Randomizing with seed: " + RandomizerMod.Instance.Settings.Seed);
+            RandomizerMod.Instance.Log("Mode - " + (RandomizerMod.Instance.Settings.NoClaw ? "No Claw" : "Standard"));
             RandomizerMod.Instance.Log("Shade skips - " + RandomizerMod.Instance.Settings.ShadeSkips);
             RandomizerMod.Instance.Log("Acid skips - " + RandomizerMod.Instance.Settings.AcidSkips);
             RandomizerMod.Instance.Log("Spike tunnel skips - " + RandomizerMod.Instance.Settings.SpikeTunnels);
@@ -479,6 +480,12 @@ namespace RandomizerMod.Randomization
             unobtainedLocations.AddRange(shopItems.Keys);
             unobtainedItems = LogicManager.ItemNames.ToList();
             obtainedItems = new List<string>();
+
+            // Don't place claw in no claw mode, obviously
+            if (RandomizerMod.Instance.Settings.NoClaw)
+            {
+                unobtainedItems.Remove("Mantis_Claw");
+            }
 
             Done = false;
         }
