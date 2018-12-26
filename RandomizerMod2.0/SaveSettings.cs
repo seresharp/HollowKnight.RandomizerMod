@@ -151,6 +151,7 @@ namespace RandomizerMod
                 else if (key.StartsWith("itemPlacements"))
                 {
                     itemPlacements.Add(key.Split(':')[1], StringValues[key]);
+                    StringValues.Remove(key);
                 }
             }
 
