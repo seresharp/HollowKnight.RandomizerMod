@@ -353,6 +353,19 @@ namespace RandomizerMod
                     }
 
                     break;
+                case SceneNames.RestingGrounds_04:
+                    // Make dream nail plaque not take 20 years to activate
+                    FsmState dreamerPlaqueInspect = FSMUtility.LocateFSM(GameObject.Find("Dreamer Plaque Inspect"), "Conversation Control").GetState("Hero Anim");
+                    dreamerPlaqueInspect.RemoveActionsOfType<ActivateGameObject>();
+                    dreamerPlaqueInspect.RemoveTransitionsTo("Fade Up");
+                    dreamerPlaqueInspect.AddTransition("FINISHED", "Map Msg?");
+
+                    PlayMakerFSM dreamerScene2 = FSMUtility.LocateFSM(GameObject.Find("Dreamer Scene 2"), "Control");
+                    dreamerScene2.GetState("Take Control").RemoveTransitionsTo("Blast");
+                    dreamerScene2.GetState("Take Control").AddTransition("FINISHED", "Fade Out");
+                    dreamerScene2.GetState("Fade Out").RemoveTransitionsTo("Dial Wait");
+                    dreamerScene2.GetState("Fade Out").AddTransition("FINISHED", "Set Compass Point");
+                    break;
                 case SceneNames.Ruins1_05b when RandomizerMod.Instance.Settings.Lemm:
                     // Lemm sell all
                     PlayMakerFSM lemm = FSMUtility.LocateFSM(GameObject.Find("Relic Dealer"), "npc_control");
