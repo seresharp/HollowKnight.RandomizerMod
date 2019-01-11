@@ -55,15 +55,21 @@ namespace RandomizerMod
         {
             get => GetBool(false);
             set => SetBool(value);
-        }
+		}
 
-        public bool ShadeSkips
-        {
-            get => GetBool(false);
-            set => SetBool(value);
-        }
+		public bool ShadeSkips
+		{
+			get => GetBool( false );
+			set => SetBool( value );
+		}
 
-        public bool AcidSkips
+		public bool ShadeSkipsPrev
+		{
+			get => GetBool( false );
+			set => SetBool( value );
+		}
+
+		public bool AcidSkips
         {
             get => GetBool(false);
             set => SetBool(value);

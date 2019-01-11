@@ -272,5 +272,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\items.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\UI\logo2.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
