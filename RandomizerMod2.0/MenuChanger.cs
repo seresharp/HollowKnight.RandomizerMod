@@ -225,7 +225,7 @@ namespace RandomizerMod
 
             // Setup game type button changes
             void SaveShadeVal(RandoMenuItem<bool> item) {
-                RandomizerMod.Instance.Settings.ShadeSkipsPrev = item.CurrentSelection;
+				SetShadeSkips( shadeSkipsBtn.CurrentSelection, true );
             }
 
             void SwitchGameType(bool steelMode)
