@@ -59,14 +59,8 @@ namespace RandomizerMod
 
         public bool ShadeSkips
         {
-            get => GetBool( false );
-            set => SetBool( value );
-        }
-
-        public bool ShadeSkipsPrev
-        {
-            get => GetBool( false );
-            set => SetBool( value );
+            get => GetBool(false);
+            set => SetBool(value);
         }
 
         public bool AcidSkips

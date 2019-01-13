@@ -31,20 +31,20 @@ namespace RandomizerMod
             Object.Destroy(parent.GetComponent<VerticalLayoutGroup>());
 
             // Create new buttons
-            MenuButton startRandoBtn = classic.Clone( "StartRando", MenuButton.MenuButtonType.Proceed, new Vector2( 650, -480 ), "Start Game", "Randomizer v2", RandomizerMod.GetSprite( "UI.logo" ) );
-            MenuButton startNormalBtn = classic.Clone( "StartNormal", MenuButton.MenuButtonType.Proceed, new Vector2( -650, -480 ), "Start Game", "Non-Randomizer" );
-            MenuButton startSteelRandoBtn = steel.Clone( "StartSteelRando", MenuButton.MenuButtonType.Proceed, new Vector2( 10000, 10000 ), "Steel Soul", "Randomizer v2", RandomizerMod.GetSprite( "UI.logo2" ) );
-            MenuButton startSteelNormalBtn = steel.Clone( "StartSteelNormal", MenuButton.MenuButtonType.Proceed, new Vector2( 10000, 10000 ), "Steel Soul", "Non-Randomizer" );
+            MenuButton startRandoBtn = classic.Clone("StartRando", MenuButton.MenuButtonType.Proceed, new Vector2(650, -480), "Start Game", "Randomizer v2", RandomizerMod.GetSprite("UI.logo"));
+            MenuButton startNormalBtn = classic.Clone("StartNormal", MenuButton.MenuButtonType.Proceed, new Vector2(-650, -480), "Start Game", "Non-Randomizer");
+            MenuButton startSteelRandoBtn = steel.Clone("StartSteelRando", MenuButton.MenuButtonType.Proceed, new Vector2(10000, 10000), "Steel Soul", "Randomizer v2", RandomizerMod.GetSprite("UI.logo2"));
+            MenuButton startSteelNormalBtn = steel.Clone("StartSteelNormal", MenuButton.MenuButtonType.Proceed, new Vector2(10000, 10000), "Steel Soul", "Non-Randomizer");
 
             startNormalBtn.transform.localScale = startRandoBtn.transform.localScale = startSteelNormalBtn.transform.localScale = startSteelRandoBtn.transform.localScale = new Vector2(0.75f, 0.75f);
 
             MenuButton backBtn = back.Clone("Back", MenuButton.MenuButtonType.Proceed, new Vector2(0, -100), "Back");
-            
+
             RandoMenuItem<bool> allBossesBtn = new RandoMenuItem<bool>(back, new Vector2(0, 850), "All Bosses", false, true);
             RandoMenuItem<bool> allSkillsBtn = new RandoMenuItem<bool>(back, new Vector2(0, 760), "All Skills", false, true);
             RandoMenuItem<bool> allCharmsBtn = new RandoMenuItem<bool>(back, new Vector2(0, 670), "All Charms", false, true);
 
-            RandoMenuItem<string> gameTypeBtn = new RandoMenuItem<string>( back, new Vector2( 0, 400 ), "Game Type", "Normal", "Steel Soul" );
+            RandoMenuItem<string> gameTypeBtn = new RandoMenuItem<string>(back, new Vector2(0, 400), "Game Type", "Normal", "Steel Soul");
 
             RandoMenuItem<bool> charmNotchBtn = new RandoMenuItem<bool>(back, new Vector2(900, 850), "Salubra Notches", true, false);
             RandoMenuItem<bool> lemmBtn = new RandoMenuItem<bool>(back, new Vector2(900, 760), "Lemm Sell All", true, false);
@@ -110,10 +110,10 @@ namespace RandomizerMod
             playScreen.defaultHighlight = startRandoBtn;
 
             // Apply navigation info (up, right, down, left)
-            startNormalBtn.SetNavigation( magolorBtn.Button, startRandoBtn, backBtn, startRandoBtn );
-            startRandoBtn.SetNavigation( lemmBtn.Button, startNormalBtn, backBtn, startNormalBtn );
-            startSteelNormalBtn.SetNavigation( magolorBtn.Button, startSteelRandoBtn, backBtn, startSteelRandoBtn );
-            startSteelRandoBtn.SetNavigation( lemmBtn.Button, startSteelNormalBtn, backBtn, startSteelNormalBtn );
+            startNormalBtn.SetNavigation(magolorBtn.Button, startRandoBtn, backBtn, startRandoBtn);
+            startRandoBtn.SetNavigation(lemmBtn.Button, startNormalBtn, backBtn, startNormalBtn);
+            startSteelNormalBtn.SetNavigation(magolorBtn.Button, startSteelRandoBtn, backBtn, startSteelRandoBtn);
+            startSteelRandoBtn.SetNavigation(lemmBtn.Button, startSteelNormalBtn, backBtn, startSteelNormalBtn);
             backBtn.SetNavigation(startNormalBtn, startNormalBtn, modeBtn.Button, startRandoBtn);
             allBossesBtn.Button.SetNavigation(modeBtn.Button, charmNotchBtn.Button, allSkillsBtn.Button, presetBtn.Button);
             allSkillsBtn.Button.SetNavigation(allBossesBtn.Button, lemmBtn.Button, allCharmsBtn.Button, shadeSkipsBtn.Button);
@@ -136,16 +136,15 @@ namespace RandomizerMod
                 switch (item.CurrentSelection)
                 {
                     case "Easy":
-                        SetShadeSkips( false, true );
+                        SetShadeSkips(false);
                         acidSkipsBtn.SetSelection(false);
                         spikeTunnelsBtn.SetSelection(false);
                         miscSkipsBtn.SetSelection(false);
                         fireballSkipsBtn.SetSelection(false);
                         magolorBtn.SetSelection(false);
-                        modeBtn.SetSelection("Standard");
                         break;
                     case "Hard":
-                        SetShadeSkips( true, true );
+                        SetShadeSkips(true);
                         acidSkipsBtn.SetSelection(true);
                         spikeTunnelsBtn.SetSelection(true);
                         miscSkipsBtn.SetSelection(true);
@@ -153,7 +152,7 @@ namespace RandomizerMod
                         magolorBtn.SetSelection(false);
                         break;
                     case "Moglar":
-                        SetShadeSkips( true, true );
+                        SetShadeSkips(true);
                         acidSkipsBtn.SetSelection(true);
                         spikeTunnelsBtn.SetSelection(true);
                         miscSkipsBtn.SetSelection(true);
@@ -172,8 +171,9 @@ namespace RandomizerMod
             // Event for setting stuff to hard mode on no claw selected
             void SetNoClaw(RandoMenuItem<string> item)
             {
-                if (item.CurrentSelection == "No Claw") {
-                    SetShadeSkips( true, true );
+                if (item.CurrentSelection == "No Claw")
+                {
+                    SetShadeSkips(true);
                     acidSkipsBtn.SetSelection(true);
                     spikeTunnelsBtn.SetSelection(true);
                     miscSkipsBtn.SetSelection(true);
@@ -190,16 +190,19 @@ namespace RandomizerMod
                 }
             }
 
-            void SetShadeSkips(bool enabled, bool updatePrev) {
-                if ( gameTypeBtn.CurrentSelection == "Normal" ) {
-                    shadeSkipsBtn.SetSelection( enabled );
-                } else {
-                    shadeSkipsBtn.SetSelection( false );
+            void SetShadeSkips(bool enabled)
+            {
+                if (enabled)
+                {
+                    gameTypeBtn.SetSelection("Normal");
+                    SwitchGameType(false);
+                }
+                else
+                {
+                    modeBtn.SetSelection("Standard");
                 }
 
-                if ( updatePrev ) {
-                    RandomizerMod.Instance.Settings.ShadeSkipsPrev = enabled;
-                }
+                shadeSkipsBtn.SetSelection(enabled);
             }
 
             void SettingChanged(RandoMenuItem<bool> item)
@@ -224,41 +227,42 @@ namespace RandomizerMod
             magolorBtn.Changed += SettingChanged;
 
             // Setup game type button changes
-            void SaveShadeVal(RandoMenuItem<bool> item) {
-				SetShadeSkips( shadeSkipsBtn.CurrentSelection, true );
+            void SaveShadeVal(RandoMenuItem<bool> item)
+            {
+                SetShadeSkips(shadeSkipsBtn.CurrentSelection);
             }
 
             void SwitchGameType(bool steelMode)
             {
-                if ( steelMode == true ) { // True because event fires before switching selection
+                if (!steelMode)
+                {
                     // Normal mode
-                    startRandoBtn.transform.localPosition = new Vector2( 650, -480 );
-                    startNormalBtn.transform.localPosition = new Vector2( -650, -480 );
-                    startSteelRandoBtn.transform.localPosition = new Vector2( 10000, 10000 );
-                    startSteelNormalBtn.transform.localPosition = new Vector2( 10000, 10000 );
+                    startRandoBtn.transform.localPosition = new Vector2(650, -480);
+                    startNormalBtn.transform.localPosition = new Vector2(-650, -480);
+                    startSteelRandoBtn.transform.localPosition = new Vector2(10000, 10000);
+                    startSteelNormalBtn.transform.localPosition = new Vector2(10000, 10000);
 
-                    shadeSkipsBtn.SetSelection( RandomizerMod.Instance.Settings.ShadeSkipsPrev );
-
-                    backBtn.SetNavigation( startNormalBtn, startNormalBtn, modeBtn.Button, startRandoBtn );
-                    magolorBtn.Button.SetNavigation( fireballSkipsBtn.Button, gameTypeBtn.Button, startNormalBtn, lemmBtn.Button );
-                    lemmBtn.Button.SetNavigation( charmNotchBtn.Button, shadeSkipsBtn.Button, startRandoBtn, allSkillsBtn.Button );
-                } else {
+                    backBtn.SetNavigation(startNormalBtn, startNormalBtn, modeBtn.Button, startRandoBtn);
+                    magolorBtn.Button.SetNavigation(fireballSkipsBtn.Button, gameTypeBtn.Button, startNormalBtn, lemmBtn.Button);
+                    lemmBtn.Button.SetNavigation(charmNotchBtn.Button, shadeSkipsBtn.Button, startRandoBtn, allSkillsBtn.Button);
+                }
+                else
+                {
                     // Steel Soul mode
-                    startRandoBtn.transform.localPosition = new Vector2( 10000, 10000 );
-                    startNormalBtn.transform.localPosition = new Vector2( 10000, 10000 );
-                    startSteelRandoBtn.transform.localPosition = new Vector2( 650, -480 );
-                    startSteelNormalBtn.transform.localPosition = new Vector2( -650, -480 );
+                    startRandoBtn.transform.localPosition = new Vector2(10000, 10000);
+                    startNormalBtn.transform.localPosition = new Vector2(10000, 10000);
+                    startSteelRandoBtn.transform.localPosition = new Vector2(650, -480);
+                    startSteelNormalBtn.transform.localPosition = new Vector2(-650, -480);
 
-                    shadeSkipsBtn.SetSelection(false);
-                    // shadeSkipsBtn.Button.interactable = false; // This doesn't seem to work...
+                    SetShadeSkips(false);
 
-                    backBtn.SetNavigation( startSteelNormalBtn, startSteelNormalBtn, modeBtn.Button, startSteelRandoBtn );
-                    magolorBtn.Button.SetNavigation( fireballSkipsBtn.Button, gameTypeBtn.Button, startSteelNormalBtn, lemmBtn.Button );
-                    lemmBtn.Button.SetNavigation( charmNotchBtn.Button, shadeSkipsBtn.Button, startSteelRandoBtn, allSkillsBtn.Button );
+                    backBtn.SetNavigation(startSteelNormalBtn, startSteelNormalBtn, modeBtn.Button, startSteelRandoBtn);
+                    magolorBtn.Button.SetNavigation(fireballSkipsBtn.Button, gameTypeBtn.Button, startSteelNormalBtn, lemmBtn.Button);
+                    lemmBtn.Button.SetNavigation(charmNotchBtn.Button, shadeSkipsBtn.Button, startSteelRandoBtn, allSkillsBtn.Button);
                 }
             }
 
-            gameTypeBtn.Button.AddEvent( EventTriggerType.Submit, garbage => SwitchGameType( ( gameTypeBtn.CurrentSelection == "Normal" ) ) );
+            gameTypeBtn.Button.AddEvent(EventTriggerType.Submit, garbage => SwitchGameType(gameTypeBtn.CurrentSelection != "Normal"));
 
             // Setup start game button events
             void StartGame(bool rando)
@@ -276,12 +280,16 @@ namespace RandomizerMod
                 {
                     RandomizerMod.Instance.Settings.NoClaw = modeBtn.CurrentSelection == "No Claw";
 
-                    if ( gameTypeBtn.CurrentSelection != "Normal" ) {
+                    if (gameTypeBtn.CurrentSelection != "Normal")
+                    {
                         // This check may not be needed.
                         RandomizerMod.Instance.Settings.ShadeSkips = false;
-                    } else {
+                    }
+                    else
+                    {
                         RandomizerMod.Instance.Settings.ShadeSkips = shadeSkipsBtn.CurrentSelection;
                     }
+
                     RandomizerMod.Instance.Settings.AcidSkips = acidSkipsBtn.CurrentSelection;
                     RandomizerMod.Instance.Settings.SpikeTunnels = spikeTunnelsBtn.CurrentSelection;
                     RandomizerMod.Instance.Settings.MiscSkips = miscSkipsBtn.CurrentSelection;
@@ -292,10 +300,10 @@ namespace RandomizerMod
                 RandomizerMod.Instance.StartNewGame();
             }
 
-            startNormalBtn.AddEvent( EventTriggerType.Submit, garbage => StartGame( false ) );
-            startRandoBtn.AddEvent( EventTriggerType.Submit, garbage => StartGame( true ) );
-            startSteelNormalBtn.AddEvent( EventTriggerType.Submit, garbage => StartGame( false ) );
-            startSteelRandoBtn.AddEvent( EventTriggerType.Submit, garbage => StartGame( true ) );
+            startNormalBtn.AddEvent(EventTriggerType.Submit, garbage => StartGame(false));
+            startRandoBtn.AddEvent(EventTriggerType.Submit, garbage => StartGame(true));
+            startSteelNormalBtn.AddEvent(EventTriggerType.Submit, garbage => StartGame(false));
+            startSteelRandoBtn.AddEvent(EventTriggerType.Submit, garbage => StartGame(true));
         }
 
         private static void ParseSeedInput(string input)
