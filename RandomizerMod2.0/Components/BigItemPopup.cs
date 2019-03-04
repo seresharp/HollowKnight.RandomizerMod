@@ -179,7 +179,11 @@ namespace RandomizerMod.Components
             yield return FadeInCanvasGroup(eggCG);
 
             // Stop doing things instantly before polling input
-            StopCoroutine(skipCoroutine);
+            if (!showInstantly)
+            {
+                StopCoroutine(skipCoroutine);
+            }
+
             showInstantly = false;
 
             // Save the coroutine to stop it later

@@ -345,6 +345,11 @@ namespace RandomizerMod.Randomization
                                 else
                                 {
                                     actions.Add(new ChangeShinyIntoGeo(oldItem.sceneName, oldItem.objectName, oldItem.fsmName, newItem.boolName, newItem.geo));
+
+                                    if (!string.IsNullOrEmpty(oldItem.altObjectName))
+                                    {
+                                        actions.Add(new ChangeShinyIntoGeo(oldItem.sceneName, oldItem.altObjectName, oldItem.fsmName, newItem.boolName, newItem.geo));
+                                    }
                                 }
 
                                 break;
