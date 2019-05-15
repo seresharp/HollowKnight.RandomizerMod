@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Reflection;
+using System.Collections.Generic;
 using RandomizerMod.Extensions;
+using Modding;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 using Object = UnityEngine.Object;
 
@@ -28,31 +28,16 @@ namespace RandomizerMod
 
         public static GameObject TinkEffect => Object.Instantiate(tinkEffect);
 
-        public static void GetPrefabs()
+        public static void GetPrefabs(Dictionary<string, GameObject> objects)
         {
-            FieldInfo smallGeoPrefabField = typeof(HealthManager).GetField("smallGeoPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
-            FieldInfo mediumGeoPrefabField = typeof(HealthManager).GetField("mediumGeoPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
-            FieldInfo largeGeoPrefabField = typeof(HealthManager).GetField("largeGeoPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            Scene kp = UnityEngine.SceneManagement.SceneManager.GetSceneByName(SceneNames.Tutorial_01);
-
-            GameObject shiny = kp.FindGameObject("Shiny Item (1)");
-
-            HealthManager health = kp.FindGameObject("Crawler 1").GetComponent<HealthManager>();
-            GameObject smallBuggyBean = (GameObject)smallGeoPrefabField.GetValue(health);
-            GameObject mediumBuggyBean = (GameObject)mediumGeoPrefabField.GetValue(health);
-            GameObject largeBuggyBean = (GameObject)largeGeoPrefabField.GetValue(health);
-
-            GameObject tink = kp.FindGameObject("Cave Spikes (1)").GetComponent<TinkEffect>().blockEffect;
-
-            shinyItem = Object.Instantiate(shiny);
-            shinyItem.SetActive(false);
+            shinyItem = objects["_Props/Chest/Item/Shiny Item (1)"];
             shinyItem.name = "Randomizer Shiny";
-            Object.DontDestroyOnLoad(shinyItem);
 
-            smallGeo = Object.Instantiate(smallBuggyBean);
-            mediumGeo = Object.Instantiate(mediumBuggyBean);
-            largeGeo = Object.Instantiate(largeBuggyBean);
+            HealthManager health = objects["_Enemies/Crawler 1"].GetComponent<HealthManager>();
+            smallGeo = Object.Instantiate(ReflectionHelper.GetAttr<HealthManager, GameObject>(health, "smallGeoPrefab"));
+            mediumGeo = Object.Instantiate(ReflectionHelper.GetAttr<HealthManager, GameObject>(health, "mediumGeoPrefab"));
+            largeGeo = Object.Instantiate(ReflectionHelper.GetAttr<HealthManager, GameObject>(health, "largeGeoPrefab"));
+
             smallGeo.SetActive(false);
             mediumGeo.SetActive(false);
             largeGeo.SetActive(false);
@@ -60,9 +45,12 @@ namespace RandomizerMod
             Object.DontDestroyOnLoad(mediumGeo);
             Object.DontDestroyOnLoad(largeGeo);
 
-            tinkEffect = Object.Instantiate(tink);
+            tinkEffect = Object.Instantiate(objects["_Props/Cave Spikes (1)"].GetComponent<TinkEffect>().blockEffect);
             tinkEffect.SetActive(false);
             Object.DontDestroyOnLoad(tinkEffect);
+
+            Object.Destroy(objects["_Props/Cave Spikes (1)"]);
+            Object.Destroy(objects["_Enemies/Crawler 1"]);
 
             if (shinyItem == null || smallGeo == null || mediumGeo == null || largeGeo == null || tinkEffect == null)
             {

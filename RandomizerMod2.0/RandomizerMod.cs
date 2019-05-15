@@ -25,7 +25,7 @@ namespace RandomizerMod
             "Microsoft.StyleCop.CSharp.OrderingRules",
             "SA1204:StaticElementsMustAppearBeforeInstanceElements",
             Justification = "Initialize is essentially the class constructor")]
-        public override void Initialize()
+        public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloaded)
         {
             if (Instance != null)
             {
@@ -102,9 +102,8 @@ namespace RandomizerMod
             BenchHandler.Hook();
             MiscSceneChanges.Hook();
 
-            // Preload shiny item
-            // Can't thread this because Unity sucks
-            Components.Preloader.Preload();
+            // Setup preloaded objects
+            ObjectCache.GetPrefabs(preloaded[SceneNames.Tutorial_01]);
 
             // Load fonts
             FontManager.LoadFonts();
@@ -122,6 +121,13 @@ namespace RandomizerMod
             secondaryBools.Add(nameof(PlayerData.gotCharm_24), nameof(PlayerData.fragileGreed_unbreakable));
             secondaryBools.Add(nameof(PlayerData.gotCharm_25), nameof(PlayerData.fragileStrength_unbreakable));
         }
+
+        public override List<(string, string)> GetPreloadNames() => new List<(string, string)>()
+        {
+            (SceneNames.Tutorial_01, "_Props/Chest/Item/Shiny Item (1)"),
+            (SceneNames.Tutorial_01, "_Enemies/Crawler 1"),
+            (SceneNames.Tutorial_01, "_Props/Cave Spikes (1)")
+        };
 
         public static Sprite GetSprite(string name)
         {
@@ -180,8 +186,8 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2b.16";
-            int minAPI = 45;
+            string ver = "2b.17";
+            int minAPI = 49;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
             if (apiTooLow)
@@ -252,7 +258,7 @@ namespace RandomizerMod
 
             // This variable is incredibly stubborn, not worth the effort to make it cooperate
             // Just override it completely
-            if (boolName == nameof(PlayerData.gotSlyCharm)) return Settings.SlyCharm;
+            if (boolName == nameof(PlayerData.gotSlyCharm) && Settings.Randomizer) return Settings.SlyCharm;
 
             if (boolName.StartsWith("RandomizerMod.")) return Settings.GetBool(false, boolName.Substring(14));
 
@@ -332,7 +338,7 @@ namespace RandomizerMod
                 pd.SetBool(nameof(PlayerData.hasNailArt), hasCyclone || hasUpwardSlash || hasDashSlash);
                 pd.SetBool(nameof(PlayerData.hasAllNailArts), hasCyclone && hasUpwardSlash && hasDashSlash);
             }
-            else if (boolName == nameof(PlayerData.hasDreamGate))
+            else if (boolName == nameof(PlayerData.hasDreamGate) && value)
             {
                 // Make sure the player can actually use dream gate after getting it
                 FSMUtility.LocateFSM(HeroController.instance.gameObject, "Dream Nail").FsmVariables.GetFsmBool("Dream Warp Allowed").Value = true;

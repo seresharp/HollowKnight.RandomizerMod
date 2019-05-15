@@ -88,7 +88,6 @@
     <Compile Include="Actions\ChangeChestGeo.cs" />
     <Compile Include="Actions\CreateNewShiny.cs" />
     <Compile Include="BenchHandler.cs" />
-    <Compile Include="Components\Preloader.cs" />
     <Compile Include="Components\RandomizerTinkEffect.cs" />
     <Compile Include="Components\Shop.cs" />
     <Compile Include="Components\StickyWall.cs">
