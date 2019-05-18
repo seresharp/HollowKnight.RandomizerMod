@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RandomizerMod.Extensions
+﻿namespace RandomizerMod.Extensions
 {
     internal static class HeroControllerExtensions
     {

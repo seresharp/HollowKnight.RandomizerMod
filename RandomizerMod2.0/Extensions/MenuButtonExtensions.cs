@@ -1,16 +1,14 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
-using Object = UnityEngine.Object;
 
 namespace RandomizerMod.Extensions
 {
     internal static class MenuButtonExtensions
     {
-        public static MenuButton Clone(this MenuButton self, string name, MenuButton.MenuButtonType type, Vector2 pos, string text = null, string description = null, Sprite image = null)
+        public static MenuButton Clone(this MenuButton self, string name, MenuButton.MenuButtonType type, Vector2 pos,
+            string text = null, string description = null, Sprite image = null)
         {
             // Set up duplicate of button
             MenuButton newBtn = Object.Instantiate(self.gameObject).GetComponent<MenuButton>();
@@ -46,9 +44,10 @@ namespace RandomizerMod.Extensions
             return newBtn;
         }
 
-        public static void SetNavigation(this Selectable self, Selectable up, Selectable right, Selectable down, Selectable left)
+        public static void SetNavigation(this Selectable self, Selectable up, Selectable right, Selectable down,
+            Selectable left)
         {
-            self.navigation = new Navigation()
+            self.navigation = new Navigation
             {
                 mode = Navigation.Mode.Explicit,
                 selectOnUp = up,
@@ -85,22 +84,26 @@ namespace RandomizerMod.Extensions
 
         public static void SetDown(this Selectable self, Selectable down)
         {
-            self.SetNavigation(self.navigation.selectOnUp, self.navigation.selectOnRight, down, self.navigation.selectOnLeft);
+            self.SetNavigation(self.navigation.selectOnUp, self.navigation.selectOnRight, down,
+                self.navigation.selectOnLeft);
         }
 
         public static void SetUp(this Selectable self, Selectable up)
         {
-            self.SetNavigation(up, self.navigation.selectOnRight, self.navigation.selectOnDown, self.navigation.selectOnLeft);
+            self.SetNavigation(up, self.navigation.selectOnRight, self.navigation.selectOnDown,
+                self.navigation.selectOnLeft);
         }
 
         public static void SetLeft(this Selectable self, Selectable left)
         {
-            self.SetNavigation(self.navigation.selectOnUp, self.navigation.selectOnRight, self.navigation.selectOnDown, left);
+            self.SetNavigation(self.navigation.selectOnUp, self.navigation.selectOnRight, self.navigation.selectOnDown,
+                left);
         }
 
         public static void SetRight(this Selectable self, Selectable right)
         {
-            self.SetNavigation(self.navigation.selectOnUp, right, self.navigation.selectOnDown, self.navigation.selectOnLeft);
+            self.SetNavigation(self.navigation.selectOnUp, right, self.navigation.selectOnDown,
+                self.navigation.selectOnLeft);
         }
     }
 }

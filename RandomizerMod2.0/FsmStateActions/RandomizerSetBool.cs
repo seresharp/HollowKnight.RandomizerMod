@@ -1,13 +1,12 @@
-﻿using System;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 
 namespace RandomizerMod.FsmStateActions
 {
     internal class RandomizerSetBool : FsmStateAction
     {
-        private string name;
-        private bool val;
-        private bool playerdata;
+        private readonly string name;
+        private readonly bool playerdata;
+        private readonly bool val;
 
         public RandomizerSetBool(string boolName, bool val, bool playerdata = false)
         {

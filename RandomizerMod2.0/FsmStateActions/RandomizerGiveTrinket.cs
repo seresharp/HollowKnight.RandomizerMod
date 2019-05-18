@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 
 namespace RandomizerMod.FsmStateActions
 {
     internal class RandomizerGiveTrinket : FsmStateAction
     {
-        private int num;
+        private readonly int num;
 
         public RandomizerGiveTrinket(int trinketNum)
         {

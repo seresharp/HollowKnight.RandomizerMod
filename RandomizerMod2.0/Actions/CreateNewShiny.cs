@@ -1,42 +1,39 @@
-﻿using System;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using UnityEngine;
-
-using Object = UnityEngine.Object;
 
 namespace RandomizerMod.Actions
 {
     internal class CreateNewShiny : RandomizerAction
     {
-        [SerializeField] private string sceneName;
-        [SerializeField] private float x;
-        [SerializeField] private float y;
-        [SerializeField] private string newShinyName;
+        private readonly string _newShinyName;
+        private readonly string _sceneName;
+        private readonly float _x;
+        private readonly float _y;
 
         public CreateNewShiny(string sceneName, float x, float y, string newShinyName)
         {
-            this.sceneName = sceneName;
-            this.x = x;
-            this.y = y;
-            this.newShinyName = newShinyName;
+            _sceneName = sceneName;
+            _x = x;
+            _y = y;
+            _newShinyName = newShinyName;
         }
 
         public override ActionType Type => ActionType.GameObject;
 
         public override void Process(string scene, Object changeObj)
         {
-            if (scene != sceneName)
+            if (scene != _sceneName)
             {
                 return;
             }
 
             // Put a shiny in the same location as the original
             GameObject shiny = ObjectCache.ShinyItem;
-            shiny.name = newShinyName;
+            shiny.name = _newShinyName;
 
-            shiny.transform.position = new Vector3(x, y, shiny.transform.position.z);
+            shiny.transform.position = new Vector3(_x, _y, shiny.transform.position.z);
             shiny.SetActive(true);
 
             // Force the new shiny to fall straight downwards

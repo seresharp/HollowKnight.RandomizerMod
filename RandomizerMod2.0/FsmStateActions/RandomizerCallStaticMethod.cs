@@ -6,8 +6,8 @@ namespace RandomizerMod.FsmStateActions
 {
     internal class RandomizerCallStaticMethod : FsmStateAction
     {
-        private MethodInfo info;
-        private object[] parameters;
+        private readonly MethodInfo info;
+        private readonly object[] parameters;
 
         public RandomizerCallStaticMethod(Type t, string methodName, params object[] parameters)
         {
@@ -34,7 +34,7 @@ namespace RandomizerMod.FsmStateActions
             }
             catch (Exception e)
             {
-                RandomizerMod.Instance.LogError("Error invoking static method from FSM:\n" + e);
+                LogError("Error invoking static method from FSM:\n" + e);
             }
 
             Finish();

@@ -1,60 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using RandomizerMod.Extensions;
+﻿using System.Collections.Generic;
 using Modding;
 using UnityEngine;
-
-using Object = UnityEngine.Object;
+using static RandomizerMod.LogHelper;
 
 namespace RandomizerMod
 {
     internal static class ObjectCache
     {
-        private static GameObject shinyItem;
+        private static GameObject _shinyItem;
 
-        private static GameObject smallGeo;
-        private static GameObject mediumGeo;
-        private static GameObject largeGeo;
+        private static GameObject _smallGeo;
+        private static GameObject _mediumGeo;
+        private static GameObject _largeGeo;
 
-        private static GameObject tinkEffect;
+        private static GameObject _tinkEffect;
 
-        public static GameObject ShinyItem => Object.Instantiate(shinyItem);
+        public static GameObject ShinyItem => Object.Instantiate(_shinyItem);
 
-        public static GameObject SmallGeo => Object.Instantiate(smallGeo);
+        public static GameObject SmallGeo => Object.Instantiate(_smallGeo);
 
-        public static GameObject MediumGeo => Object.Instantiate(mediumGeo);
+        public static GameObject MediumGeo => Object.Instantiate(_mediumGeo);
 
-        public static GameObject LargeGeo => Object.Instantiate(largeGeo);
+        public static GameObject LargeGeo => Object.Instantiate(_largeGeo);
 
-        public static GameObject TinkEffect => Object.Instantiate(tinkEffect);
+        public static GameObject TinkEffect => Object.Instantiate(_tinkEffect);
 
         public static void GetPrefabs(Dictionary<string, GameObject> objects)
         {
-            shinyItem = objects["_Props/Chest/Item/Shiny Item (1)"];
-            shinyItem.name = "Randomizer Shiny";
+            _shinyItem = objects["_Props/Chest/Item/Shiny Item (1)"];
+            _shinyItem.name = "Randomizer Shiny";
 
             HealthManager health = objects["_Enemies/Crawler 1"].GetComponent<HealthManager>();
-            smallGeo = Object.Instantiate(ReflectionHelper.GetAttr<HealthManager, GameObject>(health, "smallGeoPrefab"));
-            mediumGeo = Object.Instantiate(ReflectionHelper.GetAttr<HealthManager, GameObject>(health, "mediumGeoPrefab"));
-            largeGeo = Object.Instantiate(ReflectionHelper.GetAttr<HealthManager, GameObject>(health, "largeGeoPrefab"));
+            _smallGeo = Object.Instantiate(
+                ReflectionHelper.GetAttr<HealthManager, GameObject>(health, "smallGeoPrefab"));
+            _mediumGeo =
+                Object.Instantiate(ReflectionHelper.GetAttr<HealthManager, GameObject>(health, "mediumGeoPrefab"));
+            _largeGeo = Object.Instantiate(
+                ReflectionHelper.GetAttr<HealthManager, GameObject>(health, "largeGeoPrefab"));
 
-            smallGeo.SetActive(false);
-            mediumGeo.SetActive(false);
-            largeGeo.SetActive(false);
-            Object.DontDestroyOnLoad(smallGeo);
-            Object.DontDestroyOnLoad(mediumGeo);
-            Object.DontDestroyOnLoad(largeGeo);
+            _smallGeo.SetActive(false);
+            _mediumGeo.SetActive(false);
+            _largeGeo.SetActive(false);
+            Object.DontDestroyOnLoad(_smallGeo);
+            Object.DontDestroyOnLoad(_mediumGeo);
+            Object.DontDestroyOnLoad(_largeGeo);
 
-            tinkEffect = Object.Instantiate(objects["_Props/Cave Spikes (1)"].GetComponent<TinkEffect>().blockEffect);
-            tinkEffect.SetActive(false);
-            Object.DontDestroyOnLoad(tinkEffect);
+            _tinkEffect = Object.Instantiate(objects["_Props/Cave Spikes (1)"].GetComponent<TinkEffect>().blockEffect);
+            _tinkEffect.SetActive(false);
+            Object.DontDestroyOnLoad(_tinkEffect);
 
             Object.Destroy(objects["_Props/Cave Spikes (1)"]);
             Object.Destroy(objects["_Enemies/Crawler 1"]);
 
-            if (shinyItem == null || smallGeo == null || mediumGeo == null || largeGeo == null || tinkEffect == null)
+            if (_shinyItem == null || _smallGeo == null || _mediumGeo == null || _largeGeo == null ||
+                _tinkEffect == null)
             {
-                RandomizerMod.Instance.LogWarn("One or more ObjectCache items are null");
+                LogWarn("One or more ObjectCache items are null");
             }
         }
     }

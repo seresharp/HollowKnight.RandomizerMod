@@ -1,59 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Components;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
 using UnityEngine;
 
-using Object = UnityEngine.Object;
-
 namespace RandomizerMod.Actions
 {
-    [Serializable]
     public struct BigItemDef
     {
-        [SerializeField] public string BoolName;
-        [SerializeField] public string SpriteKey;
-        [SerializeField] public string TakeKey;
-        [SerializeField] public string NameKey;
-        [SerializeField] public string ButtonKey;
-        [SerializeField] public string DescOneKey;
-        [SerializeField] public string DescTwoKey;
+        public string BoolName;
+        public string SpriteKey;
+        public string TakeKey;
+        public string NameKey;
+        public string ButtonKey;
+        public string DescOneKey;
+        public string DescTwoKey;
     }
 
-    [Serializable]
-    public class ChangeShinyIntoBigItem : RandomizerAction, ISerializationCallbackReceiver
+
+    public class ChangeShinyIntoBigItem : RandomizerAction
     {
-        [SerializeField] private string sceneName;
-        [SerializeField] private string objectName;
-        [SerializeField] private string fsmName;
-        [SerializeField] private string boolName;
-        [SerializeField] private bool playerdata;
+        private readonly string _boolName;
+        private readonly string _fsmName;
 
-        // Serialization hack
-        [SerializeField] private List<string> itemDefStrings;
+        private readonly BigItemDef[] _itemDefs;
 
-        private BigItemDef[] itemDefs;
+        private readonly string _objectName;
+        private readonly bool _playerdata;
+        private readonly string _sceneName;
 
         // BigItemDef array is meant to be for additive items
         // For example, items[0] could be vengeful spirit and items[1] would be shade soul
-        public ChangeShinyIntoBigItem(string sceneName, string objectName, string fsmName, BigItemDef[] items, string boolName, bool playerdata = false)
+        public ChangeShinyIntoBigItem(string sceneName, string objectName, string fsmName, BigItemDef[] items,
+            string boolName, bool playerdata = false)
         {
-            this.sceneName = sceneName;
-            this.objectName = objectName;
-            this.fsmName = fsmName;
-            this.boolName = boolName;
-            this.playerdata = playerdata;
-            itemDefs = items;
+            _sceneName = sceneName;
+            _objectName = objectName;
+            _fsmName = fsmName;
+            _boolName = boolName;
+            _playerdata = playerdata;
+            _itemDefs = items;
         }
 
         public override ActionType Type => ActionType.PlayMakerFSM;
 
         public override void Process(string scene, Object changeObj)
         {
-            if (scene != sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != fsmName || fsm.gameObject.name != objectName)
+            if (scene != _sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != _fsmName ||
+                fsm.gameObject.name != _objectName)
             {
                 return;
             }
@@ -67,13 +62,13 @@ namespace RandomizerMod.Actions
 
             // Change pd bool test to our new bool
             PlayerDataBoolTest boolTest = pdBool.GetActionsOfType<PlayerDataBoolTest>()[0];
-            if (playerdata)
+            if (_playerdata)
             {
-                boolTest.boolName = boolName;
+                boolTest.boolName = _boolName;
             }
             else
             {
-                RandomizerBoolTest randBoolTest = new RandomizerBoolTest(boolName, boolTest.isFalse, boolTest.isTrue);
+                RandomizerBoolTest randBoolTest = new RandomizerBoolTest(_boolName, boolTest.isFalse, boolTest.isTrue);
                 pdBool.RemoveActionsOfType<PlayerDataBoolTest>();
                 pdBool.AddFirstAction(randBoolTest);
             }
@@ -86,42 +81,21 @@ namespace RandomizerMod.Actions
             bigGetFlash.AddAction(new RandomizerCallStaticMethod(
                 typeof(BigItemPopup),
                 nameof(BigItemPopup.ShowAdditive),
-                itemDefs,
+                _itemDefs,
                 fsm.gameObject,
                 "GET ITEM MSG END"));
 
             // Don't actually need to set the skill here, that happens in BigItemPopup
             // Maybe change that at some point, it's not where it should happen
-            if (!playerdata)
+            if (!_playerdata)
             {
-                bigGetFlash.AddAction(new RandomizerSetBool(boolName, true));
+                bigGetFlash.AddAction(new RandomizerSetBool(_boolName, true));
             }
 
             // Exit the fsm after the popup
             bigGetFlash.ClearTransitions();
             bigGetFlash.AddTransition("GET ITEM MSG END", "Hero Up");
             bigGetFlash.AddTransition("HERO DAMAGED", "Finish");
-        }
-
-        public void OnBeforeSerialize()
-        {
-            itemDefStrings = new List<string>();
-            foreach (BigItemDef item in itemDefs)
-            {
-                itemDefStrings.Add(JsonUtility.ToJson(item));
-            }
-        }
-
-        public void OnAfterDeserialize()
-        {
-            List<BigItemDef> itemDefList = new List<BigItemDef>();
-
-            foreach (string item in itemDefStrings)
-            {
-                itemDefList.Add(JsonUtility.FromJson<BigItemDef>(item));
-            }
-
-            itemDefs = itemDefList.ToArray();
         }
     }
 }

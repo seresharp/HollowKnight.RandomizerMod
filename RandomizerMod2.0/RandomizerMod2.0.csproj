@@ -114,6 +114,7 @@
     <Compile Include="Extensions\PlayMakerFSMExtensions.cs" />
     <Compile Include="FsmStateActions\RandomizerBoolTest.cs" />
     <Compile Include="Actions\RandomizerAction.cs" />
+    <Compile Include="LogHelper.cs" />
     <Compile Include="MenuChanger.cs" />
     <Compile Include="MiscSceneChanges.cs" />
     <Compile Include="ObjectCache.cs" />

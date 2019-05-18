@@ -1,57 +1,72 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-
-using Object = UnityEngine.Object;
 
 namespace RandomizerMod.Actions
 {
-    [Serializable]
     public struct ShopItemDef
     {
         // Values from ShopItemStats
-        [SerializeField] public string PlayerDataBoolName;
-        [SerializeField] public string NameConvo;
-        [SerializeField] public string DescConvo;
-        [SerializeField] public string RequiredPlayerDataBool;
-        [SerializeField] public string RemovalPlayerDataBool;
-        [SerializeField] public bool DungDiscount;
-        [SerializeField] public string NotchCostBool;
-        [SerializeField] public int Cost;
+        public string PlayerDataBoolName;
+        public string NameConvo;
+        public string DescConvo;
+        public string RequiredPlayerDataBool;
+        public string RemovalPlayerDataBool;
+        public bool DungDiscount;
+        public string NotchCostBool;
+        public int Cost;
 
         // Sprite name in resources
-        [SerializeField] public string SpriteName;
+        public string SpriteName;
     }
 
-    [Serializable]
+
     public class ChangeShopContents : RandomizerAction, ISerializationCallbackReceiver
     {
-        // Variables that actually get used
-        [SerializeField] private string sceneName;
-        [SerializeField] private string objectName;
-        private ShopItemDef[] items;
-
         // Variable for serialization hack
-        [SerializeField] private List<string> itemDefStrings;
+        private List<string> _itemDefStrings;
+        private ShopItemDef[] _items;
+
+        // Variables that actually get used
 
         public ChangeShopContents(string sceneName, string objectName, ShopItemDef[] items)
         {
-            this.sceneName = sceneName;
-            this.objectName = objectName;
-            this.items = items;
+            SceneName = sceneName;
+            ObjectName = objectName;
+            _items = items;
         }
 
         public override ActionType Type => ActionType.GameObject;
 
-        public string SceneName => sceneName;
+        public string SceneName { get; }
 
-        public string ObjectName => objectName;
+        public string ObjectName { get; }
+
+        public void OnBeforeSerialize()
+        {
+            _itemDefStrings = new List<string>();
+            foreach (ShopItemDef item in _items)
+            {
+                _itemDefStrings.Add(JsonUtility.ToJson(item));
+            }
+        }
+
+        public void OnAfterDeserialize()
+        {
+            List<ShopItemDef> itemDefList = new List<ShopItemDef>();
+
+            foreach (string item in _itemDefStrings)
+            {
+                itemDefList.Add(JsonUtility.FromJson<ShopItemDef>(item));
+            }
+
+            _items = itemDefList.ToArray();
+        }
 
         public void AddItemDefs(ShopItemDef[] newItems)
         {
-            if (items == null)
+            if (_items == null)
             {
-                items = newItems;
+                _items = newItems;
                 return;
             }
 
@@ -60,29 +75,29 @@ namespace RandomizerMod.Actions
                 return;
             }
 
-            ShopItemDef[] combined = new ShopItemDef[items.Length + newItems.Length];
-            items.CopyTo(combined, 0);
-            newItems.CopyTo(combined, items.Length);
-            items = combined;
+            ShopItemDef[] combined = new ShopItemDef[_items.Length + newItems.Length];
+            _items.CopyTo(combined, 0);
+            newItems.CopyTo(combined, _items.Length);
+            _items = combined;
         }
 
         public override void Process(string scene, Object changeObj)
         {
-            if (scene != sceneName)
+            if (scene != SceneName)
             {
                 return;
             }
 
             // Find the shop and save an item for use later
-            GameObject shopObj = GameObject.Find(objectName);
+            GameObject shopObj = GameObject.Find(ObjectName);
             ShopMenuStock shop = shopObj.GetComponent<ShopMenuStock>();
             GameObject itemPrefab = Object.Instantiate(shop.stock[0]);
             itemPrefab.SetActive(false);
-                
+
             // Remove all charm type items from the store
             List<GameObject> newStock = new List<GameObject>();
-                
-            foreach (ShopItemDef itemDef in items)
+
+            foreach (ShopItemDef itemDef in _items)
             {
                 // Create a new shop item for this item def
                 GameObject newItemObj = Object.Instantiate(itemPrefab);
@@ -108,7 +123,8 @@ namespace RandomizerMod.Actions
                 stats.relicPDInt = string.Empty;
 
                 // Apply the sprite for the UI
-                stats.transform.Find("Item Sprite").gameObject.GetComponent<SpriteRenderer>().sprite = RandomizerMod.GetSprite(itemDef.SpriteName);
+                stats.transform.Find("Item Sprite").gameObject.GetComponent<SpriteRenderer>().sprite =
+                    RandomizerMod.GetSprite(itemDef.SpriteName);
 
                 newStock.Add(newItemObj);
             }
@@ -143,27 +159,6 @@ namespace RandomizerMod.Actions
 
                 shop.stockAlt = altStock.ToArray();
             }
-        }
-
-        public void OnBeforeSerialize()
-        {
-            itemDefStrings = new List<string>();
-            foreach (ShopItemDef item in items)
-            {
-                itemDefStrings.Add(JsonUtility.ToJson(item));
-            }
-        }
-
-        public void OnAfterDeserialize()
-        {
-            List<ShopItemDef> itemDefList = new List<ShopItemDef>();
-
-            foreach (string item in itemDefStrings)
-            {
-                itemDefList.Add(JsonUtility.FromJson<ShopItemDef>(item));
-            }
-
-            items = itemDefList.ToArray();
         }
     }
 }

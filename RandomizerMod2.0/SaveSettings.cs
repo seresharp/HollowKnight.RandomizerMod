@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Linq;
 using Modding;
 using RandomizerMod.Actions;
 using UnityEngine;
 
 namespace RandomizerMod
 {
-    public class SaveSettings : IModSettings, ISerializationCallbackReceiver
+    public class SaveSettings : ModSettings, ISerializationCallbackReceiver
     {
-        public List<RandomizerAction> actions = new List<RandomizerAction>();
-        public Dictionary<string, string> itemPlacements = new Dictionary<string, string>();
+        private SerializableStringDictionary _itemPlacements = new SerializableStringDictionary();
 
-        private static Type[] types;
+        /// <remarks>item, location</remarks>
+        public (string, string)[] ItemPlacements => _itemPlacements.Select(pair => (pair.Key, pair.Value)).ToArray();
 
         public bool AllBosses
         {
@@ -105,62 +102,27 @@ namespace RandomizerMod
             set => SetBool(value);
         }
 
-        // Serialize actions list into string dict because Unity serializer can't handle inheritance
-        public void OnBeforeSerialize()
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
-            for (int i = 0; i < actions.Count; i++)
-            {
-                string json = JsonUtility.ToJson(actions[i]);
-                StringValues.Add($"RandomizerAction:{i}:{actions[i].GetType()}", json);
-            }
-
-            foreach (string key in itemPlacements.Keys)
-            {
-                StringValues.Add($"itemPlacements:{key}", itemPlacements[key]);
-            }
+            SetString(JsonUtility.ToJson(_itemPlacements), nameof(_itemPlacements));
         }
 
-        // Load the actions back into their list
+        // Recreate the actions after loading a save
         public void OnAfterDeserialize()
         {
-            if (types == null)
-            {
-                types = Assembly.GetAssembly(typeof(RandomizerAction)).GetTypes().Where(t => t.IsSubclassOf(typeof(RandomizerAction))).ToArray();
-            }
+            _itemPlacements =
+                JsonUtility.FromJson<SerializableStringDictionary>(GetString(null, nameof(_itemPlacements)));
+            RandomizerAction.CreateActions(ItemPlacements);
+        }
 
-            Dictionary<int, RandomizerAction> dict = new Dictionary<int, RandomizerAction>();
+        public void ResetItemPlacements()
+        {
+            _itemPlacements = new SerializableStringDictionary();
+        }
 
-            // Load the actions into a dict with numbers as keys
-            foreach (string key in StringValues.Keys.ToList())
-            {
-                if (key.StartsWith("RandomizerAction"))
-                {
-                    string type = key.Split(':')[2];
-                    int num = Convert.ToInt32(key.Split(':')[1]);
-                    foreach (Type t in types)
-                    {
-                        if (type == t.ToString())
-                        {
-                            dict.Add(num, (RandomizerAction)JsonUtility.FromJson(StringValues[key], t));
-                            break;
-                        }
-                    }
-
-                    StringValues.Remove(key);
-                }
-                else if (key.StartsWith("itemPlacements"))
-                {
-                    itemPlacements.Add(key.Split(':')[1], StringValues[key]);
-                    StringValues.Remove(key);
-                }
-            }
-
-            // Put them back into the list in order
-            // This should be unnecessary in theory but I was having issues with order
-            for (int i = 0; i < dict.Count; i++)
-            {
-                actions.Add(dict[i]);
-            }
+        public void AddItemPlacement(string item, string location)
+        {
+            _itemPlacements[item] = location;
         }
     }
 }

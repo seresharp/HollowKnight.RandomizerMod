@@ -5,7 +5,7 @@ namespace RandomizerMod.FsmStateActions
 {
     internal class RandomizerExecuteLambda : FsmStateAction
     {
-        private Action method;
+        private readonly Action method;
 
         public RandomizerExecuteLambda(Action method)
         {
@@ -20,7 +20,7 @@ namespace RandomizerMod.FsmStateActions
             }
             catch (Exception e)
             {
-                RandomizerMod.Instance.LogError("Error in RandomizerExecuteLambda:\n" + e);
+                LogError("Error in RandomizerExecuteLambda:\n" + e);
             }
 
             Finish();

@@ -1,37 +1,34 @@
-﻿using System;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
 using UnityEngine;
 
-using Object = UnityEngine.Object;
-
 namespace RandomizerMod.Actions
 {
-    [Serializable]
     public class ChangeShinyIntoGeo : RandomizerAction
     {
-        [SerializeField] private string sceneName;
-        [SerializeField] private string objectName;
-        [SerializeField] private string fsmName;
-        [SerializeField] private string boolName;
-        [SerializeField] private int geoAmount;
+        private readonly string _boolName;
+        private readonly string _fsmName;
+        private readonly int _geoAmount;
+        private readonly string _objectName;
+        private readonly string _sceneName;
 
         public ChangeShinyIntoGeo(string sceneName, string objectName, string fsmName, string boolName, int geoAmount)
         {
-            this.sceneName = sceneName;
-            this.objectName = objectName;
-            this.fsmName = fsmName;
-            this.boolName = boolName;
-            this.geoAmount = geoAmount;
+            _sceneName = sceneName;
+            _objectName = objectName;
+            _fsmName = fsmName;
+            _boolName = boolName;
+            _geoAmount = geoAmount;
         }
 
         public override ActionType Type => ActionType.PlayMakerFSM;
 
         public override void Process(string scene, Object changeObj)
         {
-            if (scene != sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != fsmName || fsm.gameObject.name != objectName)
+            if (scene != _sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != _fsmName ||
+                fsm.gameObject.name != _objectName)
             {
                 return;
             }
@@ -44,11 +41,11 @@ namespace RandomizerMod.Actions
             pdBool.RemoveActionsOfType<StringCompare>();
 
             // Add our own check to stop the shiny from being grabbed twice
-            pdBool.AddAction(new RandomizerBoolTest(boolName, null, "COLLECTED"));
+            pdBool.AddAction(new RandomizerBoolTest(_boolName, null, "COLLECTED"));
 
             // The "Charm?" state is a good entry point for our geo spawning
-            charm.AddAction(new RandomizerSetBool(boolName, true));
-            charm.AddAction(new RandomizerAddGeo(fsm.gameObject, geoAmount));
+            charm.AddAction(new RandomizerSetBool(_boolName, true));
+            charm.AddAction(new RandomizerAddGeo(fsm.gameObject, _geoAmount));
 
             // Skip all the other type checks
             charm.ClearTransitions();

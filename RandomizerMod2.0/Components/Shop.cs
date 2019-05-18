@@ -1,36 +1,42 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Modding;
 using RandomizerMod.Actions;
 using UnityEngine;
 using UnityEngine.UI;
+using static RandomizerMod.LogHelper;
 
 namespace RandomizerMod.Components
 {
     internal class Shop : MonoBehaviour
     {
+        public enum ShopType
+        {
+            Geo,
+            Essence
+        }
+
         // float[] can't be const and this is mostly the same thing (Not really but whatever)
-        private static readonly float[] DefaultPositions = new float[] { 0.8f, 0.7f, 0.5825f, 0.465f, 0.365f, 0.265f };
+        private static readonly float[] DefaultPositions = {0.8f, 0.7f, 0.5825f, 0.465f, 0.365f, 0.265f};
 
-        private static Sprite blackPixel = CanvasUtil.NullSprite(new byte[] { 0x00, 0x00, 0x00, 0xAA });
+        private static readonly Sprite blackPixel = CanvasUtil.NullSprite(new byte[] {0x00, 0x00, 0x00, 0xAA});
 
-        private static Sprite[] bottomFrames;
-        private static Sprite[] topFrames;
-
-        private ShopItemDef[] items;
-        private ShopType type;
+        private static readonly Sprite[] bottomFrames;
+        private static readonly Sprite[] topFrames;
 
         private Sprite geoSprite;
 
-        private int[] validItems;
-        private int selected = 0;
-
         private GameObject[,] itemImages;
+
+        private ShopItemDef[] items;
+        private int selected;
+        private ShopType type;
+
+        private int[] validItems;
 
         static Shop()
         {
-            bottomFrames = new Sprite[]
+            bottomFrames = new[]
             {
                 RandomizerMod.GetSprite("Anim.Shop.BottomFleur.2"),
                 RandomizerMod.GetSprite("Anim.Shop.BottomFleur.3"),
@@ -41,7 +47,7 @@ namespace RandomizerMod.Components
                 RandomizerMod.GetSprite("Anim.Shop.BottomFleur.8")
             };
 
-            topFrames = new Sprite[]
+            topFrames = new[]
             {
                 RandomizerMod.GetSprite("Anim.Shop.TopFleur.0"),
                 RandomizerMod.GetSprite("Anim.Shop.TopFleur.1"),
@@ -55,12 +61,6 @@ namespace RandomizerMod.Components
             };
         }
 
-        public enum ShopType
-        {
-            Geo,
-            Essence
-        }
-
         public static void Show()
         {
             // Create base canvas
@@ -68,9 +68,9 @@ namespace RandomizerMod.Components
 
             // Add shop component, set values
             Shop shop = canvas.AddComponent<Shop>();
-            shop.items = new ShopItemDef[]
+            shop.items = new[]
             {
-                new ShopItemDef()
+                new ShopItemDef
                 {
                     PlayerDataBoolName = "gotCharm_1",
                     NameConvo = "CHARM_NAME_1",
@@ -82,7 +82,7 @@ namespace RandomizerMod.Components
                     Cost = 420,
                     SpriteName = "Charms.1.png"
                 },
-                new ShopItemDef()
+                new ShopItemDef
                 {
                     PlayerDataBoolName = "gotCharm_2",
                     NameConvo = "CHARM_NAME_2",
@@ -94,7 +94,7 @@ namespace RandomizerMod.Components
                     Cost = 420,
                     SpriteName = "Charms.2.png"
                 },
-                new ShopItemDef()
+                new ShopItemDef
                 {
                     PlayerDataBoolName = "gotCharm_3",
                     NameConvo = "CHARM_NAME_3",
@@ -106,7 +106,7 @@ namespace RandomizerMod.Components
                     Cost = 420,
                     SpriteName = "Charms.3.png"
                 },
-                new ShopItemDef()
+                new ShopItemDef
                 {
                     PlayerDataBoolName = "gotCharm_4",
                     NameConvo = "CHARM_NAME_4",
@@ -118,7 +118,7 @@ namespace RandomizerMod.Components
                     Cost = 420,
                     SpriteName = "Charms.4.png"
                 },
-                new ShopItemDef()
+                new ShopItemDef
                 {
                     PlayerDataBoolName = "gotCharm_5",
                     NameConvo = "CHARM_NAME_5",
@@ -130,7 +130,7 @@ namespace RandomizerMod.Components
                     Cost = 420,
                     SpriteName = "Charms.5.png"
                 },
-                new ShopItemDef()
+                new ShopItemDef
                 {
                     PlayerDataBoolName = "gotCharm_6",
                     NameConvo = "CHARM_NAME_6",
@@ -142,7 +142,7 @@ namespace RandomizerMod.Components
                     Cost = 420,
                     SpriteName = "Charms.6.png"
                 },
-                new ShopItemDef()
+                new ShopItemDef
                 {
                     PlayerDataBoolName = "gotCharm_7",
                     NameConvo = "CHARM_NAME_7",
@@ -154,7 +154,7 @@ namespace RandomizerMod.Components
                     Cost = 420,
                     SpriteName = "Charms.7.png"
                 },
-                new ShopItemDef()
+                new ShopItemDef
                 {
                     PlayerDataBoolName = "gotCharm_8",
                     NameConvo = "CHARM_NAME_8",
@@ -166,7 +166,7 @@ namespace RandomizerMod.Components
                     Cost = 420,
                     SpriteName = "Charms.8.png"
                 },
-                new ShopItemDef()
+                new ShopItemDef
                 {
                     PlayerDataBoolName = "gotCharm_9",
                     NameConvo = "CHARM_NAME_9",
@@ -178,7 +178,7 @@ namespace RandomizerMod.Components
                     Cost = 420,
                     SpriteName = "Charms.9.png"
                 },
-                new ShopItemDef()
+                new ShopItemDef
                 {
                     PlayerDataBoolName = "gotCharm_10",
                     NameConvo = "CHARM_NAME_10",
@@ -196,7 +196,9 @@ namespace RandomizerMod.Components
 
         public void Start()
         {
-            geoSprite = type == ShopType.Geo ? RandomizerMod.GetSprite("UI.Shop.Geo") : RandomizerMod.GetSprite("UI.Shop.Essence");
+            geoSprite = type == ShopType.Geo
+                ? RandomizerMod.GetSprite("UI.Shop.Geo")
+                : RandomizerMod.GetSprite("UI.Shop.Essence");
 
             StartCoroutine(ShowShop());
         }
@@ -227,7 +229,8 @@ namespace RandomizerMod.Components
             PlayerData pd = PlayerData.instance;
 
             // These ones can't be empty
-            if (string.IsNullOrEmpty(item.PlayerDataBoolName) || string.IsNullOrEmpty(item.NameConvo) || string.IsNullOrEmpty(item.DescConvo) || string.IsNullOrEmpty(item.SpriteName))
+            if (string.IsNullOrEmpty(item.PlayerDataBoolName) || string.IsNullOrEmpty(item.NameConvo) ||
+                string.IsNullOrEmpty(item.DescConvo) || string.IsNullOrEmpty(item.SpriteName))
             {
                 return false;
             }
@@ -254,7 +257,8 @@ namespace RandomizerMod.Components
                 item.NotchCostBool = string.Empty;
             }
 
-            if (pd.GetBool(item.PlayerDataBoolName) || pd.GetBool(item.RemovalPlayerDataBool) || (item.RequiredPlayerDataBool != string.Empty && !pd.GetBool(item.RequiredPlayerDataBool)))
+            if (pd.GetBool(item.PlayerDataBoolName) || pd.GetBool(item.RemovalPlayerDataBool) ||
+                item.RequiredPlayerDataBool != string.Empty && !pd.GetBool(item.RequiredPlayerDataBool))
             {
                 return false;
             }
@@ -263,7 +267,7 @@ namespace RandomizerMod.Components
             {
                 return false;
             }
-            
+
             return true;
         }
 
@@ -281,15 +285,25 @@ namespace RandomizerMod.Components
 
             for (int i = 0; i < itemImages.GetLength(0); i++)
             {
-                itemImages[i, 0] = CanvasUtil.CreateImagePanel(gameObject, RandomizerMod.GetSprite(items[validItems[i]].SpriteName), new CanvasUtil.RectData(new Vector2(90, 90), Vector2.zero, new Vector2(0.525f, 0f), new Vector2(0.525f, 0f)));
-                itemImages[i, 1] = CanvasUtil.CreateImagePanel(gameObject, geoSprite, new CanvasUtil.RectData(new Vector2(50, 50), Vector2.zero, new Vector2(0.57f, 0f), new Vector2(0.57f, 0f)));
+                itemImages[i, 0] = CanvasUtil.CreateImagePanel(gameObject,
+                    RandomizerMod.GetSprite(items[validItems[i]].SpriteName),
+                    new CanvasUtil.RectData(new Vector2(90, 90), Vector2.zero, new Vector2(0.525f, 0f),
+                        new Vector2(0.525f, 0f)));
+                itemImages[i, 1] = CanvasUtil.CreateImagePanel(gameObject, geoSprite,
+                    new CanvasUtil.RectData(new Vector2(50, 50), Vector2.zero, new Vector2(0.57f, 0f),
+                        new Vector2(0.57f, 0f)));
 
-                int cost = (int)(items[validItems[i]].Cost * (items[validItems[i]].DungDiscount ? 0.75f : 1));
-                itemImages[i, 2] = CanvasUtil.CreateTextPanel(gameObject, cost.ToString(), 34, TextAnchor.MiddleCenter, new CanvasUtil.RectData(new Vector2(1920, 1080), Vector2.zero, new Vector2(0.61f, 0f), new Vector2(0.61f, 0f)), FontManager.GetFont("Perpetua"));
+                int cost = (int) (items[validItems[i]].Cost * (items[validItems[i]].DungDiscount ? 0.75f : 1));
+                itemImages[i, 2] = CanvasUtil.CreateTextPanel(gameObject, cost.ToString(), 34, TextAnchor.MiddleCenter,
+                    new CanvasUtil.RectData(new Vector2(1920, 1080), Vector2.zero, new Vector2(0.61f, 0f),
+                        new Vector2(0.61f, 0f)), FontManager.GetFont("Perpetua"));
 
-                if ((type == ShopType.Geo && cost > PlayerData.instance.geo) || (type == ShopType.Essence && cost > PlayerData.instance.dreamOrbs))
+                if (type == ShopType.Geo && cost > PlayerData.instance.geo ||
+                    type == ShopType.Essence && cost > PlayerData.instance.dreamOrbs)
                 {
-                    itemImages[i, 3] = CanvasUtil.CreateImagePanel(gameObject, blackPixel, new CanvasUtil.RectData(new Vector2(300, 100), Vector2.zero, new Vector2(0.57f, 0f), new Vector2(0.57f, 0f)));
+                    itemImages[i, 3] = CanvasUtil.CreateImagePanel(gameObject, blackPixel,
+                        new CanvasUtil.RectData(new Vector2(300, 100), Vector2.zero, new Vector2(0.57f, 0f),
+                            new Vector2(0.57f, 0f)));
                     itemImages[i, 3].GetComponent<Image>().preserveAspect = false;
                 }
             }
@@ -313,7 +327,7 @@ namespace RandomizerMod.Components
             {
                 for (int j = 0; j < itemImages.GetLength(1); j++)
                 {
-                    RandomizerMod.Instance.Log(i + " " + j);
+                    Log(i + " " + j);
                     if (itemImages[i, j] != null)
                     {
                         if (pos >= 0 && pos < DefaultPositions.Length)
@@ -347,20 +361,33 @@ namespace RandomizerMod.Components
 
         private IEnumerator ShowShop()
         {
-            GameObject background = CanvasUtil.CreateImagePanel(gameObject, RandomizerMod.GetSprite("UI.Shop.Background"), new CanvasUtil.RectData(new Vector2(810, 813), Vector2.zero, new Vector2(0.675f, 0.525f), new Vector2(0.675f, 0.525f)));
+            GameObject background = CanvasUtil.CreateImagePanel(gameObject,
+                RandomizerMod.GetSprite("UI.Shop.Background"),
+                new CanvasUtil.RectData(new Vector2(810, 813), Vector2.zero, new Vector2(0.675f, 0.525f),
+                    new Vector2(0.675f, 0.525f)));
 
-            GameObject bottomFleur = CanvasUtil.CreateImagePanel(gameObject, RandomizerMod.GetSprite("Anim.Shop.BottomFleur.0"), new CanvasUtil.RectData(new Vector2(811, 241), Vector2.zero, new Vector2(0.675f, 0.3f), new Vector2(0.675f, 0.3f)));
+            GameObject bottomFleur = CanvasUtil.CreateImagePanel(gameObject,
+                RandomizerMod.GetSprite("Anim.Shop.BottomFleur.0"),
+                new CanvasUtil.RectData(new Vector2(811, 241), Vector2.zero, new Vector2(0.675f, 0.3f),
+                    new Vector2(0.675f, 0.3f)));
             StartCoroutine(AnimateImage(bottomFleur, bottomFrames, 12));
             StartCoroutine(TweenY(bottomFleur, 0.3f, 0.2f, 60, 15));
 
-            GameObject topFleur = CanvasUtil.CreateImagePanel(gameObject, RandomizerMod.GetSprite("Anim.Shop.TopFleur.0"), new CanvasUtil.RectData(new Vector2(808, 198), Vector2.zero, new Vector2(0.675f, 0.6f), new Vector2(0.675f, 0.6f)));
+            GameObject topFleur = CanvasUtil.CreateImagePanel(gameObject,
+                RandomizerMod.GetSprite("Anim.Shop.TopFleur.0"),
+                new CanvasUtil.RectData(new Vector2(808, 198), Vector2.zero, new Vector2(0.675f, 0.6f),
+                    new Vector2(0.675f, 0.6f)));
             StartCoroutine(AnimateImage(topFleur, topFrames, 12));
             StartCoroutine(TweenY(topFleur, 0.6f, 0.85f, 60, 15));
 
             yield return StartCoroutine(CanvasUtil.FadeInCanvasGroup(background.AddComponent<CanvasGroup>()));
 
-            CanvasUtil.CreateImagePanel(gameObject, RandomizerMod.GetSprite("UI.Shop.Selector"), new CanvasUtil.RectData(new Vector2(340, 113), Vector2.zero, new Vector2(0.57f, 0.5825f), new Vector2(0.57f, 0.5825f)));
-            CanvasUtil.CreateImagePanel(gameObject, RandomizerMod.GetSprite("UI.Shop.Shitpost"), new CanvasUtil.RectData(new Vector2(112, 112), Vector2.zero, new Vector2(0.6775f, 0.92f), new Vector2(0.6775f, 0.92f)));
+            CanvasUtil.CreateImagePanel(gameObject, RandomizerMod.GetSprite("UI.Shop.Selector"),
+                new CanvasUtil.RectData(new Vector2(340, 113), Vector2.zero, new Vector2(0.57f, 0.5825f),
+                    new Vector2(0.57f, 0.5825f)));
+            CanvasUtil.CreateImagePanel(gameObject, RandomizerMod.GetSprite("UI.Shop.Shitpost"),
+                new CanvasUtil.RectData(new Vector2(112, 112), Vector2.zero, new Vector2(0.6775f, 0.92f),
+                    new Vector2(0.6775f, 0.92f)));
 
             ResetItems();
 
@@ -378,7 +405,7 @@ namespace RandomizerMod.Components
                     selected--;
                     UpdatePositions();
                 }
-                else if (selected < (validItems.Length - 1) && buttons.down.WasPressed)
+                else if (selected < validItems.Length - 1 && buttons.down.WasPressed)
                 {
                     selected++;
                     UpdatePositions();

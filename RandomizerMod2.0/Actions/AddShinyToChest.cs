@@ -1,34 +1,31 @@
-﻿using System;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using UnityEngine;
 
-using Object = UnityEngine.Object;
-
 namespace RandomizerMod.Actions
 {
-    [Serializable]
     public class AddShinyToChest : RandomizerAction
     {
-        [SerializeField] private string sceneName;
-        [SerializeField] private string objectName;
-        [SerializeField] private string fsmName;
-        [SerializeField] private string newShinyName;
+        private readonly string _fsmName;
+        private readonly string _newShinyName;
+        private readonly string _objectName;
+        private readonly string _sceneName;
 
         public AddShinyToChest(string sceneName, string objectName, string fsmName, string newShinyName)
         {
-            this.sceneName = sceneName;
-            this.objectName = objectName;
-            this.fsmName = fsmName;
-            this.newShinyName = newShinyName;
+            _sceneName = sceneName;
+            _objectName = objectName;
+            _fsmName = fsmName;
+            _newShinyName = newShinyName;
         }
 
         public override ActionType Type => ActionType.PlayMakerFSM;
 
         public override void Process(string scene, Object changeObj)
         {
-            if (scene != sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != fsmName || fsm.gameObject.name != objectName)
+            if (scene != _sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != _fsmName ||
+                fsm.gameObject.name != _objectName)
             {
                 return;
             }
@@ -55,7 +52,7 @@ namespace RandomizerMod.Actions
             shiny.SetActive(false);
             shiny.transform.SetParent(item.transform);
             shiny.transform.position = item.transform.position;
-            shiny.name = newShinyName;
+            shiny.name = _newShinyName;
 
             // Force the new shiny to fling out of the chest
             PlayMakerFSM shinyControl = FSMUtility.LocateFSM(shiny, "Shiny Control");

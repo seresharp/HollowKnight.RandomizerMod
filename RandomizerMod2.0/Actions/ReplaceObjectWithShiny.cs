@@ -1,43 +1,39 @@
-﻿using System;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-using Object = UnityEngine.Object;
-
 namespace RandomizerMod.Actions
 {
-    [Serializable]
     public class ReplaceObjectWithShiny : RandomizerAction
     {
-        [SerializeField] private string sceneName;
-        [SerializeField] private string objectName;
-        [SerializeField] private string newShinyName;
+        private readonly string _newShinyName;
+        private readonly string _objectName;
+        private readonly string _sceneName;
 
         public ReplaceObjectWithShiny(string sceneName, string objectName, string newShinyName)
         {
-            this.sceneName = sceneName;
-            this.objectName = objectName;
-            this.newShinyName = newShinyName;
+            _sceneName = sceneName;
+            _objectName = objectName;
+            _newShinyName = newShinyName;
         }
 
         public override ActionType Type => ActionType.GameObject;
 
         public override void Process(string scene, Object changeObj)
         {
-            if (scene != sceneName)
+            if (scene != _sceneName)
             {
                 return;
             }
 
             Scene currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-            GameObject obj = currentScene.FindGameObject(objectName);
+            GameObject obj = currentScene.FindGameObject(_objectName);
 
             // Put a shiny in the same location as the original
             GameObject shiny = ObjectCache.ShinyItem;
-            shiny.name = newShinyName;
+            shiny.name = _newShinyName;
             if (obj.transform.parent != null)
             {
                 shiny.transform.SetParent(obj.transform.parent);

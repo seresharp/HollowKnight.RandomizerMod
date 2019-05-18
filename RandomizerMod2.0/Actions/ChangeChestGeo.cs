@@ -1,38 +1,33 @@
-﻿using System;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
 using UnityEngine;
 
-using Object = UnityEngine.Object;
-
 namespace RandomizerMod.Actions
 {
-    [Serializable]
     public class ChangeChestGeo : RandomizerAction
     {
-        private const int GEO_VALUE_LARGE = 25;
-        private const int GEO_VALUE_MEDIUM = 5;
+        private readonly string _fsmName;
+        private readonly int _geoAmount;
+        private readonly string _objectName;
 
-        [SerializeField] private string sceneName;
-        [SerializeField] private string objectName;
-        [SerializeField] private string fsmName;
-        [SerializeField] private int geoAmount;
+        private readonly string _sceneName;
 
         public ChangeChestGeo(string sceneName, string objectName, string fsmName, int geoAmount)
         {
-            this.sceneName = sceneName;
-            this.objectName = objectName;
-            this.fsmName = fsmName;
-            this.geoAmount = geoAmount;
+            _sceneName = sceneName;
+            _objectName = objectName;
+            _fsmName = fsmName;
+            _geoAmount = geoAmount;
         }
 
         public override ActionType Type => ActionType.PlayMakerFSM;
 
         public override void Process(string scene, Object changeObj)
         {
-            if (scene != sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != fsmName || fsm.gameObject.name != objectName)
+            if (scene != _sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != _fsmName ||
+                fsm.gameObject.name != _objectName)
             {
                 return;
             }
@@ -44,7 +39,7 @@ namespace RandomizerMod.Actions
 
             // Add geo to chest
             // Chest geo pool cannot be trusted, often spawns less than it should
-            spawnItems.AddAction(new RandomizerAddGeo(fsm.gameObject, geoAmount));
+            spawnItems.AddAction(new RandomizerAddGeo(fsm.gameObject, _geoAmount));
 
             // Remove pre-existing geo from chest
             foreach (FlingObjectsFromGlobalPool fling in spawnItems.GetActionsOfType<FlingObjectsFromGlobalPool>())

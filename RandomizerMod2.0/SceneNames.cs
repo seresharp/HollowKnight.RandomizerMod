@@ -1,4 +1,7 @@
-﻿namespace RandomizerMod
+﻿// ReSharper disable file InconsistentNaming
+// ReSharper disable file UnusedMember.Global
+
+namespace RandomizerMod
 {
     // Names as constants so I don't misspell them
     internal static class SceneNames

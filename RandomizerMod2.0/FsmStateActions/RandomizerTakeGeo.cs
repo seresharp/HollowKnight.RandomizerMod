@@ -4,7 +4,7 @@ namespace RandomizerMod.FsmStateActions
 {
     internal class RandomizerTakeGeo : FsmStateAction
     {
-        private int amount;
+        private readonly int amount;
 
         public RandomizerTakeGeo(int amount)
         {

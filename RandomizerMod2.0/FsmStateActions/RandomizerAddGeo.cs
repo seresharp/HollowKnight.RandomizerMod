@@ -1,8 +1,6 @@
-﻿using System;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 using UnityEngine;
-
-using Object = UnityEngine.Object;
+using Random = System.Random;
 
 namespace RandomizerMod.FsmStateActions
 {
@@ -11,9 +9,9 @@ namespace RandomizerMod.FsmStateActions
         private const int GEO_VALUE_LARGE = 25;
         private const int GEO_VALUE_MEDIUM = 5;
 
-        private GameObject gameObject;
+        private readonly GameObject gameObject;
+        private readonly bool minimize;
         private int count;
-        private bool minimize;
 
         public RandomizerAddGeo(GameObject baseObj, int amount, bool minimizeObjects = false)
         {
@@ -44,11 +42,11 @@ namespace RandomizerMod.FsmStateActions
 
             if (!minimize)
             {
-                System.Random random = new System.Random();
+                Random random = new Random();
 
                 smallNum = random.Next(0, count / 10);
                 count -= smallNum;
-                largeNum = random.Next(count / (GEO_VALUE_LARGE * 2), (count / GEO_VALUE_LARGE) + 1);
+                largeNum = random.Next(count / (GEO_VALUE_LARGE * 2), count / GEO_VALUE_LARGE + 1);
                 count -= largeNum * GEO_VALUE_LARGE;
                 medNum = count / GEO_VALUE_MEDIUM;
                 count -= medNum * 5;
@@ -76,7 +74,7 @@ namespace RandomizerMod.FsmStateActions
             mediumPrefab.SetActive(true);
             largePrefab.SetActive(true);
 
-            FlingUtils.Config flingConfig = new FlingUtils.Config()
+            FlingUtils.Config flingConfig = new FlingUtils.Config
             {
                 Prefab = smallPrefab,
                 AmountMin = smallNum,
@@ -88,7 +86,8 @@ namespace RandomizerMod.FsmStateActions
             };
 
             // Special case for thorns of agony, spore shroom, flukenest to stop geo from flying into unreachable spots
-            if (sceneName == SceneNames.Fungus1_14 || sceneName == SceneNames.Fungus2_20 || sceneName == SceneNames.Waterways_12)
+            if (sceneName == SceneNames.Fungus1_14 || sceneName == SceneNames.Fungus2_20 ||
+                sceneName == SceneNames.Waterways_12)
             {
                 flingConfig.AngleMin = 90;
                 flingConfig.AngleMax = 90;

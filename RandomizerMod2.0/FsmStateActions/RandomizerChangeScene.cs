@@ -1,14 +1,17 @@
 ﻿using System.Reflection;
+using GlobalEnums;
 using HutongGames.PlayMaker;
 
 namespace RandomizerMod.FsmStateActions
 {
     internal class RandomizerChangeScene : FsmStateAction
     {
-        private static FieldInfo sceneLoad = typeof(GameManager).GetField("sceneLoad", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo sceneLoad =
+            typeof(GameManager).GetField("sceneLoad", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        private string sceneName;
-        private string gateName;
+        private readonly string gateName;
+
+        private readonly string sceneName;
 
         public RandomizerChangeScene(string scene, string gate)
         {
@@ -39,7 +42,7 @@ namespace RandomizerMod.FsmStateActions
                 GameManager.instance.StopAllCoroutines();
                 sceneLoad.SetValue(GameManager.instance, null);
 
-                GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo()
+                GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo
                 {
                     IsFirstLevelForPlayer = false,
                     SceneName = sceneName,
@@ -53,7 +56,7 @@ namespace RandomizerMod.FsmStateActions
                 });
             }
 
-            SceneLoad load = (SceneLoad)sceneLoad.GetValue(GameManager.instance);
+            SceneLoad load = (SceneLoad) sceneLoad.GetValue(GameManager.instance);
             if (load != null)
             {
                 load.Finish += loadScene;
@@ -64,34 +67,34 @@ namespace RandomizerMod.FsmStateActions
             }
         }
 
-        private GlobalEnums.GatePosition GetGatePosition(string name)
+        private GatePosition GetGatePosition(string name)
         {
             if (name.Contains("top"))
             {
-                return GlobalEnums.GatePosition.top;
+                return GatePosition.top;
             }
 
             if (name.Contains("bot"))
             {
-                return GlobalEnums.GatePosition.bottom;
+                return GatePosition.bottom;
             }
 
             if (name.Contains("left"))
             {
-                return GlobalEnums.GatePosition.left;
+                return GatePosition.left;
             }
 
             if (name.Contains("right"))
             {
-                return GlobalEnums.GatePosition.right;
+                return GatePosition.right;
             }
 
             if (name.Contains("door"))
             {
-                return GlobalEnums.GatePosition.door;
+                return GatePosition.door;
             }
 
-            return GlobalEnums.GatePosition.unknown;
+            return GatePosition.unknown;
         }
     }
 }

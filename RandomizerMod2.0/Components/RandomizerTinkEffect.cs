@@ -1,13 +1,11 @@
-﻿using System;
-using UnityEngine;
-
+﻿using UnityEngine;
 using Random = System.Random;
 
 namespace RandomizerMod.Components
 {
     internal class RandomizerTinkEffect : MonoBehaviour
     {
-        private static Random rnd = new Random();
+        private static readonly Random rnd = new Random();
 
         private float nextTime;
 

@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 
 namespace RandomizerMod.FsmStateActions
 {
     internal class RandomizerBoolTest : FsmStateAction
     {
-        private string boolName;
-        private FsmEvent failEvent;
-        private FsmEvent successEvent;
-        private bool playerdata;
+        private readonly string boolName;
+        private readonly FsmEvent failEvent;
+        private readonly bool playerdata;
+        private readonly FsmEvent successEvent;
 
-        public RandomizerBoolTest(string boolName, string failEventName, string successEventName, bool playerdata = false)
+        public RandomizerBoolTest(string boolName, string failEventName, string successEventName,
+            bool playerdata = false)
         {
             this.boolName = boolName;
             this.playerdata = playerdata;
@@ -53,7 +50,8 @@ namespace RandomizerMod.FsmStateActions
 
         public override void OnEnter()
         {
-            if ((playerdata && PlayerData.instance.GetBool(boolName)) || (!playerdata && RandomizerMod.Instance.Settings.GetBool(false, boolName)))
+            if (playerdata && PlayerData.instance.GetBool(boolName) ||
+                !playerdata && RandomizerMod.Instance.Settings.GetBool(false, boolName))
             {
                 if (successEvent != null)
                 {

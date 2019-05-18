@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
+using Language;
+using static RandomizerMod.LogHelper;
 
 namespace RandomizerMod
 {
     internal static class LanguageStringManager
     {
-        private static Dictionary<string, Dictionary<string, string>> languageStrings = new Dictionary<string, Dictionary<string, string>>();
-        private static Random rnd = new Random();
+        private static readonly Dictionary<string, Dictionary<string, string>> LanguageStrings =
+            new Dictionary<string, Dictionary<string, string>>();
+
+        private static readonly Random Rnd = new Random();
 
         public static void LoadLanguageXML(Stream xmlStream)
         {
@@ -18,15 +22,28 @@ namespace RandomizerMod
             xml.Load(xmlStream);
             xmlStream.Dispose();
 
-            foreach (XmlNode node in xml.SelectNodes("Language/entry"))
+            XmlNodeList nodes = xml.SelectNodes("Language/entry");
+            if (nodes == null)
             {
-                string sheet = node.Attributes["sheet"].Value;
-                string key = node.Attributes["key"].Value;
+                LogWarn("Malformatted language xml, no nodes that match Language/entry");
+                return;
+            }
+
+            foreach (XmlNode node in nodes)
+            {
+                string sheet = node.Attributes?["sheet"]?.Value;
+                string key = node.Attributes?["key"]?.Value;
+
+                if (sheet == null || key == null)
+                {
+                    LogWarn("Malformatted language xml, missing sheet or key on node");
+                    continue;
+                }
 
                 SetString(sheet, key, node.InnerText.Replace("\\n", "\n"));
             }
 
-            RandomizerMod.Instance.Log("Language xml processed");
+            Log("Language xml processed");
         }
 
         public static void SetString(string sheetName, string key, string text)
@@ -36,10 +53,10 @@ namespace RandomizerMod
                 return;
             }
 
-            if (!languageStrings.TryGetValue(sheetName, out Dictionary<string, string> sheet))
+            if (!LanguageStrings.TryGetValue(sheetName, out Dictionary<string, string> sheet))
             {
                 sheet = new Dictionary<string, string>();
-                languageStrings.Add(sheetName, sheet);
+                LanguageStrings.Add(sheetName, sheet);
             }
 
             sheet[key] = text;
@@ -52,7 +69,7 @@ namespace RandomizerMod
                 return;
             }
 
-            if (languageStrings.TryGetValue(sheetName, out Dictionary<string, string> sheet) && sheet.ContainsKey(key))
+            if (LanguageStrings.TryGetValue(sheetName, out Dictionary<string, string> sheet) && sheet.ContainsKey(key))
             {
                 sheet.Remove(key);
             }
@@ -67,9 +84,9 @@ namespace RandomizerMod
 
             if (DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
             {
-                if (Language.Language.CurrentLanguage() != Language.LanguageCode.EN)
+                if (Language.Language.CurrentLanguage() != LanguageCode.EN)
                 {
-                    Language.Language.SwitchLanguage(Language.LanguageCode.EN);
+                    Language.Language.SwitchLanguage(LanguageCode.EN);
                 }
 
                 string normal;
@@ -77,44 +94,44 @@ namespace RandomizerMod
                 {
                     normal = Language.Language.GetInternal(key, sheetTitle);
                 }
-                else if (languageStrings.ContainsKey(sheetTitle) && languageStrings[sheetTitle].ContainsKey(key))
+                else if (LanguageStrings.ContainsKey(sheetTitle) && LanguageStrings[sheetTitle].ContainsKey(key))
                 {
-                    normal = languageStrings[sheetTitle][key];
+                    normal = LanguageStrings[sheetTitle][key];
                 }
                 else
                 {
                     normal = "#!#" + key + "#!#";
                 }
-                
+
                 StringBuilder shitpost = new StringBuilder();
                 bool special = false;
-                for (int i = 0; i < normal.Length; i++)
+                foreach (char c in normal)
                 {
-                    if (!special && normal[i] >= 'a' && normal[i] <= 'z')
+                    if (!special && c >= 'a' && c <= 'z')
                     {
-                        shitpost.Append((char)('a' + rnd.Next(26)));
+                        shitpost.Append((char) ('a' + Rnd.Next(26)));
                     }
-                    else if (!special && normal[i] >= 'A' && normal[i] <= 'Z')
+                    else if (!special && c >= 'A' && c <= 'Z')
                     {
-                        shitpost.Append((char)('A' + rnd.Next(26)));
+                        shitpost.Append((char) ('A' + Rnd.Next(26)));
                     }
                     else
                     {
-                        if (normal[i] == '<' || normal[i] == '>')
+                        if (c == '<' || c == '>')
                         {
                             special = !special;
                         }
 
-                        shitpost.Append(normal[i]);
+                        shitpost.Append(c);
                     }
                 }
 
                 return shitpost.ToString();
             }
 
-            if (languageStrings.ContainsKey(sheetTitle) && languageStrings[sheetTitle].ContainsKey(key))
+            if (LanguageStrings.ContainsKey(sheetTitle) && LanguageStrings[sheetTitle].ContainsKey(key))
             {
-                return languageStrings[sheetTitle][key];
+                return LanguageStrings[sheetTitle][key];
             }
 
             return Language.Language.GetInternal(key, sheetTitle);

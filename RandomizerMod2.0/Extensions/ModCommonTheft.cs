@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static RandomizerMod.LogHelper;
 
 namespace RandomizerMod.Extensions
 {
@@ -37,7 +38,7 @@ namespace RandomizerMod.Extensions
                 return null;
             }
 
-            foreach (var t in gameObject.GetComponentsInChildren<Transform>(true))
+            foreach (Transform t in gameObject.GetComponentsInChildren<Transform>(true))
             {
                 if (t.name == name)
                 {
@@ -73,7 +74,7 @@ namespace RandomizerMod.Extensions
             }
             catch (Exception e)
             {
-                RandomizerMod.Instance.Log("FindGameObject failed:\n" + e.Message);
+                Log("FindGameObject failed:\n" + e.Message);
             }
 
             return null;

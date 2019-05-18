@@ -1,30 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using Modding;
+using RandomizerMod.Actions;
+using RandomizerMod.Randomization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
 using Object = UnityEngine.Object;
 
 namespace RandomizerMod
 {
-    public class RandomizerMod : Mod<SaveSettings>
+    public class RandomizerMod : Mod
     {
-        private static Dictionary<string, Sprite> sprites;
-        private static Dictionary<string, string> secondaryBools;
+        private static Dictionary<string, Sprite> _sprites;
+        private static Dictionary<string, string> _secondaryBools;
 
-        private static Thread logicParseThread;
+        private static Thread _logicParseThread;
 
         public static RandomizerMod Instance { get; private set; }
 
-        [SuppressMessage(
-            "Microsoft.StyleCop.CSharp.OrderingRules",
-            "SA1204:StaticElementsMustAppearBeforeInstanceElements",
-            Justification = "Initialize is essentially the class constructor")]
+        public SaveSettings Settings { get; set; } = new SaveSettings();
+
+        public override ModSettings SaveSettings
+        {
+            get => Settings = Settings ?? new SaveSettings();
+            set => Settings = value is SaveSettings saveSettings ? saveSettings : Settings;
+        }
+
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloaded)
         {
             if (Instance != null)
@@ -42,7 +46,7 @@ namespace RandomizerMod
             // Unlock godseeker too because idk why not
             GameManager.instance.SetStatusRecordInt("RecBossRushMode", 1);
 
-            sprites = new Dictionary<string, Sprite>();
+            _sprites = new Dictionary<string, Sprite>();
 
             // Load logo and xml from embedded resources
             Assembly randoDLL = GetType().Assembly;
@@ -52,6 +56,12 @@ namespace RandomizerMod
                 {
                     // Read bytes of image
                     Stream imageStream = randoDLL.GetManifestResourceStream(res);
+
+                    if (imageStream == null)
+                    {
+                        continue;
+                    }
+
                     byte[] buffer = new byte[imageStream.Length];
                     imageStream.Read(buffer, 0, buffer.Length);
                     imageStream.Dispose();
@@ -61,7 +71,7 @@ namespace RandomizerMod
                     tex.LoadImage(buffer, true);
 
                     // Create sprite from texture
-                    sprites.Add(
+                    _sprites.Add(
                         Path.GetFileNameWithoutExtension(res.Replace("RandomizerMod.Resources.", string.Empty)),
                         Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f)));
 
@@ -82,8 +92,8 @@ namespace RandomizerMod
                 else if (res.EndsWith("items.xml"))
                 {
                     // Thread the xml parsing because it's kinda slow
-                    logicParseThread = new Thread(Randomization.LogicManager.ParseXML);
-                    logicParseThread.Start(randoDLL.GetManifestResourceStream(res));
+                    _logicParseThread = new Thread(LogicManager.ParseXML);
+                    _logicParseThread.Start(randoDLL.GetManifestResourceStream(res));
                 }
                 else
                 {
@@ -98,7 +108,7 @@ namespace RandomizerMod
             ModHooks.Instance.GetPlayerBoolHook += BoolGetOverride;
             ModHooks.Instance.SetPlayerBoolHook += BoolSetOverride;
 
-            Actions.RandomizerAction.Hook();
+            RandomizerAction.Hook();
             BenchHandler.Hook();
             MiscSceneChanges.Hook();
 
@@ -109,29 +119,34 @@ namespace RandomizerMod
             FontManager.LoadFonts();
 
             // Some items have two bools for no reason, gotta deal with that
-            secondaryBools = new Dictionary<string, string>();
+            _secondaryBools = new Dictionary<string, string>
+            {
+                {nameof(PlayerData.hasDash), nameof(PlayerData.canDash)},
+                {nameof(PlayerData.hasShadowDash), nameof(PlayerData.canShadowDash)},
+                {nameof(PlayerData.hasSuperDash), nameof(PlayerData.canSuperDash)},
+                {nameof(PlayerData.hasWalljump), nameof(PlayerData.canWallJump)},
+                {nameof(PlayerData.gotCharm_23), nameof(PlayerData.fragileHealth_unbreakable)},
+                {nameof(PlayerData.gotCharm_24), nameof(PlayerData.fragileGreed_unbreakable)},
+                {nameof(PlayerData.gotCharm_25), nameof(PlayerData.fragileStrength_unbreakable)}
+            };
 
-            secondaryBools.Add(nameof(PlayerData.hasDash), nameof(PlayerData.canDash));
-            secondaryBools.Add(nameof(PlayerData.hasShadowDash), nameof(PlayerData.canShadowDash));
-            secondaryBools.Add(nameof(PlayerData.hasSuperDash), nameof(PlayerData.canSuperDash));
-            secondaryBools.Add(nameof(PlayerData.hasWalljump), nameof(PlayerData.canWallJump));
 
             // Marking unbreakable charms as secondary too to make shade skips viable
-            secondaryBools.Add(nameof(PlayerData.gotCharm_23), nameof(PlayerData.fragileHealth_unbreakable));
-            secondaryBools.Add(nameof(PlayerData.gotCharm_24), nameof(PlayerData.fragileGreed_unbreakable));
-            secondaryBools.Add(nameof(PlayerData.gotCharm_25), nameof(PlayerData.fragileStrength_unbreakable));
         }
 
-        public override List<(string, string)> GetPreloadNames() => new List<(string, string)>()
+        public override List<(string, string)> GetPreloadNames()
         {
-            (SceneNames.Tutorial_01, "_Props/Chest/Item/Shiny Item (1)"),
-            (SceneNames.Tutorial_01, "_Enemies/Crawler 1"),
-            (SceneNames.Tutorial_01, "_Props/Cave Spikes (1)")
-        };
+            return new List<(string, string)>
+            {
+                (SceneNames.Tutorial_01, "_Props/Chest/Item/Shiny Item (1)"),
+                (SceneNames.Tutorial_01, "_Enemies/Crawler 1"),
+                (SceneNames.Tutorial_01, "_Props/Cave Spikes (1)")
+            };
+        }
 
         public static Sprite GetSprite(string name)
         {
-            if (sprites != null && sprites.TryGetValue(name, out Sprite sprite))
+            if (_sprites != null && _sprites.TryGetValue(name, out Sprite sprite))
             {
                 return sprite;
             }
@@ -141,7 +156,7 @@ namespace RandomizerMod
 
         public static bool LoadComplete()
         {
-            return logicParseThread == null || !logicParseThread.IsAlive;
+            return _logicParseThread == null || !_logicParseThread.IsAlive;
         }
 
         public void StartNewGame()
@@ -163,24 +178,24 @@ namespace RandomizerMod
                 PlayerData.instance.zoteRescuedDeepnest = true;
             }
 
-            if (Settings.Randomizer)
+            if (!Settings.Randomizer)
             {
-                if (!LoadComplete())
-                {
-                    logicParseThread.Join();
-                }
+                return;
+            }
 
-                try
-                {
-                    Randomization.Randomizer.Randomize();
-                }
-                catch (Exception e)
-                {
-                    LogError("Error in randomization:\n" + e);
-                }
+            if (!LoadComplete())
+            {
+                _logicParseThread.Join();
+            }
 
-                Settings.actions = new List<Actions.RandomizerAction>();
-                Settings.actions.AddRange(Randomization.Randomizer.Actions);
+            try
+            {
+                Randomizer.Randomize();
+                RandomizerAction.CreateActions(Settings.ItemPlacements);
+            }
+            catch (Exception e)
+            {
+                LogError("Error in randomization:\n" + e);
             }
         }
 
@@ -198,7 +213,7 @@ namespace RandomizerMod
             return ver;
         }
 
-        private void UpdateCharmNotches(PlayerData pd, HeroController controller)
+        private void UpdateCharmNotches(PlayerData pd)
         {
             // Update charm notches
             if (Settings.CharmNotch)
@@ -241,78 +256,130 @@ namespace RandomizerMod
             }
         }
 
-#warning Fix this mess
-        [SuppressMessage(
-            "Microsoft.StyleCop.CSharp.LayoutRules",
-            "SA1503:CurlyBracketsMustNotBeOmitted",
-            Justification = "Suppressing to turn into one warning. I'll deal with this mess later")]
         private bool BoolGetOverride(string boolName)
         {
             // Fake spell bools
-            if (boolName == "hasVengefulSpirit") return PlayerData.instance.fireballLevel > 0;
-            if (boolName == "hasShadeSoul") return PlayerData.instance.fireballLevel > 1;
-            if (boolName == "hasDesolateDive") return PlayerData.instance.quakeLevel > 0;
-            if (boolName == "hasDescendingDark") return PlayerData.instance.quakeLevel > 1;
-            if (boolName == "hasHowlingWraiths") return PlayerData.instance.screamLevel > 0;
-            if (boolName == "hasAbyssShriek") return PlayerData.instance.screamLevel > 1;
+            if (boolName == "hasVengefulSpirit")
+            {
+                return PlayerData.instance.fireballLevel > 0;
+            }
+
+            if (boolName == "hasShadeSoul")
+            {
+                return PlayerData.instance.fireballLevel > 1;
+            }
+
+            if (boolName == "hasDesolateDive")
+            {
+                return PlayerData.instance.quakeLevel > 0;
+            }
+
+            if (boolName == "hasDescendingDark")
+            {
+                return PlayerData.instance.quakeLevel > 1;
+            }
+
+            if (boolName == "hasHowlingWraiths")
+            {
+                return PlayerData.instance.screamLevel > 0;
+            }
+
+            if (boolName == "hasAbyssShriek")
+            {
+                return PlayerData.instance.screamLevel > 1;
+            }
 
             // This variable is incredibly stubborn, not worth the effort to make it cooperate
             // Just override it completely
-            if (boolName == nameof(PlayerData.gotSlyCharm) && Settings.Randomizer) return Settings.SlyCharm;
+            if (boolName == nameof(PlayerData.gotSlyCharm) && Settings.Randomizer)
+            {
+                return Settings.SlyCharm;
+            }
 
-            if (boolName.StartsWith("RandomizerMod.")) return Settings.GetBool(false, boolName.Substring(14));
+            if (boolName.StartsWith("RandomizerMod."))
+            {
+                return Settings.GetBool(false, boolName.Substring(14));
+            }
 
             return PlayerData.instance.GetBoolInternal(boolName);
         }
 
-        [SuppressMessage(
-            "Microsoft.StyleCop.CSharp.LayoutRules",
-            "SA1503:CurlyBracketsMustNotBeOmitted",
-            Justification = "Suppressing to turn into one warning. I'll deal with this mess later")]
         private void BoolSetOverride(string boolName, bool value)
         {
             PlayerData pd = PlayerData.instance;
 
             // It's just way easier if I can treat spells as bools
-            if (boolName == "hasVengefulSpirit" && value && pd.fireballLevel <= 0) pd.SetInt("fireballLevel", 1);
-            else if (boolName == "hasVengefulSpirit" && !value) pd.SetInt("fireballLevel", 0);
-            else if (boolName == "hasShadeSoul" && value) pd.SetInt("fireballLevel", 2);
-            else if (boolName == "hasShadeSoul" && !value && pd.fireballLevel >= 2) pd.SetInt("fireballLevel", 1);
-            else if (boolName == "hasDesolateDive" && value && pd.quakeLevel <= 0) pd.SetInt("quakeLevel", 1);
-            else if (boolName == "hasDesolateDive" && !value) pd.SetInt("quakeLevel", 0);
-            else if (boolName == "hasDescendingDark" && value) pd.SetInt("quakeLevel", 2);
-            else if (boolName == "hasDescendingDark" && !value && pd.quakeLevel >= 2) pd.SetInt("quakeLevel", 1);
-            else if (boolName == "hasHowlingWraiths" && value && pd.screamLevel <= 0) pd.SetInt("screamLevel", 1);
-            else if (boolName == "hasHowlingWraiths" && !value) pd.SetInt("screamLevel", 0);
-            else if (boolName == "hasAbyssShriek" && value) pd.SetInt("screamLevel", 2);
-            else if (boolName == "hasAbyssShriek" && !value && pd.screamLevel >= 2) pd.SetInt("screamLevel", 1);
+            if (boolName == "hasVengefulSpirit" && value && pd.fireballLevel <= 0)
+            {
+                pd.SetInt("fireballLevel", 1);
+            }
+            else if (boolName == "hasVengefulSpirit" && !value)
+            {
+                pd.SetInt("fireballLevel", 0);
+            }
+            else if (boolName == "hasShadeSoul" && value)
+            {
+                pd.SetInt("fireballLevel", 2);
+            }
+            else if (boolName == "hasShadeSoul" && !value && pd.fireballLevel >= 2)
+            {
+                pd.SetInt("fireballLevel", 1);
+            }
+            else if (boolName == "hasDesolateDive" && value && pd.quakeLevel <= 0)
+            {
+                pd.SetInt("quakeLevel", 1);
+            }
+            else if (boolName == "hasDesolateDive" && !value)
+            {
+                pd.SetInt("quakeLevel", 0);
+            }
+            else if (boolName == "hasDescendingDark" && value)
+            {
+                pd.SetInt("quakeLevel", 2);
+            }
+            else if (boolName == "hasDescendingDark" && !value && pd.quakeLevel >= 2)
+            {
+                pd.SetInt("quakeLevel", 1);
+            }
+            else if (boolName == "hasHowlingWraiths" && value && pd.screamLevel <= 0)
+            {
+                pd.SetInt("screamLevel", 1);
+            }
+            else if (boolName == "hasHowlingWraiths" && !value)
+            {
+                pd.SetInt("screamLevel", 0);
+            }
+            else if (boolName == "hasAbyssShriek" && value)
+            {
+                pd.SetInt("screamLevel", 2);
+            }
+            else if (boolName == "hasAbyssShriek" && !value && pd.screamLevel >= 2)
+            {
+                pd.SetInt("screamLevel", 1);
+            }
             else if (boolName.StartsWith("RandomizerMod."))
             {
                 boolName = boolName.Substring(14);
-                if (boolName.StartsWith("ShopFireball")) pd.IncrementInt("fireballLevel");
-                else if (boolName.StartsWith("ShopQuake")) pd.IncrementInt("quakeLevel");
-                else if (boolName.StartsWith("ShopScream")) pd.IncrementInt("screamLevel");
+                if (boolName.StartsWith("ShopFireball"))
+                {
+                    pd.IncrementInt("fireballLevel");
+                }
+                else if (boolName.StartsWith("ShopQuake"))
+                {
+                    pd.IncrementInt("quakeLevel");
+                }
+                else if (boolName.StartsWith("ShopScream"))
+                {
+                    pd.IncrementInt("screamLevel");
+                }
                 else if (boolName.StartsWith("ShopDash"))
                 {
-                    if (pd.hasDash)
-                    {
-                        pd.SetBool("hasShadowDash", true);
-                    }
-                    else
-                    {
-                        pd.SetBool("hasDash", true);
-                    }
+                    pd.SetBool(pd.hasDash ? "hasShadowDash" : "hasDash", true);
                 }
                 else if (boolName.StartsWith("ShopDreamNail"))
                 {
-                    if (pd.hasDreamNail)
-                    {
-                        pd.SetBool(nameof(PlayerData.hasDreamGate), true);
-                    }
-                    else
-                    {
-                        pd.SetBool(nameof(PlayerData.hasDreamNail), true);
-                    }
+                    pd.SetBool(pd.hasDreamNail ? nameof(PlayerData.hasDreamGate) : nameof(PlayerData.hasDreamNail),
+                        true);
                 }
 
                 Settings.SetBool(value, boolName);
@@ -323,12 +390,13 @@ namespace RandomizerMod
             pd.SetBoolInternal(boolName, value);
 
             // Check if there is a secondary bool for this item
-            if (secondaryBools.TryGetValue(boolName, out string secondaryBoolName))
+            if (_secondaryBools.TryGetValue(boolName, out string secondaryBoolName))
             {
                 pd.SetBool(secondaryBoolName, value);
             }
 
-            if (boolName == nameof(PlayerData.hasCyclone) || boolName == nameof(PlayerData.hasUpwardSlash) || boolName == nameof(PlayerData.hasDashSlash))
+            if (boolName == nameof(PlayerData.hasCyclone) || boolName == nameof(PlayerData.hasUpwardSlash) ||
+                boolName == nameof(PlayerData.hasDashSlash))
             {
                 // Make nail arts work
                 bool hasCyclone = pd.GetBool(nameof(PlayerData.hasCyclone));
@@ -341,7 +409,8 @@ namespace RandomizerMod
             else if (boolName == nameof(PlayerData.hasDreamGate) && value)
             {
                 // Make sure the player can actually use dream gate after getting it
-                FSMUtility.LocateFSM(HeroController.instance.gameObject, "Dream Nail").FsmVariables.GetFsmBool("Dream Warp Allowed").Value = true;
+                FSMUtility.LocateFSM(HeroController.instance.gameObject, "Dream Nail").FsmVariables
+                    .GetFsmBool("Dream Warp Allowed").Value = true;
             }
             else if (boolName == nameof(PlayerData.hasAcidArmour) && value)
             {
@@ -351,7 +420,7 @@ namespace RandomizerMod
             else if (boolName.StartsWith("gotCharm_"))
             {
                 // Check for Salubra notches if it's a charm
-                UpdateCharmNotches(pd, HeroController.instance);
+                UpdateCharmNotches(pd);
             }
         }
 
@@ -371,6 +440,7 @@ namespace RandomizerMod
             {
                 // Reset settings on menu load
                 Settings = new SaveSettings();
+                RandomizerAction.ClearActions();
 
                 try
                 {
@@ -381,7 +451,8 @@ namespace RandomizerMod
                     LogError("Error editing menu:\n" + e);
                 }
             }
-            else if (GameManager.instance.GetSceneNameString() == SceneNames.End_Credits && Settings != null && Settings.Randomizer && Settings.itemPlacements.Count != 0)
+            else if (GameManager.instance.GetSceneNameString() == SceneNames.End_Credits && Settings != null &&
+                     Settings.Randomizer && Settings.ItemPlacements.Length != 0)
             {
 #warning Unfinished functionality here
                 /*foreach (GameObject obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
@@ -391,9 +462,9 @@ namespace RandomizerMod
 
                 GameObject canvas = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
                 float y = -30;
-                foreach (KeyValuePair<string, string> item in Settings.itemPlacements)
+                foreach (KeyValuePair<string, string> item in saveSettings.itemPlacements)
                 {
-                    y -= 1020 / Settings.itemPlacements.Count;
+                    y -= 1020 / saveSettings.itemPlacements.Count;
                     CanvasUtil.CreateTextPanel(canvas, item.Key + " - " + item.Value, 16, TextAnchor.UpperLeft, new CanvasUtil.RectData(new Vector2(1920, 50), new Vector2(0, y), new Vector2(0, 1), new Vector2(0, 1), new Vector2(0f, 0f)), FontManager.GetFont("Perpetua"));
                 }*/
             }
@@ -410,7 +481,7 @@ namespace RandomizerMod
                         Object.DestroyImmediate(oldShiny);
                     }
 
-                    EditShinies(to);
+                    RandomizerAction.EditShinies();
                 }
                 catch (Exception e)
                 {
@@ -426,26 +497,6 @@ namespace RandomizerMod
             catch (Exception e)
             {
                 LogError($"Error applying changes to scene {to.name}:\n" + e);
-            }
-        }
-
-        private void EditShinies(Scene to)
-        {
-            string scene = GameManager.instance.GetSceneNameString();
-
-            foreach (Actions.RandomizerAction action in Settings.actions)
-            {
-                if (action.Type == Actions.RandomizerAction.ActionType.GameObject)
-                {
-                    try
-                    {
-                        action.Process(scene, null);
-                    }
-                    catch (Exception e)
-                    {
-                        LogError($"Error processing action of type {action.GetType()}:\n{JsonUtility.ToJson(action)}\n{e}");
-                    }
-                }
             }
         }
     }

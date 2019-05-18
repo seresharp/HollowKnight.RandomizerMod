@@ -1,53 +1,51 @@
-﻿using System;
-using HutongGames.PlayMaker.Actions;
+﻿using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
 using UnityEngine;
 
-using Object = UnityEngine.Object;
-
 namespace RandomizerMod.Actions
 {
-    [Serializable]
     internal class ChangeBoolTest : RandomizerAction
     {
-        [SerializeField] private string sceneName;
-        [SerializeField] private string objectName;
-        [SerializeField] private string fsmName;
-        [SerializeField] private string stateName;
-        [SerializeField] private string boolName;
-        [SerializeField] private bool playerdata;
+        private readonly string _boolName;
+        private readonly string _fsmName;
+        private readonly string _objectName;
+        private readonly bool _playerdata;
+        private readonly string _sceneName;
+        private readonly string _stateName;
 
-        public ChangeBoolTest(string sceneName, string objectName, string fsmName, string stateName, string boolName, bool playerdata = false)
+        public ChangeBoolTest(string sceneName, string objectName, string fsmName, string stateName, string boolName,
+            bool playerdata = false)
         {
-            this.sceneName = sceneName;
-            this.objectName = objectName;
-            this.fsmName = fsmName;
-            this.stateName = stateName;
-            this.boolName = boolName;
-            this.playerdata = playerdata;
+            _sceneName = sceneName;
+            _objectName = objectName;
+            _fsmName = fsmName;
+            _stateName = stateName;
+            _boolName = boolName;
+            _playerdata = playerdata;
         }
 
         public override ActionType Type => ActionType.PlayMakerFSM;
 
         public override void Process(string scene, Object changeObj)
         {
-            if (scene != sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != fsmName || fsm.gameObject.name != objectName)
+            if (scene != _sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != _fsmName ||
+                fsm.gameObject.name != _objectName)
             {
                 return;
             }
 
-            PlayerDataBoolTest pdBoolTest = fsm.GetState(stateName).GetActionsOfType<PlayerDataBoolTest>()[0];
+            PlayerDataBoolTest pdBoolTest = fsm.GetState(_stateName).GetActionsOfType<PlayerDataBoolTest>()[0];
 
-            if (playerdata)
+            if (_playerdata)
             {
-                pdBoolTest.boolName = boolName;
+                pdBoolTest.boolName = _boolName;
             }
             else
             {
-                RandomizerBoolTest boolTest = new RandomizerBoolTest(boolName, pdBoolTest.isFalse, pdBoolTest.isTrue);
-                fsm.GetState(stateName).RemoveActionsOfType<PlayerDataBoolTest>();
-                fsm.GetState(stateName).AddFirstAction(boolTest);
+                RandomizerBoolTest boolTest = new RandomizerBoolTest(_boolName, pdBoolTest.isFalse, pdBoolTest.isTrue);
+                fsm.GetState(_stateName).RemoveActionsOfType<PlayerDataBoolTest>();
+                fsm.GetState(_stateName).AddFirstAction(boolTest);
             }
         }
     }

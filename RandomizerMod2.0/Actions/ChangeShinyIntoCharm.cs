@@ -3,20 +3,17 @@ using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
-using UnityEngine;
-
 using Object = UnityEngine.Object;
 
 namespace RandomizerMod.Actions
 {
-    [Serializable]
     public class ChangeShinyIntoCharm : RandomizerAction
     {
-        [SerializeField] private string sceneName;
-        [SerializeField] private string objectName;
-        [SerializeField] private string fsmName;
-        [SerializeField] private int charmNum;
-        [SerializeField] private string boolName;
+        private readonly string _boolName;
+        private readonly int _charmNum;
+        private readonly string _fsmName;
+        private readonly string _objectName;
+        private readonly string _sceneName;
 
         public ChangeShinyIntoCharm(string sceneName, string objectName, string fsmName, string boolName)
             : this(sceneName, objectName, fsmName, Convert.ToInt32(boolName.Substring(9)))
@@ -25,19 +22,20 @@ namespace RandomizerMod.Actions
 
         public ChangeShinyIntoCharm(string sceneName, string objectName, string fsmName, int charmNum)
         {
-            this.sceneName = sceneName;
-            this.objectName = objectName;
-            this.fsmName = fsmName;
-            this.charmNum = charmNum;
+            _sceneName = sceneName;
+            _objectName = objectName;
+            _fsmName = fsmName;
+            _charmNum = charmNum;
 
-            boolName = $"gotCharm_{charmNum}";
+            _boolName = $"gotCharm_{charmNum}";
         }
 
         public override ActionType Type => ActionType.PlayMakerFSM;
 
         public override void Process(string scene, Object changeObj)
         {
-            if (scene != sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != fsmName || fsm.gameObject.name != objectName)
+            if (scene != _sceneName || !(changeObj is PlayMakerFSM fsm) || fsm.FsmName != _fsmName ||
+                fsm.gameObject.name != _objectName)
             {
                 return;
             }
@@ -51,14 +49,14 @@ namespace RandomizerMod.Actions
             pdBool.RemoveActionsOfType<StringCompare>();
 
             // Add action to potentially despawn the object
-            pdBool.AddAction(new RandomizerBoolTest(boolName, null, "COLLECTED", true));
+            pdBool.AddAction(new RandomizerBoolTest(_boolName, null, "COLLECTED", true));
 
             // Force the FSM into the charm state, set it to the correct charm
             charm.ClearTransitions();
             charm.AddTransition("FINISHED", "Get Charm");
             getCharm.RemoveActionsOfType<SetPlayerDataBool>();
-            getCharm.AddAction(new RandomizerSetBool(boolName, true, true));
-            fsm.GetState("Normal Msg").GetActionsOfType<SetFsmInt>()[0].setValue = charmNum;
+            getCharm.AddAction(new RandomizerSetBool(_boolName, true, true));
+            fsm.GetState("Normal Msg").GetActionsOfType<SetFsmInt>()[0].setValue = _charmNum;
         }
     }
 }
