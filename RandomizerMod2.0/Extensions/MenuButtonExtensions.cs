@@ -14,11 +14,13 @@ namespace RandomizerMod.Extensions
             MenuButton newBtn = Object.Instantiate(self.gameObject).GetComponent<MenuButton>();
             newBtn.name = name;
             newBtn.buttonType = type;
-            newBtn.transform.SetParent(self.transform.parent);
-            newBtn.transform.localScale = self.transform.localScale;
+
+            Transform transform = newBtn.transform;
+            transform.SetParent(self.transform.parent);
+            transform.localScale = self.transform.localScale;
 
             // Place the button in the proper spot
-            newBtn.transform.localPosition = pos;
+            transform.localPosition = pos;
 
             // Change text on the button
             if (text != null)
@@ -64,8 +66,11 @@ namespace RandomizerMod.Extensions
 
         public static void AddEvent(this MenuButton self, EventTriggerType type, UnityAction<BaseEventData> func)
         {
-            EventTrigger.Entry newEvent = new EventTrigger.Entry();
-            newEvent.eventID = type;
+            EventTrigger.Entry newEvent = new EventTrigger.Entry
+            {
+                eventID = type
+            };
+
             newEvent.callback.AddListener(func);
 
             EventTrigger trig = self.gameObject.GetComponent<EventTrigger>();
@@ -80,30 +85,6 @@ namespace RandomizerMod.Extensions
             {
                 self.AddEvent(EventTriggerType.PointerClick, func);
             }
-        }
-
-        public static void SetDown(this Selectable self, Selectable down)
-        {
-            self.SetNavigation(self.navigation.selectOnUp, self.navigation.selectOnRight, down,
-                self.navigation.selectOnLeft);
-        }
-
-        public static void SetUp(this Selectable self, Selectable up)
-        {
-            self.SetNavigation(up, self.navigation.selectOnRight, self.navigation.selectOnDown,
-                self.navigation.selectOnLeft);
-        }
-
-        public static void SetLeft(this Selectable self, Selectable left)
-        {
-            self.SetNavigation(self.navigation.selectOnUp, self.navigation.selectOnRight, self.navigation.selectOnDown,
-                left);
-        }
-
-        public static void SetRight(this Selectable self, Selectable right)
-        {
-            self.SetNavigation(self.navigation.selectOnUp, right, self.navigation.selectOnDown,
-                self.navigation.selectOnLeft);
         }
     }
 }

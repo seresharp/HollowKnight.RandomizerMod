@@ -5,12 +5,12 @@ namespace RandomizerMod.Components
 {
     internal class ObjectDestroyer : MonoBehaviour
     {
-        private string objectName;
+        private string _objectName;
 
         public static void Destroy(string objectName)
         {
             GameObject obj = new GameObject();
-            obj.AddComponent<ObjectDestroyer>().objectName = objectName;
+            obj.AddComponent<ObjectDestroyer>()._objectName = objectName;
         }
 
         public void Start()
@@ -20,12 +20,12 @@ namespace RandomizerMod.Components
 
         public IEnumerator CheckDestroy()
         {
-            while (GameObject.Find(objectName) == null)
+            while (GameObject.Find(_objectName) == null)
             {
                 yield return new WaitForEndOfFrame();
             }
 
-            Destroy(GameObject.Find(objectName));
+            Destroy(GameObject.Find(_objectName));
             Destroy(gameObject);
         }
     }

@@ -10,20 +10,20 @@ namespace RandomizerMod.FsmStateActions
         private const int GEO_VALUE_LARGE = 25;
         private const int GEO_VALUE_MEDIUM = 5;
 
-        private readonly GameObject gameObject;
-        private readonly bool minimize;
-        private int count;
+        private readonly GameObject _gameObject;
+        private readonly bool _minimize;
+        private int _count;
 
         public RandomizerAddGeo(GameObject baseObj, int amount, bool minimizeObjects = false)
         {
-            count = amount;
-            gameObject = baseObj;
-            minimize = minimizeObjects;
+            _count = amount;
+            _gameObject = baseObj;
+            _minimize = minimizeObjects;
         }
 
         public void SetGeo(int geo)
         {
-            count = geo;
+            _count = geo;
         }
 
         public override void OnEnter()
@@ -32,34 +32,34 @@ namespace RandomizerMod.FsmStateActions
             string sceneName = Ref.GM.GetSceneNameString();
             if (sceneName == SceneNames.Dream_Nailcollection || sceneName == SceneNames.Room_Sly_Storeroom)
             {
-                Ref.Hero.AddGeo(count);
+                Ref.Hero.AddGeo(_count);
                 Finish();
                 return;
             }
 
-            int smallNum = 0;
-            int medNum = 0;
-            int largeNum = 0;
+            int smallNum;
+            int medNum;
+            int largeNum;
 
-            if (!minimize)
+            if (!_minimize)
             {
                 Random random = new Random();
 
-                smallNum = random.Next(0, count / 10);
-                count -= smallNum;
-                largeNum = random.Next(count / (GEO_VALUE_LARGE * 2), count / GEO_VALUE_LARGE + 1);
-                count -= largeNum * GEO_VALUE_LARGE;
-                medNum = count / GEO_VALUE_MEDIUM;
-                count -= medNum * 5;
-                smallNum += count;
+                smallNum = random.Next(0, _count / 10);
+                _count -= smallNum;
+                largeNum = random.Next(_count / (GEO_VALUE_LARGE * 2), _count / GEO_VALUE_LARGE + 1);
+                _count -= largeNum * GEO_VALUE_LARGE;
+                medNum = _count / GEO_VALUE_MEDIUM;
+                _count -= medNum * 5;
+                smallNum += _count;
             }
             else
             {
-                largeNum = count / GEO_VALUE_LARGE;
-                count -= largeNum * GEO_VALUE_LARGE;
-                medNum = count / GEO_VALUE_MEDIUM;
-                count -= medNum * GEO_VALUE_MEDIUM;
-                smallNum = count;
+                largeNum = _count / GEO_VALUE_LARGE;
+                _count -= largeNum * GEO_VALUE_LARGE;
+                medNum = _count / GEO_VALUE_MEDIUM;
+                _count -= medNum * GEO_VALUE_MEDIUM;
+                smallNum = _count;
             }
 
             GameObject smallPrefab = ObjectCache.SmallGeo;
@@ -96,21 +96,21 @@ namespace RandomizerMod.FsmStateActions
 
             if (smallNum > 0)
             {
-                FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
+                FlingUtils.SpawnAndFling(flingConfig, _gameObject.transform, new Vector3(0f, 0f, 0f));
             }
 
             if (medNum > 0)
             {
                 flingConfig.Prefab = mediumPrefab;
                 flingConfig.AmountMin = flingConfig.AmountMax = medNum;
-                FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
+                FlingUtils.SpawnAndFling(flingConfig, _gameObject.transform, new Vector3(0f, 0f, 0f));
             }
 
             if (largeNum > 0)
             {
                 flingConfig.Prefab = largePrefab;
                 flingConfig.AmountMin = flingConfig.AmountMax = largeNum;
-                FlingUtils.SpawnAndFling(flingConfig, gameObject.transform, new Vector3(0f, 0f, 0f));
+                FlingUtils.SpawnAndFling(flingConfig, _gameObject.transform, new Vector3(0f, 0f, 0f));
             }
 
             smallPrefab.SetActive(false);

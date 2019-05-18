@@ -6,18 +6,18 @@ namespace RandomizerMod.Components
 {
     internal class RandomizerTinkEffect : MonoBehaviour
     {
-        private static readonly Random rnd = new Random();
+        private static readonly Random Rnd = new Random();
 
-        private float nextTime;
+        private float _nextTime;
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.tag != "Nail Attack" || Time.time < nextTime)
+            if (!collision.CompareTag("Nail Attack") || Time.time < _nextTime)
             {
                 return;
             }
 
-            nextTime = Time.time + 0.25f;
+            _nextTime = Time.time + 0.25f;
 
             GameCameras cam = GameCameras.instance;
             if (cam != null)
@@ -59,7 +59,7 @@ namespace RandomizerMod.Components
             GameObject effect = ObjectCache.TinkEffect;
             effect.transform.localPosition = position;
             effect.transform.localRotation = Quaternion.Euler(euler);
-            effect.GetComponent<AudioSource>().pitch = (85 + rnd.Next(30)) / 100f;
+            effect.GetComponent<AudioSource>().pitch = (85 + Rnd.Next(30)) / 100f;
 
             effect.SetActive(true);
         }

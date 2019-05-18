@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using SeanprCore;
 using static RandomizerMod.LogHelper;
 
 namespace RandomizerMod.Randomization
@@ -50,8 +51,6 @@ namespace RandomizerMod.Randomization
         public string shopSpriteKey;
         public string notchCost;
 
-        public string shopName;
-
         // Item tier flags
         public bool progression;
         public bool isGoodItem;
@@ -80,16 +79,16 @@ namespace RandomizerMod.Randomization
 
     internal static class LogicManager
     {
-        private static Dictionary<string, ReqDef> items;
-        private static Dictionary<string, ShopDef> shops;
-        private static Dictionary<string, string[]> additiveItems;
-        private static Dictionary<string, string[]> macros;
+        private static Dictionary<string, ReqDef> _items;
+        private static Dictionary<string, ShopDef> _shops;
+        private static Dictionary<string, string[]> _additiveItems;
+        private static Dictionary<string, string[]> _macros;
 
-        public static string[] ItemNames => items.Keys.ToArray();
+        public static string[] ItemNames => _items.Keys.ToArray();
 
-        public static string[] ShopNames => shops.Keys.ToArray();
+        public static string[] ShopNames => _shops.Keys.ToArray();
 
-        public static string[] AdditiveItemNames => additiveItems.Keys.ToArray();
+        public static string[] AdditiveItemNames => _additiveItems.Keys.ToArray();
 
         public static void ParseXML(object streamObj)
         {
@@ -108,10 +107,10 @@ namespace RandomizerMod.Randomization
                 xml.Load(xmlStream);
                 xmlStream.Dispose();
 
-                macros = new Dictionary<string, string[]>();
-                additiveItems = new Dictionary<string, string[]>();
-                items = new Dictionary<string, ReqDef>();
-                shops = new Dictionary<string, ShopDef>();
+                _macros = new Dictionary<string, string[]>();
+                _additiveItems = new Dictionary<string, string[]>();
+                _items = new Dictionary<string, ReqDef>();
+                _shops = new Dictionary<string, ShopDef>();
 
                 ParseAdditiveItemXML(xml.SelectNodes("randomizer/additiveItemSet"));
                 ParseMacroXML(xml.SelectNodes("randomizer/macro"));
@@ -129,7 +128,7 @@ namespace RandomizerMod.Randomization
 
         public static ReqDef GetItemDef(string name)
         {
-            if (!items.TryGetValue(name, out ReqDef def))
+            if (!_items.TryGetValue(name, out ReqDef def))
             {
                 LogWarn($"Nonexistent item \"{name}\" requested");
             }
@@ -139,7 +138,7 @@ namespace RandomizerMod.Randomization
 
         public static ShopDef GetShopDef(string name)
         {
-            if (!shops.TryGetValue(name, out ShopDef def))
+            if (!_shops.TryGetValue(name, out ShopDef def))
             {
                 LogWarn($"Nonexistent shop \"{name}\" requested");
             }
@@ -151,11 +150,11 @@ namespace RandomizerMod.Randomization
         {
             string[] logic;
 
-            if (items.TryGetValue(item, out ReqDef reqDef))
+            if (_items.TryGetValue(item, out ReqDef reqDef))
             {
                 logic = reqDef.logic;
             }
-            else if (shops.TryGetValue(item, out ShopDef shopDef))
+            else if (_shops.TryGetValue(item, out ShopDef shopDef))
             {
                 logic = shopDef.logic;
             }
@@ -172,9 +171,9 @@ namespace RandomizerMod.Randomization
 
             Stack<bool> stack = new Stack<bool>();
 
-            for (int i = 0; i < logic.Length; i++)
+            foreach (string token in logic)
             {
-                switch (logic[i])
+                switch (token)
                 {
                     case "+":
                         if (stack.Count < 2)
@@ -221,7 +220,7 @@ namespace RandomizerMod.Randomization
                         stack.Push(false);
                         break;
                     default:
-                        stack.Push(obtained.Contains(logic[i]));
+                        stack.Push(obtained.Contains(token));
                         break;
                 }
             }
@@ -242,7 +241,7 @@ namespace RandomizerMod.Randomization
 
         public static string[] GetAdditiveItems(string name)
         {
-            if (!additiveItems.TryGetValue(name, out string[] items))
+            if (!_additiveItems.TryGetValue(name, out string[] items))
             {
                 LogWarn($"Nonexistent additive item set \"{name}\" requested");
                 return null;
@@ -292,7 +291,7 @@ namespace RandomizerMod.Randomization
                 else
                 {
                     // Parse macros
-                    if (macros.TryGetValue(op, out string[] macro))
+                    if (_macros.TryGetValue(op, out string[] macro))
                     {
                         postfix.AddRange(macro);
                     }
@@ -333,7 +332,7 @@ namespace RandomizerMod.Randomization
         {
             foreach (XmlNode setNode in nodes)
             {
-                XmlAttribute nameAttr = setNode.Attributes["name"];
+                XmlAttribute nameAttr = setNode.Attributes?["name"];
                 if (nameAttr == null)
                 {
                     LogWarn("Node in items.xml has no name attribute");
@@ -347,8 +346,8 @@ namespace RandomizerMod.Randomization
                 }
 
                 LogDebug($"Parsed XML for item set \"{nameAttr.InnerText}\"");
-                additiveItems.Add(nameAttr.InnerText, additiveSet);
-                macros.Add(nameAttr.InnerText, ShuntingYard(string.Join(" | ", additiveSet)));
+                _additiveItems.Add(nameAttr.InnerText, additiveSet);
+                _macros.Add(nameAttr.InnerText, ShuntingYard(string.Join(" | ", additiveSet)));
             }
         }
 
@@ -356,7 +355,7 @@ namespace RandomizerMod.Randomization
         {
             foreach (XmlNode macroNode in nodes)
             {
-                XmlAttribute nameAttr = macroNode.Attributes["name"];
+                XmlAttribute nameAttr = macroNode.Attributes?["name"];
                 if (nameAttr == null)
                 {
                     LogWarn("Node in items.xml has no name attribute");
@@ -364,7 +363,7 @@ namespace RandomizerMod.Randomization
                 }
 
                 LogDebug($"Parsed XML for macro \"{nameAttr.InnerText}\"");
-                macros.Add(nameAttr.InnerText, ShuntingYard(macroNode.InnerText));
+                _macros.Add(nameAttr.InnerText, ShuntingYard(macroNode.InnerText));
             }
         }
 
@@ -375,7 +374,7 @@ namespace RandomizerMod.Randomization
 
             foreach (XmlNode itemNode in nodes)
             {
-                XmlAttribute nameAttr = itemNode.Attributes["name"];
+                XmlAttribute nameAttr = itemNode.Attributes?["name"];
                 if (nameAttr == null)
                 {
                     LogWarn("Node in items.xml has no name attribute");
@@ -423,14 +422,11 @@ namespace RandomizerMod.Randomization
                     }
                     else if (field.FieldType == typeof(ItemType))
                     {
-                        // Enum.TryParse doesn't exist in .NET 3.5
-                        ItemType type;
-                        try
+                        if (fieldNode.InnerText.TryToEnum(out ItemType type))
                         {
-                            type = (ItemType) Enum.Parse(typeof(ItemType), fieldNode.InnerText);
                             field.SetValue(def, type);
                         }
-                        catch
+                        else
                         {
                             LogWarn($"Could not parse \"{fieldNode.InnerText}\" to ItemType");
                         }
@@ -453,7 +449,7 @@ namespace RandomizerMod.Randomization
                 }
 
                 LogDebug($"Parsed XML for item \"{nameAttr.InnerText}\"");
-                items.Add(nameAttr.InnerText, (ReqDef) def);
+                _items.Add(nameAttr.InnerText, (ReqDef) def);
             }
         }
 
@@ -464,7 +460,7 @@ namespace RandomizerMod.Randomization
 
             foreach (XmlNode shopNode in nodes)
             {
-                XmlAttribute nameAttr = shopNode.Attributes["name"];
+                XmlAttribute nameAttr = shopNode.Attributes?["name"];
                 if (nameAttr == null)
                 {
                     LogWarn("Node in items.xml has no name attribute");
@@ -517,7 +513,7 @@ namespace RandomizerMod.Randomization
                 }
 
                 LogDebug($"Parsed XML for shop \"{nameAttr.InnerText}\"");
-                shops.Add(nameAttr.InnerText, (ShopDef) def);
+                _shops.Add(nameAttr.InnerText, (ShopDef) def);
             }
         }
     }

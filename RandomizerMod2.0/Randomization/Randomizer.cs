@@ -120,25 +120,24 @@ namespace RandomizerMod.Randomization
                 }
             }
 
-            while (unusedProgressionItems.Count > 0)
+            List<string> weightedLocations = new List<string>();
+            foreach (string str in _unobtainedLocations)
             {
-                // TODO: Make extension to remove all of a string from a list so I don't have to recalculate this every time
-                List<string> weightedLocations = new List<string>();
-                foreach (string str in _unobtainedLocations)
+                // Items tagged as requiring "EVERYTHING" will not be in this dict
+                if (!locationDepths.ContainsKey(str))
                 {
-                    // Items tagged as requiring "EVERYTHING" will not be in this dict
-                    if (!locationDepths.ContainsKey(str))
-                    {
-                        continue;
-                    }
-
-                    // Using weight^2 to heavily bias towards late locations
-                    for (int i = 0; i < locationDepths[str] * locationDepths[str]; i++)
-                    {
-                        weightedLocations.Add(str);
-                    }
+                    continue;
                 }
 
+                // Using weight^2 to heavily bias towards late locations
+                for (int i = 0; i < locationDepths[str] * locationDepths[str]; i++)
+                {
+                    weightedLocations.Add(str);
+                }
+            }
+
+            while (unusedProgressionItems.Count > 0)
+            {
                 string placeLocation = weightedLocations[rand.Next(weightedLocations.Count)];
                 string placeItem = unusedProgressionItems[rand.Next(unusedProgressionItems.Count)];
 
@@ -146,6 +145,8 @@ namespace RandomizerMod.Randomization
                 unusedProgressionItems.Remove(placeItem);
                 _unobtainedItems.Remove(placeItem);
                 _obtainedItems.Add(placeItem);
+
+                weightedLocations.RemoveAll(str => str == placeLocation);
 
                 LogItemPlacement(placeItem, placeLocation);
 

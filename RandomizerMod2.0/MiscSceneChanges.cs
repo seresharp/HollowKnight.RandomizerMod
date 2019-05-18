@@ -22,14 +22,14 @@ namespace RandomizerMod
 
             ModHooks.Instance.ObjectPoolSpawnHook += FixExplosionPogo;
             On.EnemyHitEffectsArmoured.RecieveHitEffect += FalseKnightNoises;
-            On.PlayMakerFSM.OnEnable += FixDreamNail;
+            On.PlayMakerFSM.OnEnable += ModifyFSM;
         }
 
         public static void UnHook()
         {
             ModHooks.Instance.ObjectPoolSpawnHook -= FixExplosionPogo;
             On.EnemyHitEffectsArmoured.RecieveHitEffect -= FalseKnightNoises;
-            On.PlayMakerFSM.OnEnable -= FixDreamNail;
+            On.PlayMakerFSM.OnEnable -= ModifyFSM;
         }
 
         public static void SceneChanged(Scene newScene)
@@ -296,23 +296,29 @@ namespace RandomizerMod
                         GameObject newHopper2 = Object.Instantiate(hopper2, hopper2.transform.parent);
 
                         // Don't want people abusing the easter egg as a geo farm
-                        newHopper1.GetComponent<HealthManager>().SetGeoSmall(0);
-                        newHopper1.GetComponent<HealthManager>().SetGeoMedium(0);
-                        newHopper1.GetComponent<HealthManager>().SetGeoLarge(0);
+                        HealthManager hopper1HM = newHopper1.GetComponent<HealthManager>();
+                        hopper1HM.SetGeoSmall(0);
+                        hopper1HM.SetGeoMedium(0);
+                        hopper1HM.SetGeoLarge(0);
 
-                        newHopper2.GetComponent<HealthManager>().SetGeoSmall(0);
-                        newHopper2.GetComponent<HealthManager>().SetGeoMedium(0);
-                        newHopper2.GetComponent<HealthManager>().SetGeoLarge(0);
+                        HealthManager hopper2HM = newHopper2.GetComponent<HealthManager>();
+                        hopper2HM.SetGeoSmall(0);
+                        hopper2HM.SetGeoMedium(0);
+                        hopper2HM.SetGeoLarge(0);
 
-                        newHopper1.transform.localPosition = new Vector3(
-                            newHopper1.transform.localPosition.x + Rnd.Next(5),
-                            newHopper1.transform.localPosition.y,
-                            newHopper1.transform.localPosition.z);
+                        Vector3 hopper1Pos = newHopper1.transform.localPosition;
+                        hopper1Pos = new Vector3(
+                            hopper1Pos.x + Rnd.Next(5),
+                            hopper1Pos.y,
+                            hopper1Pos.z);
+                        newHopper1.transform.localPosition = hopper1Pos;
 
-                        newHopper2.transform.localPosition = new Vector3(
-                            newHopper2.transform.localPosition.x + Rnd.Next(5) - 4,
-                            newHopper2.transform.localPosition.y,
-                            newHopper2.transform.localPosition.z);
+                        Vector3 hopper2Pos = newHopper2.transform.localPosition;
+                        hopper2Pos = new Vector3(
+                            hopper2Pos.x + Rnd.Next(5) - 4,
+                            hopper2Pos.y,
+                            hopper2Pos.z);
+                        newHopper2.transform.localPosition = hopper2Pos;
                     }
 
                     break;
@@ -445,45 +451,57 @@ namespace RandomizerMod
         {
             orig(self, dir);
 
-            if (_rndNum == 17 && self.gameObject.name == "False Knight New")
+            if (_rndNum != 17 || self.gameObject.name != "False Knight New")
             {
-                AudioPlayerOneShot hitPlayer = FSMUtility.LocateFSM(self.gameObject, "FalseyControl").GetState("Hit")
-                    .GetActionsOfType<AudioPlayerOneShot>()[0];
-                AudioClip clip = hitPlayer.audioClips[Rnd.Next(hitPlayer.audioClips.Length)];
-
-                AudioClip temp = self.enemyDamage.Clip;
-                self.enemyDamage.Clip = clip;
-                self.enemyDamage.SpawnAndPlayOneShot(self.audioPlayerPrefab, self.transform.position);
-                self.enemyDamage.Clip = temp;
+                return;
             }
+
+            AudioPlayerOneShot hitPlayer = FSMUtility.LocateFSM(self.gameObject, "FalseyControl").GetState("Hit")
+                .GetActionsOfType<AudioPlayerOneShot>()[0];
+            AudioClip clip = hitPlayer.audioClips[Rnd.Next(hitPlayer.audioClips.Length)];
+
+            AudioClip temp = self.enemyDamage.Clip;
+            self.enemyDamage.Clip = clip;
+            self.enemyDamage.SpawnAndPlayOneShot(self.audioPlayerPrefab, self.transform.position);
+            self.enemyDamage.Clip = temp;
         }
 
         private static GameObject FixExplosionPogo(GameObject go)
         {
-            if (go.name.StartsWith("Gas Explosion Recycle M"))
+            if (!go.name.StartsWith("Gas Explosion Recycle M"))
             {
-                go.layer = (int) PhysLayers.ENEMIES;
-                NonBouncer noFun = go.GetComponent<NonBouncer>();
-                if (noFun)
-                {
-                    noFun.active = false;
-                }
+                return go;
+            }
+
+            go.layer = (int) PhysLayers.ENEMIES;
+            NonBouncer noFun = go.GetComponent<NonBouncer>();
+            if (noFun)
+            {
+                noFun.active = false;
             }
 
             return go;
         }
 
-        private static void FixDreamNail(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
+        private static void ModifyFSM(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
+            if (self.Fsm.FsmComponent.FsmName == "Check Zote Death")
+            {
+                Object.Destroy(self);
+                return;
+            }
+
             orig(self);
 
-            if (self.gameObject.name == "Knight" && self.FsmName == "Dream Nail")
+            if (self.gameObject.name == "Knight" || self.FsmName == "Dream Nail")
             {
-                self.GetState("Cancelable").GetActionsOfType<ListenForDreamNail>()[0].activeBool = true;
-                self.GetState("Cancelable Dash").GetActionsOfType<ListenForDreamNail>()[0].activeBool = true;
-                self.GetState("Queuing").GetActionsOfType<ListenForDreamNail>()[0].activeBool = true;
-                self.GetState("Queuing").RemoveActionsOfType<BoolTest>();
+                return;
             }
+
+            self.GetState("Cancelable").GetActionsOfType<ListenForDreamNail>()[0].activeBool = true;
+            self.GetState("Cancelable Dash").GetActionsOfType<ListenForDreamNail>()[0].activeBool = true;
+            self.GetState("Queuing").GetActionsOfType<ListenForDreamNail>()[0].activeBool = true;
+            self.GetState("Queuing").RemoveActionsOfType<BoolTest>();
         }
     }
 }

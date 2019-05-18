@@ -9,23 +9,23 @@ namespace RandomizerMod.Components
 {
     internal class BigItemPopup : MonoBehaviour
     {
-        private static readonly Sprite blackPixel = CanvasUtil.NullSprite(new byte[] {0x00, 0x00, 0x00, 0xAA});
-        private static readonly Sprite[] frames;
-        private string buttonText;
-        private string descOneText;
-        private string descTwoText;
-        private string fsmEvent;
-        private GameObject fsmObj;
+        private static readonly Sprite BlackPixel = CanvasUtil.NullSprite(new byte[] {0x00, 0x00, 0x00, 0xAA});
+        private static readonly Sprite[] Frames;
+        private string _buttonText;
+        private string _descOneText;
+        private string _descTwoText;
+        private string _fsmEvent;
+        private GameObject _fsmObj;
 
-        private Sprite imagePrompt;
-        private string nameText;
+        private Sprite _imagePrompt;
+        private string _nameText;
 
-        private bool showInstantly;
-        private string takeText;
+        private bool _showInstantly;
+        private string _takeText;
 
         static BigItemPopup()
         {
-            frames = new[]
+            Frames = new[]
             {
                 RandomizerMod.GetSprite("Anim.BigItemFleur.0"),
                 RandomizerMod.GetSprite("Anim.BigItemFleur.1"),
@@ -73,14 +73,14 @@ namespace RandomizerMod.Components
 
             // Add popup component, set values
             BigItemPopup popup = canvas.AddComponent<BigItemPopup>();
-            popup.imagePrompt = RandomizerMod.GetSprite(spriteKey);
-            popup.takeText = Language.Language.Get(takeKey, "Prompts").Replace("<br>", " ");
-            popup.nameText = Language.Language.Get(nameKey, "UI").Replace("<br>", " ");
-            popup.buttonText = Language.Language.Get(buttonKey, "Prompts").Replace("<br>", " ");
-            popup.descOneText = Language.Language.Get(descOneKey, "Prompts").Replace("<br>", " ");
-            popup.descTwoText = Language.Language.Get(descTwoKey, "Prompts").Replace("<br>", " ");
-            popup.fsmObj = fsmObj;
-            popup.fsmEvent = eventName;
+            popup._imagePrompt = RandomizerMod.GetSprite(spriteKey);
+            popup._takeText = Language.Language.Get(takeKey, "Prompts").Replace("<br>", " ");
+            popup._nameText = Language.Language.Get(nameKey, "UI").Replace("<br>", " ");
+            popup._buttonText = Language.Language.Get(buttonKey, "Prompts").Replace("<br>", " ");
+            popup._descOneText = Language.Language.Get(descOneKey, "Prompts").Replace("<br>", " ");
+            popup._descTwoText = Language.Language.Get(descTwoKey, "Prompts").Replace("<br>", " ");
+            popup._fsmObj = fsmObj;
+            popup._fsmEvent = eventName;
 
             return canvas;
         }
@@ -97,7 +97,7 @@ namespace RandomizerMod.Components
             Coroutine skipCoroutine = StartCoroutine(LookForShowInstantly());
 
             // Begin dimming the scene
-            GameObject dimmer = CanvasUtil.CreateImagePanel(gameObject, blackPixel,
+            GameObject dimmer = CanvasUtil.CreateImagePanel(gameObject, BlackPixel,
                 new CanvasUtil.RectData(Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one));
             dimmer.GetComponent<Image>().preserveAspect = false;
             CanvasGroup dimmerCG = dimmer.AddComponent<CanvasGroup>();
@@ -111,16 +111,16 @@ namespace RandomizerMod.Components
             yield return WaitForSeconds(0.1f);
 
             // Aim for 400 high prompt image
-            float scaler = imagePrompt.texture.height / 400f;
-            Vector2 size = new Vector2(imagePrompt.texture.width / scaler, imagePrompt.texture.height / scaler);
+            float scaler = _imagePrompt.texture.height / 400f;
+            Vector2 size = new Vector2(_imagePrompt.texture.width / scaler, _imagePrompt.texture.height / scaler);
 
             // Begin fading in the top bits of the popup
-            GameObject topImage = CanvasUtil.CreateImagePanel(gameObject, imagePrompt,
+            GameObject topImage = CanvasUtil.CreateImagePanel(gameObject, _imagePrompt,
                 new CanvasUtil.RectData(size, Vector2.zero, new Vector2(0.5f, 0.75f), new Vector2(0.5f, 0.8f)));
-            GameObject topTextOne = CanvasUtil.CreateTextPanel(gameObject, takeText, 34, TextAnchor.MiddleCenter,
+            GameObject topTextOne = CanvasUtil.CreateTextPanel(gameObject, _takeText, 34, TextAnchor.MiddleCenter,
                 new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.55f),
                     new Vector2(0.5f, 0.55f)), Fonts.Get("Perpetua"));
-            GameObject topTextTwo = CanvasUtil.CreateTextPanel(gameObject, nameText, 76, TextAnchor.MiddleCenter,
+            GameObject topTextTwo = CanvasUtil.CreateTextPanel(gameObject, _nameText, 76, TextAnchor.MiddleCenter,
                 new CanvasUtil.RectData(new Vector2(1920, 300), Vector2.zero, new Vector2(0.5f, 0.49f),
                     new Vector2(0.5f, 0.49f)));
 
@@ -145,20 +145,20 @@ namespace RandomizerMod.Components
             yield return StartCoroutine(FadeInCanvasGroup(topTextTwoCG));
 
             // Animate the middle fleur
-            GameObject fleur = CanvasUtil.CreateImagePanel(gameObject, frames[0],
-                new CanvasUtil.RectData(new Vector2(frames[0].texture.width / 1.6f, frames[0].texture.height / 1.6f),
+            GameObject fleur = CanvasUtil.CreateImagePanel(gameObject, Frames[0],
+                new CanvasUtil.RectData(new Vector2(Frames[0].texture.width / 1.6f, Frames[0].texture.height / 1.6f),
                     Vector2.zero, new Vector2(0.5f, 0.4125f), new Vector2(0.5f, 0.4125f)));
             yield return StartCoroutine(AnimateFleur(fleur, 12));
             yield return WaitForSeconds(0.25f);
 
             // Fade in the remaining text
-            GameObject botTextOne = CanvasUtil.CreateTextPanel(gameObject, buttonText, 34, TextAnchor.MiddleCenter,
+            GameObject botTextOne = CanvasUtil.CreateTextPanel(gameObject, _buttonText, 34, TextAnchor.MiddleCenter,
                 new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.335f),
                     new Vector2(0.5f, 0.335f)), Fonts.Get("Perpetua"));
-            GameObject botTextTwo = CanvasUtil.CreateTextPanel(gameObject, descOneText, 34, TextAnchor.MiddleCenter,
+            GameObject botTextTwo = CanvasUtil.CreateTextPanel(gameObject, _descOneText, 34, TextAnchor.MiddleCenter,
                 new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.26f),
                     new Vector2(0.5f, 0.26f)), Fonts.Get("Perpetua"));
-            GameObject botTextThree = CanvasUtil.CreateTextPanel(gameObject, descTwoText, 34, TextAnchor.MiddleCenter,
+            GameObject botTextThree = CanvasUtil.CreateTextPanel(gameObject, _descTwoText, 34, TextAnchor.MiddleCenter,
                 new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.205f),
                     new Vector2(0.5f, 0.205f)), Fonts.Get("Perpetua"));
 
@@ -199,12 +199,12 @@ namespace RandomizerMod.Components
             yield return FadeInCanvasGroup(eggCG);
 
             // Stop doing things instantly before polling input
-            if (!showInstantly)
+            if (!_showInstantly)
             {
                 StopCoroutine(skipCoroutine);
             }
 
-            showInstantly = false;
+            _showInstantly = false;
 
             // Save the coroutine to stop it later
             Coroutine coroutine = StartCoroutine(BlinkCanvasGroup(eggCG));
@@ -228,9 +228,9 @@ namespace RandomizerMod.Components
             yield return WaitForSeconds(0.75f);
 
             // Optionally send FSM event after finishing
-            if (fsmObj != null && fsmEvent != null)
+            if (_fsmObj != null && _fsmEvent != null)
             {
-                FSMUtility.SendEventToGameObject(fsmObj, fsmEvent);
+                FSMUtility.SendEventToGameObject(_fsmObj, _fsmEvent);
             }
 
             // Stop the egg routine and destroy everything
@@ -243,14 +243,15 @@ namespace RandomizerMod.Components
             Image img = fleur.GetComponent<Image>();
             int spriteNum = 0;
 
-            while (spriteNum < frames.Length)
+            while (spriteNum < Frames.Length)
             {
-                img.sprite = frames[spriteNum];
+                img.sprite = Frames[spriteNum];
                 spriteNum++;
                 yield return WaitForSeconds(1 / fps);
             }
         }
 
+        // ReSharper disable once IteratorNeverReturns
         private IEnumerator BlinkCanvasGroup(CanvasGroup cg)
         {
             while (true)
@@ -263,7 +264,7 @@ namespace RandomizerMod.Components
         private IEnumerator WaitForSeconds(float seconds)
         {
             float timePassed = 0f;
-            while (timePassed < seconds && !showInstantly)
+            while (timePassed < seconds && !_showInstantly)
             {
                 timePassed += Time.deltaTime;
                 yield return new WaitForEndOfFrame();
@@ -277,7 +278,7 @@ namespace RandomizerMod.Components
                 HeroActions actions = Ref.Input.inputActions;
                 if (actions.jump.WasPressed || actions.attack.WasPressed || actions.menuCancel.WasPressed)
                 {
-                    showInstantly = true;
+                    _showInstantly = true;
                     break;
                 }
 
@@ -291,7 +292,7 @@ namespace RandomizerMod.Components
             float loopFailsafe = 0f;
             cg.alpha = 0f;
             cg.gameObject.SetActive(true);
-            while (cg.alpha < 1f && !showInstantly)
+            while (cg.alpha < 1f && !_showInstantly)
             {
                 cg.alpha += Time.deltaTime * 2f;
                 loopFailsafe += Time.deltaTime;
@@ -320,7 +321,7 @@ namespace RandomizerMod.Components
         {
             float loopFailsafe = 0f;
             cg.interactable = false;
-            while (cg.alpha > 0.05f && !showInstantly)
+            while (cg.alpha > 0.05f && !_showInstantly)
             {
                 cg.alpha -= Time.deltaTime * 2f;
                 loopFailsafe += Time.deltaTime;

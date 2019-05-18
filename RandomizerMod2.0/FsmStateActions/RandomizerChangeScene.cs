@@ -1,30 +1,27 @@
-﻿using System.Reflection;
-using GlobalEnums;
+﻿using GlobalEnums;
 using HutongGames.PlayMaker;
+using Modding;
 using SeanprCore;
 
 namespace RandomizerMod.FsmStateActions
 {
     internal class RandomizerChangeScene : FsmStateAction
     {
-        private static readonly FieldInfo sceneLoad =
-            typeof(GameManager).GetField("sceneLoad", BindingFlags.NonPublic | BindingFlags.Instance);
+        private readonly string _gateName;
 
-        private readonly string gateName;
-
-        private readonly string sceneName;
+        private readonly string _sceneName;
 
         public RandomizerChangeScene(string scene, string gate)
         {
-            sceneName = scene;
-            gateName = gate;
+            _sceneName = scene;
+            _gateName = gate;
         }
 
         public override void OnEnter()
         {
-            if (!string.IsNullOrEmpty(sceneName) && !string.IsNullOrEmpty(gateName))
+            if (!string.IsNullOrEmpty(_sceneName) && !string.IsNullOrEmpty(_gateName))
             {
-                ChangeToScene(sceneName, gateName);
+                ChangeToScene(_sceneName, _gateName);
             }
 
             Finish();
@@ -38,37 +35,40 @@ namespace RandomizerMod.FsmStateActions
                 return;
             }
 
-            void loadScene()
-            {
-                Ref.GM.StopAllCoroutines();
-                sceneLoad.SetValue(Ref.GM, null);
-
-                Ref.GM.BeginSceneTransition(new GameManager.SceneLoadInfo
-                {
-                    IsFirstLevelForPlayer = false,
-                    SceneName = sceneName,
-                    HeroLeaveDirection = GetGatePosition(gateName),
-                    EntryGateName = gateName,
-                    EntryDelay = delay,
-                    PreventCameraFadeOut = false,
-                    WaitForSceneTransitionCameraFade = true,
-                    Visualization = GameManager.SceneLoadVisualizations.Default,
-                    AlwaysUnloadUnusedAssets = false
-                });
-            }
-
-            SceneLoad load = (SceneLoad) sceneLoad.GetValue(Ref.GM);
+            SceneLoad load = ReflectionHelper.GetAttr<GameManager, SceneLoad>(Ref.GM, "sceneLoad");
             if (load != null)
             {
-                load.Finish += loadScene;
+                load.Finish += () =>
+                {
+                    LoadScene(sceneName, gateName, delay);
+                };
             }
             else
             {
-                loadScene();
+                LoadScene(sceneName, gateName, delay);
             }
         }
 
-        private GatePosition GetGatePosition(string name)
+        private static void LoadScene(string sceneName, string gateName, float delay)
+        {
+            Ref.GM.StopAllCoroutines();
+            ReflectionHelper.SetAttr<GameManager, SceneLoad>(Ref.GM, "sceneLoad", null);
+
+            Ref.GM.BeginSceneTransition(new GameManager.SceneLoadInfo
+            {
+                IsFirstLevelForPlayer = false,
+                SceneName = sceneName,
+                HeroLeaveDirection = GetGatePosition(gateName),
+                EntryGateName = gateName,
+                EntryDelay = delay,
+                PreventCameraFadeOut = false,
+                WaitForSceneTransitionCameraFade = true,
+                Visualization = GameManager.SceneLoadVisualizations.Default,
+                AlwaysUnloadUnusedAssets = false
+            });
+        }
+
+        private static GatePosition GetGatePosition(string name)
         {
             if (name.Contains("top"))
             {

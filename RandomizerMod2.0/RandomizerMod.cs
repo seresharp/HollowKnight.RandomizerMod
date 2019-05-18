@@ -130,13 +130,6 @@ namespace RandomizerMod
             Ref.PD.mageLordEncountered = true;
             Ref.PD.mageLordEncountered_2 = true;
 
-            if (Settings.AllBosses)
-            {
-                // TODO: Think of a better way to handle Zote
-                Ref.PD.zoteRescuedBuzzer = true;
-                Ref.PD.zoteRescuedDeepnest = true;
-            }
-
             if (!Settings.Randomizer)
             {
                 return;
