@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Threading;
 using Modding;
 using RandomizerMod.Actions;
 using RandomizerMod.Randomization;
+using SeanprCore;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -41,65 +41,27 @@ namespace RandomizerMod
             Instance = this;
 
             // Make sure the play mode screen is always unlocked
-            GameManager.instance.EnablePermadeathMode();
+            Ref.GM.EnablePermadeathMode();
 
             // Unlock godseeker too because idk why not
-            GameManager.instance.SetStatusRecordInt("RecBossRushMode", 1);
+            Ref.GM.SetStatusRecordInt("RecBossRushMode", 1);
 
-            _sprites = new Dictionary<string, Sprite>();
+            // Load embedded resources
+            _sprites = ResourceHelper.GetSprites("RandomizerMod.Resources.");
 
-            // Load logo and xml from embedded resources
             Assembly randoDLL = GetType().Assembly;
-            foreach (string res in randoDLL.GetManifestResourceNames())
+            try
             {
-                if (res.EndsWith(".png"))
-                {
-                    // Read bytes of image
-                    Stream imageStream = randoDLL.GetManifestResourceStream(res);
-
-                    if (imageStream == null)
-                    {
-                        continue;
-                    }
-
-                    byte[] buffer = new byte[imageStream.Length];
-                    imageStream.Read(buffer, 0, buffer.Length);
-                    imageStream.Dispose();
-
-                    // Create texture from bytes
-                    Texture2D tex = new Texture2D(1, 1);
-                    tex.LoadImage(buffer, true);
-
-                    // Create sprite from texture
-                    _sprites.Add(
-                        Path.GetFileNameWithoutExtension(res.Replace("RandomizerMod.Resources.", string.Empty)),
-                        Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f)));
-
-                    LogDebug("Created sprite from embedded image: " + res);
-                }
-                else if (res.EndsWith("language.xml"))
-                {
-                    // No sense having the whole init die if this xml is formatted improperly
-                    try
-                    {
-                        LanguageStringManager.LoadLanguageXML(randoDLL.GetManifestResourceStream(res));
-                    }
-                    catch (Exception e)
-                    {
-                        LogError("Could not process language xml:\n" + e);
-                    }
-                }
-                else if (res.EndsWith("items.xml"))
-                {
-                    // Thread the xml parsing because it's kinda slow
-                    _logicParseThread = new Thread(LogicManager.ParseXML);
-                    _logicParseThread.Start(randoDLL.GetManifestResourceStream(res));
-                }
-                else
-                {
-                    Log("Unknown resource " + res);
-                }
+                LanguageStringManager.LoadLanguageXML(
+                    randoDLL.GetManifestResourceStream("RandomizerMod.Resources.language.xml"));
             }
+            catch (Exception e)
+            {
+                LogError("Could not process language xml:\n" + e);
+            }
+
+            _logicParseThread = new Thread(LogicManager.ParseXML);
+            _logicParseThread.Start(randoDLL.GetManifestResourceStream("RandomizerMod.Resources.items.xml"));
 
             // Add hooks
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += HandleSceneChanges;
@@ -114,9 +76,6 @@ namespace RandomizerMod
 
             // Setup preloaded objects
             ObjectCache.GetPrefabs(preloaded[SceneNames.Tutorial_01]);
-
-            // Load fonts
-            FontManager.LoadFonts();
 
             // Some items have two bools for no reason, gotta deal with that
             _secondaryBools = new Dictionary<string, string>
@@ -162,20 +121,20 @@ namespace RandomizerMod
         public void StartNewGame()
         {
             // Charm tutorial popup is annoying, get rid of it
-            PlayerData.instance.hasCharm = true;
+            Ref.PD.hasCharm = true;
 
             // Fast boss intros
-            PlayerData.instance.unchainedHollowKnight = true;
-            PlayerData.instance.encounteredMimicSpider = true;
-            PlayerData.instance.infectedKnightEncountered = true;
-            PlayerData.instance.mageLordEncountered = true;
-            PlayerData.instance.mageLordEncountered_2 = true;
+            Ref.PD.unchainedHollowKnight = true;
+            Ref.PD.encounteredMimicSpider = true;
+            Ref.PD.infectedKnightEncountered = true;
+            Ref.PD.mageLordEncountered = true;
+            Ref.PD.mageLordEncountered_2 = true;
 
             if (Settings.AllBosses)
             {
                 // TODO: Think of a better way to handle Zote
-                PlayerData.instance.zoteRescuedBuzzer = true;
-                PlayerData.instance.zoteRescuedDeepnest = true;
+                Ref.PD.zoteRescuedBuzzer = true;
+                Ref.PD.zoteRescuedDeepnest = true;
             }
 
             if (!Settings.Randomizer)
@@ -201,8 +160,8 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "2b.17";
-            int minAPI = 49;
+            const string ver = "2b.18";
+            const int minAPI = 51;
 
             bool apiTooLow = Convert.ToInt32(ModHooks.Instance.ModVersion.Split('-')[1]) < minAPI;
             if (apiTooLow)
@@ -252,7 +211,7 @@ namespace RandomizerMod
                 }
 
                 pd.SetInt(nameof(PlayerData.charmSlots), notches);
-                GameManager.instance.RefreshOvercharm();
+                Ref.GM.RefreshOvercharm();
             }
         }
 
@@ -261,32 +220,32 @@ namespace RandomizerMod
             // Fake spell bools
             if (boolName == "hasVengefulSpirit")
             {
-                return PlayerData.instance.fireballLevel > 0;
+                return Ref.PD.fireballLevel > 0;
             }
 
             if (boolName == "hasShadeSoul")
             {
-                return PlayerData.instance.fireballLevel > 1;
+                return Ref.PD.fireballLevel > 1;
             }
 
             if (boolName == "hasDesolateDive")
             {
-                return PlayerData.instance.quakeLevel > 0;
+                return Ref.PD.quakeLevel > 0;
             }
 
             if (boolName == "hasDescendingDark")
             {
-                return PlayerData.instance.quakeLevel > 1;
+                return Ref.PD.quakeLevel > 1;
             }
 
             if (boolName == "hasHowlingWraiths")
             {
-                return PlayerData.instance.screamLevel > 0;
+                return Ref.PD.screamLevel > 0;
             }
 
             if (boolName == "hasAbyssShriek")
             {
-                return PlayerData.instance.screamLevel > 1;
+                return Ref.PD.screamLevel > 1;
             }
 
             // This variable is incredibly stubborn, not worth the effort to make it cooperate
@@ -301,12 +260,12 @@ namespace RandomizerMod
                 return Settings.GetBool(false, boolName.Substring(14));
             }
 
-            return PlayerData.instance.GetBoolInternal(boolName);
+            return Ref.PD.GetBoolInternal(boolName);
         }
 
         private void BoolSetOverride(string boolName, bool value)
         {
-            PlayerData pd = PlayerData.instance;
+            PlayerData pd = Ref.PD;
 
             // It's just way easier if I can treat spells as bools
             if (boolName == "hasVengefulSpirit" && value && pd.fireballLevel <= 0)
@@ -409,7 +368,7 @@ namespace RandomizerMod
             else if (boolName == nameof(PlayerData.hasDreamGate) && value)
             {
                 // Make sure the player can actually use dream gate after getting it
-                FSMUtility.LocateFSM(HeroController.instance.gameObject, "Dream Nail").FsmVariables
+                FSMUtility.LocateFSM(Ref.Hero.gameObject, "Dream Nail").FsmVariables
                     .GetFsmBool("Dream Warp Allowed").Value = true;
             }
             else if (boolName == nameof(PlayerData.hasAcidArmour) && value)
@@ -431,12 +390,12 @@ namespace RandomizerMod
                 return 0;
             }
 
-            return PlayerData.instance.GetIntInternal(intName);
+            return Ref.PD.GetIntInternal(intName);
         }
 
         private void HandleSceneChanges(Scene from, Scene to)
         {
-            if (GameManager.instance.GetSceneNameString() == SceneNames.Menu_Title)
+            if (Ref.GM.GetSceneNameString() == SceneNames.Menu_Title)
             {
                 // Reset settings on menu load
                 Settings = new SaveSettings();
@@ -451,7 +410,7 @@ namespace RandomizerMod
                     LogError("Error editing menu:\n" + e);
                 }
             }
-            else if (GameManager.instance.GetSceneNameString() == SceneNames.End_Credits && Settings != null &&
+            else if (Ref.GM.GetSceneNameString() == SceneNames.End_Credits && Settings != null &&
                      Settings.Randomizer && Settings.ItemPlacements.Length != 0)
             {
 #warning Unfinished functionality here
@@ -469,7 +428,7 @@ namespace RandomizerMod
                 }*/
             }
 
-            if (GameManager.instance.IsGameplayScene())
+            if (Ref.GM.IsGameplayScene())
             {
                 try
                 {

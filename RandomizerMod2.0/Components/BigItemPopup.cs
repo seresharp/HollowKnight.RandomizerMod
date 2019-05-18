@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Modding;
 using RandomizerMod.Actions;
+using SeanprCore;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,7 +43,7 @@ namespace RandomizerMod.Components
         {
             for (int i = 0; i < items.Length; i++)
             {
-                if (!PlayerData.instance.GetBool(items[i].BoolName))
+                if (!Ref.PD.GetBool(items[i].BoolName))
                 {
                     return Show(items[i], fsmObj, eventName);
                 }
@@ -59,7 +60,7 @@ namespace RandomizerMod.Components
 
         public static GameObject Show(BigItemDef item, GameObject fsmObj = null, string eventName = null)
         {
-            PlayerData.instance.SetBool(item.BoolName, true);
+            Ref.PD.SetBool(item.BoolName, true);
             return Show(item.SpriteKey, item.TakeKey, item.NameKey, item.ButtonKey, item.DescOneKey, item.DescTwoKey,
                 fsmObj, eventName);
         }
@@ -86,7 +87,7 @@ namespace RandomizerMod.Components
 
         public void Start()
         {
-            GameManager.instance.SaveGame(GameManager.instance.profileID, x => { });
+            Ref.GM.SaveGame(Ref.GM.profileID, x => { });
             StartCoroutine(ShowPopup());
         }
 
@@ -118,7 +119,7 @@ namespace RandomizerMod.Components
                 new CanvasUtil.RectData(size, Vector2.zero, new Vector2(0.5f, 0.75f), new Vector2(0.5f, 0.8f)));
             GameObject topTextOne = CanvasUtil.CreateTextPanel(gameObject, takeText, 34, TextAnchor.MiddleCenter,
                 new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.55f),
-                    new Vector2(0.5f, 0.55f)), FontManager.GetFont("Perpetua"));
+                    new Vector2(0.5f, 0.55f)), Fonts.Get("Perpetua"));
             GameObject topTextTwo = CanvasUtil.CreateTextPanel(gameObject, nameText, 76, TextAnchor.MiddleCenter,
                 new CanvasUtil.RectData(new Vector2(1920, 300), Vector2.zero, new Vector2(0.5f, 0.49f),
                     new Vector2(0.5f, 0.49f)));
@@ -153,13 +154,13 @@ namespace RandomizerMod.Components
             // Fade in the remaining text
             GameObject botTextOne = CanvasUtil.CreateTextPanel(gameObject, buttonText, 34, TextAnchor.MiddleCenter,
                 new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.335f),
-                    new Vector2(0.5f, 0.335f)), FontManager.GetFont("Perpetua"));
+                    new Vector2(0.5f, 0.335f)), Fonts.Get("Perpetua"));
             GameObject botTextTwo = CanvasUtil.CreateTextPanel(gameObject, descOneText, 34, TextAnchor.MiddleCenter,
                 new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.26f),
-                    new Vector2(0.5f, 0.26f)), FontManager.GetFont("Perpetua"));
+                    new Vector2(0.5f, 0.26f)), Fonts.Get("Perpetua"));
             GameObject botTextThree = CanvasUtil.CreateTextPanel(gameObject, descTwoText, 34, TextAnchor.MiddleCenter,
                 new CanvasUtil.RectData(new Vector2(1920, 100), Vector2.zero, new Vector2(0.5f, 0.205f),
-                    new Vector2(0.5f, 0.205f)), FontManager.GetFont("Perpetua"));
+                    new Vector2(0.5f, 0.205f)), Fonts.Get("Perpetua"));
 
             CanvasGroup botTextOneCG = botTextOne.AddComponent<CanvasGroup>();
             CanvasGroup botTextTwoCG = botTextTwo.AddComponent<CanvasGroup>();
@@ -211,7 +212,7 @@ namespace RandomizerMod.Components
             // Wait for the user to cancel the menu
             while (true)
             {
-                HeroActions actions = GameManager.instance.inputHandler.inputActions;
+                HeroActions actions = Ref.Input.inputActions;
                 if (actions.jump.WasPressed || actions.attack.WasPressed || actions.menuCancel.WasPressed)
                 {
                     break;
@@ -273,7 +274,7 @@ namespace RandomizerMod.Components
         {
             while (true)
             {
-                HeroActions actions = GameManager.instance.inputHandler.inputActions;
+                HeroActions actions = Ref.Input.inputActions;
                 if (actions.jump.WasPressed || actions.attack.WasPressed || actions.menuCancel.WasPressed)
                 {
                     showInstantly = true;

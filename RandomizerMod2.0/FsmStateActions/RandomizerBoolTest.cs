@@ -1,4 +1,5 @@
 ﻿using HutongGames.PlayMaker;
+using SeanprCore;
 
 namespace RandomizerMod.FsmStateActions
 {
@@ -50,7 +51,7 @@ namespace RandomizerMod.FsmStateActions
 
         public override void OnEnter()
         {
-            if (playerdata && PlayerData.instance.GetBool(boolName) ||
+            if (playerdata && Ref.PD.GetBool(boolName) ||
                 !playerdata && RandomizerMod.Instance.Settings.GetBool(false, boolName))
             {
                 if (successEvent != null)

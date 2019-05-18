@@ -1,16 +1,24 @@
 ﻿using System.Linq;
 using Modding;
 using RandomizerMod.Actions;
-using UnityEngine;
+using SeanprCore;
 
 namespace RandomizerMod
 {
-    public class SaveSettings : ModSettings, ISerializationCallbackReceiver
+    public class SaveSettings : BaseSettings
     {
         private SerializableStringDictionary _itemPlacements = new SerializableStringDictionary();
 
         /// <remarks>item, location</remarks>
         public (string, string)[] ItemPlacements => _itemPlacements.Select(pair => (pair.Key, pair.Value)).ToArray();
+
+        public SaveSettings()
+        {
+            AfterDeserialize += () =>
+            {
+                RandomizerAction.CreateActions(ItemPlacements);
+            };
+        }
 
         public bool AllBosses
         {
@@ -100,19 +108,6 @@ namespace RandomizerMod
         {
             get => GetBool(false);
             set => SetBool(value);
-        }
-
-        void ISerializationCallbackReceiver.OnBeforeSerialize()
-        {
-            SetString(JsonUtility.ToJson(_itemPlacements), nameof(_itemPlacements));
-        }
-
-        // Recreate the actions after loading a save
-        public void OnAfterDeserialize()
-        {
-            _itemPlacements =
-                JsonUtility.FromJson<SerializableStringDictionary>(GetString(null, nameof(_itemPlacements)));
-            RandomizerAction.CreateActions(ItemPlacements);
         }
 
         public void ResetItemPlacements()

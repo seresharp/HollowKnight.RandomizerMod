@@ -37,6 +37,9 @@
     <Reference Include="PlayMaker">
       <HintPath>..\..\..\References\PlayMaker.dll</HintPath>
     </Reference>
+    <Reference Include="SeanprCore">
+      <HintPath>..\..\..\References\SeanprCore.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -94,8 +97,6 @@
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="Extensions\HeroControllerExtensions.cs" />
-    <Compile Include="Extensions\ModCommonTheft.cs" />
-    <Compile Include="FontManager.cs" />
     <Compile Include="FsmStateActions\RandomizerExecuteLambda.cs" />
     <Compile Include="FsmStateActions\RandomizerTakeGeo.cs" />
     <Compile Include="FsmStateActions\RandomizerSellRelics.cs" />
@@ -111,7 +112,6 @@
     <Compile Include="FsmStateActions\RandomizerSetBool.cs" />
     <Compile Include="FsmStateActions\RandomizerSetHardSave.cs" />
     <Compile Include="LanguageStringManager.cs" />
-    <Compile Include="Extensions\PlayMakerFSMExtensions.cs" />
     <Compile Include="FsmStateActions\RandomizerBoolTest.cs" />
     <Compile Include="Actions\RandomizerAction.cs" />
     <Compile Include="LogHelper.cs" />
@@ -124,7 +124,6 @@
     <Compile Include="Randomization\Randomizer.cs" />
     <Compile Include="RestrictionManager.cs" />
     <Compile Include="SaveSettings.cs" />
-    <Compile Include="SceneNames.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Prompts\Dash.png" />

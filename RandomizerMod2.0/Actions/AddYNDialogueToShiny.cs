@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
-using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
+using SeanprCore;
 using UnityEngine;
 using static RandomizerMod.LogHelper;
 
@@ -62,7 +62,7 @@ namespace RandomizerMod.Actions
                 gameObject = new FsmOwnerDefault
                 {
                     OwnerOption = OwnerDefaultOption.SpecifyGameObject,
-                    GameObject = HeroController.instance.gameObject
+                    GameObject = Ref.Hero.gameObject
                 },
                 clipName = "Collect Normal 3",
                 animationTriggerEvent = null,
@@ -112,7 +112,7 @@ namespace RandomizerMod.Actions
                 LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE",
                     cost + " Essence: " + LanguageStringManager.GetLanguageString(itemName, "UI"));
 
-                if (PlayerData.instance.dreamOrbs < cost)
+                if (Ref.PD.dreamOrbs < cost)
                 {
                     FSMUtility.LocateFSM(GameObject.Find("Text YN"), "Dialogue Page Control")
                         .StartCoroutine(KillGeoText());

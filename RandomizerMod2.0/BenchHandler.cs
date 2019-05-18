@@ -1,4 +1,5 @@
 ﻿using On.HutongGames.PlayMaker.Actions;
+using SeanprCore;
 
 namespace RandomizerMod
 {
@@ -53,7 +54,7 @@ namespace RandomizerMod
         {
             if (self.State?.Name == "Rest Burst" && self.boolVariable?.Name == "Set Respawn")
             {
-                self.boolVariable.Value = CanSaveInRoom(GameManager.instance.GetSceneNameString());
+                self.boolVariable.Value = CanSaveInRoom(Ref.GM.GetSceneNameString());
             }
 
             orig(self);
@@ -61,7 +62,7 @@ namespace RandomizerMod
 
         private static bool CanSaveInRoom(string sceneName)
         {
-            PlayerData pd = PlayerData.instance;
+            PlayerData pd = Ref.PD;
 
             switch (sceneName)
             {

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using GlobalEnums;
 using HutongGames.PlayMaker;
+using SeanprCore;
 
 namespace RandomizerMod.FsmStateActions
 {
@@ -39,10 +40,10 @@ namespace RandomizerMod.FsmStateActions
 
             void loadScene()
             {
-                GameManager.instance.StopAllCoroutines();
-                sceneLoad.SetValue(GameManager.instance, null);
+                Ref.GM.StopAllCoroutines();
+                sceneLoad.SetValue(Ref.GM, null);
 
-                GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo
+                Ref.GM.BeginSceneTransition(new GameManager.SceneLoadInfo
                 {
                     IsFirstLevelForPlayer = false,
                     SceneName = sceneName,
@@ -56,7 +57,7 @@ namespace RandomizerMod.FsmStateActions
                 });
             }
 
-            SceneLoad load = (SceneLoad) sceneLoad.GetValue(GameManager.instance);
+            SceneLoad load = (SceneLoad) sceneLoad.GetValue(Ref.GM);
             if (load != null)
             {
                 load.Finish += loadScene;

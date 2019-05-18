@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
-using RandomizerMod.Extensions;
+using SeanprCore;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -110,8 +110,8 @@ namespace RandomizerMod
                 RandomizerMod.Instance.Settings.AllSkills)
             {
                 // Close the door and get rid of Quirrel
-                PlayerData.instance.openedBlackEggDoor = false;
-                PlayerData.instance.quirrelLeftEggTemple = true;
+                Ref.PD.openedBlackEggDoor = false;
+                Ref.PD.quirrelLeftEggTemple = true;
 
                 // Prevent the game from opening the door
                 GameObject door = GameObject.Find("Final Boss Door");
@@ -133,8 +133,8 @@ namespace RandomizerMod
                 LanguageStringManager.ResetString(HORNET_SHEET, HORNET_DOOR_KEY);
 
                 // Check dreamers
-                if (!PlayerData.instance.lurienDefeated || !PlayerData.instance.monomonDefeated ||
-                    !PlayerData.instance.hegemolDefeated)
+                if (!Ref.PD.lurienDefeated || !Ref.PD.monomonDefeated ||
+                    !Ref.PD.hegemolDefeated)
                 {
                     LanguageStringManager.SetString(HORNET_SHEET, HORNET_DOOR_KEY,
                         "What kind of idiot comes here without even killing the dreamers?");
@@ -144,15 +144,15 @@ namespace RandomizerMod
                 // Check all charms
                 if (RandomizerMod.Instance.Settings.AllCharms)
                 {
-                    PlayerData.instance.CountCharms();
-                    if (PlayerData.instance.charmsOwned < 40)
+                    Ref.PD.CountCharms();
+                    if (Ref.PD.charmsOwned < 40)
                     {
                         LanguageStringManager.SetString(HORNET_SHEET, HORNET_DOOR_KEY,
                             "What are you doing here? Go get the rest of the charms.");
                         return;
                     }
 
-                    if (PlayerData.instance.royalCharmState < 3)
+                    if (Ref.PD.royalCharmState < 3)
                     {
                         LanguageStringManager.SetString(HORNET_SHEET, HORNET_DOOR_KEY,
                             "Nice try, but half of a charm doesn't count. Go get the rest of the kingsoul.");
@@ -167,39 +167,39 @@ namespace RandomizerMod
 
                     foreach (KeyValuePair<string, string> kvp in Skills)
                     {
-                        if (!PlayerData.instance.GetBool(kvp.Key))
+                        if (!Ref.PD.GetBool(kvp.Key))
                         {
                             missingSkills.Add(kvp.Value);
                         }
                     }
 
                     // These aren't as easy to check in a loop, so I'm just gonna check them manually
-                    if (PlayerData.instance.fireballLevel == 0)
+                    if (Ref.PD.fireballLevel == 0)
                     {
                         missingSkills.Add("Vengeful Spirit");
                     }
 
-                    if (PlayerData.instance.fireballLevel < 2)
+                    if (Ref.PD.fireballLevel < 2)
                     {
                         missingSkills.Add("Shade Soul");
                     }
 
-                    if (PlayerData.instance.quakeLevel == 0)
+                    if (Ref.PD.quakeLevel == 0)
                     {
                         missingSkills.Add("Desolate Dive");
                     }
 
-                    if (PlayerData.instance.quakeLevel < 2)
+                    if (Ref.PD.quakeLevel < 2)
                     {
                         missingSkills.Add("Descending Dark");
                     }
 
-                    if (PlayerData.instance.screamLevel == 0)
+                    if (Ref.PD.screamLevel == 0)
                     {
                         missingSkills.Add("Howling Wraiths");
                     }
 
-                    if (PlayerData.instance.screamLevel < 2)
+                    if (Ref.PD.screamLevel < 2)
                     {
                         missingSkills.Add("Abyss Shriek");
                     }
@@ -236,14 +236,14 @@ namespace RandomizerMod
 
                     foreach (KeyValuePair<string, string> kvp in Bosses)
                     {
-                        if (!PlayerData.instance.GetBool(kvp.Key))
+                        if (!Ref.PD.GetBool(kvp.Key))
                         {
                             missingBosses.Add(kvp.Value);
                         }
                     }
 
                     // CG2 has no bool
-                    if (PlayerData.instance.killsMegaBeamMiner > 0)
+                    if (Ref.PD.killsMegaBeamMiner > 0)
                     {
                         missingBosses.Add("Crystal Guardian 2");
                     }
@@ -279,7 +279,7 @@ namespace RandomizerMod
                         return;
                     }
 
-                    if (PlayerData.instance.royalCharmState != 4)
+                    if (Ref.PD.royalCharmState != 4)
                     {
                         LanguageStringManager.SetString(HORNET_SHEET, HORNET_DOOR_KEY,
                             "You chose all bosses, go get void heart ya dip.");
@@ -288,7 +288,7 @@ namespace RandomizerMod
                 }
 
                 // All checks passed, time to open up
-                PlayerData.instance.openedBlackEggDoor = true;
+                Ref.PD.openedBlackEggDoor = true;
                 doorFSM.SetState("Opened");
                 doorTransitionPoint.gameObject.SetActive(true);
             }

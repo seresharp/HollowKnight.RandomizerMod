@@ -1,4 +1,5 @@
 ﻿using HutongGames.PlayMaker;
+using SeanprCore;
 
 namespace RandomizerMod.FsmStateActions
 {
@@ -19,7 +20,7 @@ namespace RandomizerMod.FsmStateActions
         {
             if (playerdata)
             {
-                PlayerData.instance.SetBool(name, val);
+                Ref.PD.SetBool(name, val);
             }
             else
             {

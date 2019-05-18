@@ -1,5 +1,6 @@
 ﻿using System;
 using RandomizerMod.Extensions;
+using SeanprCore;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,7 +18,7 @@ namespace RandomizerMod
             RandomizerMod.Instance.Settings = new SaveSettings();
 
             // Fetch data from vanilla screen
-            MenuScreen playScreen = UIManager.instance.playModeMenuScreen;
+            MenuScreen playScreen = Ref.UI.playModeMenuScreen;
 
             playScreen.title.gameObject.transform.localPosition = new Vector3(0, 520.56f);
 

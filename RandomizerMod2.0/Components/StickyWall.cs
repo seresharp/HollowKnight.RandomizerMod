@@ -3,6 +3,7 @@ using System.Reflection;
 using GlobalEnums;
 using Modding;
 using RandomizerMod.Extensions;
+using SeanprCore;
 using UnityEngine;
 
 namespace RandomizerMod.Components
@@ -11,9 +12,6 @@ namespace RandomizerMod.Components
     {
         private static readonly MethodInfo hcWallJump =
             typeof(HeroController).GetMethod("DoWallJump", BindingFlags.Instance | BindingFlags.NonPublic);
-
-        private static MethodInfo hcCanDoubleJump =
-            typeof(HeroController).GetMethod("CanDoubleJump", BindingFlags.Instance | BindingFlags.NonPublic);
 
         private BoxCollider2D box;
         private bool wallRunning;
@@ -58,7 +56,7 @@ namespace RandomizerMod.Components
 
             if (wallRunning)
             {
-                FixHero(HeroController.instance);
+                FixHero(Ref.Hero);
             }
         }
 
@@ -102,13 +100,13 @@ namespace RandomizerMod.Components
         public void Update()
         {
             // Jump off the wall if the player presses jump
-            if (wallRunning && GameManager.instance.inputHandler.inputActions.jump.WasPressed)
+            if (wallRunning && Ref.Input.inputActions.jump.WasPressed)
             {
-                StopWallRunning(HeroController.instance);
+                StopWallRunning(Ref.Hero);
                 return;
             }
 
-            HeroController hc = HeroController.instance;
+            HeroController hc = Ref.Hero;
 
             if (hc == null || !wallRunning)
             {
@@ -118,7 +116,7 @@ namespace RandomizerMod.Components
             // Handle movement of the hero
             // Bounds checking is only in the direction the player is currently moving, but this should be fine
             if (hc.transform.position.y < transform.position.y + box.size.y / 2 &&
-                GameManager.instance.inputHandler.inputActions.left.IsPressed)
+                Ref.Input.inputActions.left.IsPressed)
             {
                 hc.FaceLeft();
                 hc.gameObject.transform.SetPositionX(transform.position.x + box.size.x + .15f);
@@ -128,7 +126,7 @@ namespace RandomizerMod.Components
                 hc.GetComponent<tk2dSpriteAnimator>().Play(hc.GetRunAnimName());
             }
             else if (hc.transform.position.y > transform.position.y - box.size.y / 2 &&
-                     GameManager.instance.inputHandler.inputActions.right.IsPressed)
+                     Ref.Input.inputActions.right.IsPressed)
             {
                 hc.FaceRight();
                 hc.gameObject.transform.SetPositionX(transform.position.x + box.size.x + .15f);
@@ -137,8 +135,8 @@ namespace RandomizerMod.Components
                                                      hc.GetRunSpeed() * Time.deltaTime);
                 hc.GetComponent<tk2dSpriteAnimator>().Play(hc.GetRunAnimName());
             }
-            else if (GameManager.instance.inputHandler.inputActions.left.WasReleased ||
-                     GameManager.instance.inputHandler.inputActions.right.WasReleased)
+            else if (Ref.Input.inputActions.left.WasReleased ||
+                     Ref.Input.inputActions.right.WasReleased)
             {
                 hc.GetComponent<tk2dSpriteAnimator>().Play("Run To Idle");
                 hc.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
@@ -223,7 +221,7 @@ namespace RandomizerMod.Components
             hcWallJump.Invoke(hc, null);
 
             // If the player has wings, prevent a double jump
-            if (PlayerData.instance.hasDoubleJump)
+            if (Ref.PD.hasDoubleJump)
             {
                 On.HeroController.DoDoubleJump -= No;
                 On.HeroController.DoDoubleJump += No;
@@ -238,7 +236,7 @@ namespace RandomizerMod.Components
         {
             if (wallRunning)
             {
-                FixHero(HeroController.instance);
+                FixHero(Ref.Hero);
             }
 
             return damage;

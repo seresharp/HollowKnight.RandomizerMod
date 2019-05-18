@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RandomizerMod.Randomization;
+using SeanprCore;
 using UnityEngine;
 using static RandomizerMod.LogHelper;
 using Object = UnityEngine.Object;
@@ -340,7 +341,7 @@ namespace RandomizerMod.Actions
 
         public static void EditShinies()
         {
-            string scene = GameManager.instance.GetSceneNameString();
+            string scene = Ref.GM.GetSceneNameString();
 
             foreach (RandomizerAction action in Actions)
             {

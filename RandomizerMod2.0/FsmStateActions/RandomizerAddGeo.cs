@@ -1,4 +1,5 @@
 ﻿using HutongGames.PlayMaker;
+using SeanprCore;
 using UnityEngine;
 using Random = System.Random;
 
@@ -28,10 +29,10 @@ namespace RandomizerMod.FsmStateActions
         public override void OnEnter()
         {
             // Special case for pickups where you don't have an opportunity to pick up the geo
-            string sceneName = GameManager.instance.GetSceneNameString();
+            string sceneName = Ref.GM.GetSceneNameString();
             if (sceneName == SceneNames.Dream_Nailcollection || sceneName == SceneNames.Room_Sly_Storeroom)
             {
-                HeroController.instance.AddGeo(count);
+                Ref.Hero.AddGeo(count);
                 Finish();
                 return;
             }

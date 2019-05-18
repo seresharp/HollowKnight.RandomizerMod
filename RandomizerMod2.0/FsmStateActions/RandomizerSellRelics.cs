@@ -1,4 +1,5 @@
 ﻿using HutongGames.PlayMaker;
+using SeanprCore;
 
 namespace RandomizerMod.FsmStateActions
 {
@@ -6,27 +7,27 @@ namespace RandomizerMod.FsmStateActions
     {
         public override void OnEnter()
         {
-            if (!PlayerData.instance.GetBool("equippedCharm_10"))
+            if (!Ref.PD.GetBool("equippedCharm_10"))
             {
-                int money = PlayerData.instance.trinket1 * 200;
-                money += PlayerData.instance.trinket2 * 450;
-                money += PlayerData.instance.trinket3 * 800;
-                money += PlayerData.instance.trinket4 * 1200;
+                int money = Ref.PD.trinket1 * 200;
+                money += Ref.PD.trinket2 * 450;
+                money += Ref.PD.trinket3 * 800;
+                money += Ref.PD.trinket4 * 1200;
 
                 if (money > 0)
                 {
-                    HeroController.instance.AddGeo(money);
+                    Ref.Hero.AddGeo(money);
                 }
 
-                PlayerData.instance.soldTrinket1 += PlayerData.instance.trinket1;
-                PlayerData.instance.soldTrinket2 += PlayerData.instance.trinket2;
-                PlayerData.instance.soldTrinket3 += PlayerData.instance.trinket3;
-                PlayerData.instance.soldTrinket4 += PlayerData.instance.trinket4;
+                Ref.PD.soldTrinket1 += Ref.PD.trinket1;
+                Ref.PD.soldTrinket2 += Ref.PD.trinket2;
+                Ref.PD.soldTrinket3 += Ref.PD.trinket3;
+                Ref.PD.soldTrinket4 += Ref.PD.trinket4;
 
-                PlayerData.instance.trinket1 = 0;
-                PlayerData.instance.trinket2 = 0;
-                PlayerData.instance.trinket3 = 0;
-                PlayerData.instance.trinket4 = 0;
+                Ref.PD.trinket1 = 0;
+                Ref.PD.trinket2 = 0;
+                Ref.PD.trinket3 = 0;
+                Ref.PD.trinket4 = 0;
             }
 
             Finish();

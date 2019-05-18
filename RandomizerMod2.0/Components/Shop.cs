@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Modding;
 using RandomizerMod.Actions;
+using SeanprCore;
 using UnityEngine;
 using UnityEngine.UI;
 using static RandomizerMod.LogHelper;
@@ -226,7 +227,7 @@ namespace RandomizerMod.Components
 
         private bool IsValid(ShopItemDef item)
         {
-            PlayerData pd = PlayerData.instance;
+            PlayerData pd = Ref.PD;
 
             // These ones can't be empty
             if (string.IsNullOrEmpty(item.PlayerDataBoolName) || string.IsNullOrEmpty(item.NameConvo) ||
@@ -296,10 +297,10 @@ namespace RandomizerMod.Components
                 int cost = (int) (items[validItems[i]].Cost * (items[validItems[i]].DungDiscount ? 0.75f : 1));
                 itemImages[i, 2] = CanvasUtil.CreateTextPanel(gameObject, cost.ToString(), 34, TextAnchor.MiddleCenter,
                     new CanvasUtil.RectData(new Vector2(1920, 1080), Vector2.zero, new Vector2(0.61f, 0f),
-                        new Vector2(0.61f, 0f)), FontManager.GetFont("Perpetua"));
+                        new Vector2(0.61f, 0f)), Fonts.Get("Perpetua"));
 
-                if (type == ShopType.Geo && cost > PlayerData.instance.geo ||
-                    type == ShopType.Essence && cost > PlayerData.instance.dreamOrbs)
+                if (type == ShopType.Geo && cost > Ref.PD.geo ||
+                    type == ShopType.Essence && cost > Ref.PD.dreamOrbs)
                 {
                     itemImages[i, 3] = CanvasUtil.CreateImagePanel(gameObject, blackPixel,
                         new CanvasUtil.RectData(new Vector2(300, 100), Vector2.zero, new Vector2(0.57f, 0f),
@@ -396,7 +397,7 @@ namespace RandomizerMod.Components
 
         private IEnumerator ListenForInput()
         {
-            HeroActions buttons = GameManager.instance.inputHandler.inputActions;
+            HeroActions buttons = Ref.Input.inputActions;
 
             while (true)
             {

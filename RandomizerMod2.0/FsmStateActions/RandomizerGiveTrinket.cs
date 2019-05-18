@@ -1,4 +1,5 @@
 ﻿using HutongGames.PlayMaker;
+using SeanprCore;
 
 namespace RandomizerMod.FsmStateActions
 {
@@ -13,9 +14,9 @@ namespace RandomizerMod.FsmStateActions
 
         public override void OnEnter()
         {
-            PlayerData.instance.SetBool($"foundTrinket{num}", true);
-            PlayerData.instance.SetBool($"noTrinket{num}", false);
-            PlayerData.instance.IncrementInt($"trinket{num}");
+            Ref.PD.SetBool($"foundTrinket{num}", true);
+            Ref.PD.SetBool($"noTrinket{num}", false);
+            Ref.PD.IncrementInt($"trinket{num}");
 
             Finish();
         }

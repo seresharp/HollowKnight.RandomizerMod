@@ -1,4 +1,5 @@
 ﻿using HutongGames.PlayMaker;
+using SeanprCore;
 
 namespace RandomizerMod.FsmStateActions
 {
@@ -13,9 +14,9 @@ namespace RandomizerMod.FsmStateActions
 
         public override void OnEnter()
         {
-            if (amount > 0 && amount <= PlayerData.instance?.geo)
+            if (amount > 0 && amount <= Ref.PD?.geo)
             {
-                HeroController.instance?.TakeGeo(amount);
+                Ref.Hero?.TakeGeo(amount);
             }
 
             Finish();

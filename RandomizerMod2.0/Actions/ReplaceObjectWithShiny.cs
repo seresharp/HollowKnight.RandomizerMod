@@ -1,6 +1,6 @@
 ﻿using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
-using RandomizerMod.Extensions;
+using SeanprCore;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

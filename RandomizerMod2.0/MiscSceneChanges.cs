@@ -3,8 +3,8 @@ using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using Modding;
 using RandomizerMod.Components;
-using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
+using SeanprCore;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = System.Random;
@@ -59,12 +59,12 @@ namespace RandomizerMod
             string sceneName = newScene.name;
 
             // Remove quake floors in Soul Sanctum to prevent soft locks
-            if (PlayerData.instance.quakeLevel <= 0 && PlayerData.instance.killedMageLord &&
+            if (Ref.PD.quakeLevel <= 0 && Ref.PD.killedMageLord &&
                 (sceneName == SceneNames.Ruins1_23 || sceneName == SceneNames.Ruins1_30 ||
                  sceneName == SceneNames.Ruins1_32))
             {
-                PlayerData.instance.SetBool(nameof(PlayerData.brokenMageWindow), true);
-                PlayerData.instance.SetBool(nameof(PlayerData.brokenMageWindowGlass), true);
+                Ref.PD.SetBool(nameof(PlayerData.brokenMageWindow), true);
+                Ref.PD.SetBool(nameof(PlayerData.brokenMageWindowGlass), true);
 
                 foreach (GameObject obj in newScene.GetRootGameObjects())
                 {
@@ -96,7 +96,7 @@ namespace RandomizerMod
             {
                 case SceneNames.Abyss_12:
                     // Destroy shriek pickup if the player doesn't have wraiths
-                    if (PlayerData.instance.screamLevel == 0)
+                    if (Ref.PD.screamLevel == 0)
                     {
                         Object.Destroy(GameObject.Find("Randomizer Shiny"));
                     }
@@ -142,7 +142,7 @@ namespace RandomizerMod
                     legEater.GetState("All Gold?").RemoveTransitionsTo("No Shop");
 
                     // Just in case something other than the "Ready To Leave" state controls this
-                    PlayerData.instance.legEaterLeft = false;
+                    Ref.PD.legEaterLeft = false;
                     break;
                 case SceneNames.Mines_33:
                     // Make tolls always interactable
@@ -156,8 +156,8 @@ namespace RandomizerMod
                     break;
                 case SceneNames.RestingGrounds_07:
                     // Make Moth NPC not give items since those are now shinies
-                    PlayerData.instance.dreamReward4 = true;
-                    PlayerData.instance.dreamReward5b = true;
+                    Ref.PD.dreamReward4 = true;
+                    Ref.PD.dreamReward5b = true;
 
                     PlayMakerFSM moth = FSMUtility.LocateFSM(GameObject.Find("Dream Moth"), "Conversation Control");
                     moth.FsmVariables.GetFsmBool("Got Reward 4").Value = true;
@@ -228,7 +228,7 @@ namespace RandomizerMod
 
                     // Stop the weird invisible floor from appearing if dive has been obtained
                     // I don't think it really serves any purpose, so destroying it should be fine
-                    if (PlayerData.instance.quakeLevel > 0)
+                    if (Ref.PD.quakeLevel > 0)
                     {
                         Object.Destroy(GameObject.Find("Roof Collider Battle"));
                     }
@@ -240,7 +240,7 @@ namespace RandomizerMod
                     checkQuake.AddAction(new RandomizerBoolTest(nameof(PlayerData.killedMageLord), null, "DESTROY",
                         true));
                     break;
-                case SceneNames.Ruins1_32 when !PlayerData.instance.hasWalljump:
+                case SceneNames.Ruins1_32 when !Ref.PD.hasWalljump:
                     // Platform after soul master
                     GameObject plat = Object.Instantiate(GameObject.Find("ruind_int_plat_float_02 (3)"));
                     plat.SetActive(true);
@@ -349,7 +349,7 @@ namespace RandomizerMod
                     ObjectDestroyer.Destroy("Dream Scene Activate");
 
                     // Fix the camera lock zone by removing the FSM that destroys it
-                    if (!PlayerData.instance.hornet1Defeated)
+                    if (!Ref.PD.hornet1Defeated)
                     {
                         Object.Destroy(FSMUtility.LocateFSM(GameObject.Find("Camera Locks Boss"), "FSM"));
                     }
