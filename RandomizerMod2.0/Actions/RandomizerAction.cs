@@ -18,8 +18,6 @@ namespace RandomizerMod.Actions
             PlayMakerFSM
         }
 
-        private static readonly Random Rnd = new Random();
-
         private static readonly List<RandomizerAction> Actions = new List<RandomizerAction>();
 
         public abstract ActionType Type { get; }
@@ -29,8 +27,10 @@ namespace RandomizerMod.Actions
             Actions.Clear();
         }
 
-        public static void CreateActions((string, string)[] items)
+        public static void CreateActions((string, string)[] items, int seed)
         {
+            Random rnd = new Random(seed);
+
             ClearActions();
             Dictionary<string, int> additiveCounts = null;
 
@@ -67,7 +67,7 @@ namespace RandomizerMod.Actions
                     oldItem.type = ItemType.Charm;
                 }
 
-                string randomizerBoolName = GetAdditiveBoolName(newItemName, additiveCounts);
+                string randomizerBoolName = GetAdditiveBoolName(newItemName, ref additiveCounts);
                 bool playerdata = false;
                 if (string.IsNullOrEmpty(randomizerBoolName))
                 {
@@ -223,7 +223,7 @@ namespace RandomizerMod.Actions
                     RemovalPlayerDataBool = string.Empty,
                     DungDiscount = LogicManager.GetShopDef(shopName).dungDiscount,
                     NotchCostBool = newItem.notchCost,
-                    Cost = 100 + Rnd.Next(41) * 10,
+                    Cost = 100 + rnd.Next(41) * 10,
                     SpriteName = newItem.shopSpriteKey
                 };
 
@@ -286,7 +286,7 @@ namespace RandomizerMod.Actions
             };
         }
 
-        private static string GetAdditiveBoolName(string boolName, Dictionary<string, int> additiveCounts)
+        private static string GetAdditiveBoolName(string boolName, ref Dictionary<string, int> additiveCounts)
         {
             if (additiveCounts == null)
             {

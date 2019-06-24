@@ -16,7 +16,7 @@ namespace RandomizerMod
         {
             AfterDeserialize += () =>
             {
-                RandomizerAction.CreateActions(ItemPlacements);
+                RandomizerAction.CreateActions(ItemPlacements, Seed);
             };
         }
 

@@ -89,8 +89,7 @@ namespace RandomizerMod
                 {nameof(PlayerData.gotCharm_25), nameof(PlayerData.fragileStrength_unbreakable)}
             };
 
-
-            // Marking unbreakable charms as secondary too to make shade skips viable
+            MenuChanger.EditUI();
         }
 
         public override List<(string, string)> GetPreloadNames()
@@ -143,7 +142,7 @@ namespace RandomizerMod
             try
             {
                 Randomizer.Randomize();
-                RandomizerAction.CreateActions(Settings.ItemPlacements);
+                RandomizerAction.CreateActions(Settings.ItemPlacements, Settings.Seed);
             }
             catch (Exception e)
             {

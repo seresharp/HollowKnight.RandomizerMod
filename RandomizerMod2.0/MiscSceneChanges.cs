@@ -493,7 +493,7 @@ namespace RandomizerMod
 
             orig(self);
 
-            if (self.gameObject.name == "Knight" || self.FsmName == "Dream Nail")
+            if (self.gameObject.name != "Knight" || self.FsmName != "Dream Nail")
             {
                 return;
             }
