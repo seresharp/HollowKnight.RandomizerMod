@@ -3,7 +3,7 @@ using HutongGames.PlayMaker;
 using Modding;
 using SeanprCore;
 
-namespace RandomizerMod.FsmStateActions
+namespace RandomizerLib.FsmStateActions
 {
     internal class RandomizerChangeScene : FsmStateAction
     {
@@ -31,7 +31,7 @@ namespace RandomizerMod.FsmStateActions
         {
             if (string.IsNullOrEmpty(sceneName) || string.IsNullOrEmpty(gateName))
             {
-                Log("Empty string passed into ChangeToScene, ignoring");
+                LogHelper.Log("Empty string passed into ChangeToScene, ignoring");
                 return;
             }
 

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using Modding;
 using UnityEngine;
-using static RandomizerMod.LogHelper;
+using static RandomizerLib.LogHelper;
 
-namespace RandomizerMod
+namespace RandomizerLib
 {
-    internal static class ObjectCache
+    public static class ObjectCache
     {
         private static GameObject _shinyItem;
 

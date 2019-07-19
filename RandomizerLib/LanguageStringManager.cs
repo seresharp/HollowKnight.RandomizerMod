@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
+using JetBrains.Annotations;
 using Language;
-using static RandomizerMod.LogHelper;
+using static RandomizerLib.LogHelper;
 
-namespace RandomizerMod
+namespace RandomizerLib
 {
+    [PublicAPI]
     internal static class LanguageStringManager
     {
         private static readonly Dictionary<string, Dictionary<string, string>> LanguageStrings =

@@ -1,11 +1,13 @@
 ﻿using HutongGames.PlayMaker;
+using JetBrains.Annotations;
 using SeanprCore;
 using UnityEngine;
 using Random = System.Random;
 
-namespace RandomizerMod.FsmStateActions
+namespace RandomizerLib.FsmStateActions
 {
-    internal class RandomizerAddGeo : FsmStateAction
+    [PublicAPI]
+    public class RandomizerAddGeo : FsmStateAction
     {
         private const int GEO_VALUE_LARGE = 25;
         private const int GEO_VALUE_MEDIUM = 5;

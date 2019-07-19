@@ -1,16 +1,21 @@
 ﻿using HutongGames.PlayMaker;
+using JetBrains.Annotations;
+using Modding;
 using SeanprCore;
 
-namespace RandomizerMod.FsmStateActions
+namespace RandomizerLib.FsmStateActions
 {
-    internal class RandomizerSetBool : FsmStateAction
+    [PublicAPI]
+    public class RandomizerSetBool : FsmStateAction
     {
+        private readonly Mod _mod;
         private readonly string _name;
         private readonly bool _playerdata;
         private readonly bool _val;
 
-        public RandomizerSetBool(string boolName, bool val, bool playerdata = false)
+        public RandomizerSetBool(Mod mod, string boolName, bool val, bool playerdata = false)
         {
+            _mod = mod;
             _name = boolName;
             _val = val;
             _playerdata = playerdata;
@@ -24,7 +29,7 @@ namespace RandomizerMod.FsmStateActions
             }
             else
             {
-                RandomizerMod.Instance.Settings.SetBool(_val, _name);
+                _mod.SaveSettings.SetBool(_val, _name);
             }
 
             Finish();

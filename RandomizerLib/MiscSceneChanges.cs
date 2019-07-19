@@ -1,16 +1,18 @@
 ﻿using GlobalEnums;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
+using JetBrains.Annotations;
 using Modding;
-using RandomizerMod.Components;
-using RandomizerMod.FsmStateActions;
+using RandomizerLib.Components;
+using RandomizerLib.FsmStateActions;
 using SeanprCore;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = System.Random;
 
-namespace RandomizerMod
+namespace RandomizerLib
 {
+    [PublicAPI]
     internal static class MiscSceneChanges
     {
         private static readonly Random Rnd = new Random();
@@ -32,18 +34,18 @@ namespace RandomizerMod
             On.PlayMakerFSM.OnEnable -= ModifyFSM;
         }
 
-        public static void SceneChanged(Scene newScene)
+        public static void SceneChanged(Scene newScene, Mod mod, bool randomizer, bool noClaw)
         {
             RecalculateRandom();
 
             ApplyGeneralChanges(newScene);
 
-            if (RandomizerMod.Instance.Settings.Randomizer)
+            if (randomizer)
             {
-                ApplyRandomizerChanges(newScene);
+                ApplyRandomizerChanges(mod, newScene);
             }
 
-            if (RandomizerMod.Instance.Settings.NoClaw)
+            if (noClaw)
             {
                 ApplyNoClawChanges(newScene);
             }
@@ -51,10 +53,10 @@ namespace RandomizerMod
 
         private static void RecalculateRandom()
         {
-            _rndNum = Rnd.Next(25);
+            _rndNum = Rnd.Next(15);
         }
 
-        private static void ApplyRandomizerChanges(Scene newScene)
+        private static void ApplyRandomizerChanges(Mod mod, Scene newScene)
         {
             string sceneName = newScene.name;
 
@@ -175,7 +177,7 @@ namespace RandomizerMod
                     // Make Sly pickup send Sly back upstairs
                     FsmState slyFinish = FSMUtility.LocateFSM(GameObject.Find("Randomizer Shiny"), "Shiny Control")
                         .GetState("Finish");
-                    slyFinish.AddAction(new RandomizerSetBool("SlyCharm", true));
+                    slyFinish.AddAction(new RandomizerSetBool(mod, "SlyCharm", true));
 
                     // The game breaks if you leave the storeroom after this, so just send the player out of the shop completely
                     // People will think it's an intentional feature to cut out pointless walking anyway
@@ -237,7 +239,7 @@ namespace RandomizerMod
                     FsmState checkQuake = FSMUtility.LocateFSM(GameObject.Find("Battle Gate (1)"), "Destroy if Quake")
                         .GetState("Check");
                     checkQuake.RemoveActionsOfType<FsmStateAction>();
-                    checkQuake.AddAction(new RandomizerBoolTest(nameof(PlayerData.killedMageLord), null, "DESTROY",
+                    checkQuake.AddAction(new RandomizerBoolTest(mod, nameof(PlayerData.killedMageLord), null, "DESTROY",
                         true));
                     break;
                 case SceneNames.Ruins1_32 when !Ref.PD.hasWalljump:
@@ -258,7 +260,7 @@ namespace RandomizerMod
             switch (newScene.name)
             {
                 case SceneNames.Crossroads_38:
-                    // Faster daddy
+                    // Make grubfather throw his items out faster
                     PlayMakerFSM grubDaddy = FSMUtility.LocateFSM(GameObject.Find("Grub King"), "King Control");
                     grubDaddy.GetState("Final Reward?").RemoveTransitionsTo("Recover");
                     grubDaddy.GetState("Final Reward?").AddTransition("FINISHED", "Recheck");
@@ -340,6 +342,7 @@ namespace RandomizerMod
                                 delay = 0,
                                 everyFrame = false
                             };
+
                             childFSM.GetState("Destroy").AddFirstAction(openGate);
                             childFSM.GetState("Finish").AddFirstAction(openGate);
 
@@ -388,7 +391,7 @@ namespace RandomizerMod
                     dreamerScene2.GetState("Fade Out").RemoveTransitionsTo("Dial Wait");
                     dreamerScene2.GetState("Fade Out").AddTransition("FINISHED", "Set Compass Point");
                     break;
-                case SceneNames.Ruins1_05b when RandomizerMod.Instance.Settings.Lemm:
+                case SceneNames.Ruins1_05b: // TODO: Check lemm setting
                     // Lemm sell all
                     PlayMakerFSM lemm = FSMUtility.LocateFSM(GameObject.Find("Relic Dealer"), "npc_control");
                     lemm.GetState("Convo End").AddAction(new RandomizerSellRelics());
@@ -451,7 +454,7 @@ namespace RandomizerMod
         {
             orig(self, dir);
 
-            if (_rndNum != 17 || self.gameObject.name != "False Knight New")
+            if (_rndNum != 5 || self.gameObject.name != "False Knight New")
             {
                 return;
             }

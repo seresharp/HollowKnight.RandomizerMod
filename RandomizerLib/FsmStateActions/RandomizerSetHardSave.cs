@@ -1,11 +1,12 @@
 ﻿using HutongGames.PlayMaker;
+using JetBrains.Annotations;
 using SeanprCore;
 using UnityEngine;
-using static RandomizerMod.LogHelper;
 
-namespace RandomizerMod.FsmStateActions
+namespace RandomizerLib.FsmStateActions
 {
-    internal class RandomizerSetHardSave : FsmStateAction
+    [PublicAPI]
+    public class RandomizerSetHardSave : FsmStateAction
     {
         public override void OnEnter()
         {
@@ -29,7 +30,7 @@ namespace RandomizerMod.FsmStateActions
 
             if (spawnPoint == null)
             {
-                LogWarn(
+                LogHelper.LogWarn(
                     "RandomizerSetHardSave action present in scene with no respawn points: " +
                     Ref.GM.GetSceneNameString());
                 Finish();
@@ -48,7 +49,7 @@ namespace RandomizerMod.FsmStateActions
             }
             else
             {
-                LogWarn(
+                LogHelper.LogWarn(
                     "RandomizerSetHardSave could not identify type of RespawnPoint object in scene " +
                     Ref.GM.GetSceneNameString());
                 Finish();

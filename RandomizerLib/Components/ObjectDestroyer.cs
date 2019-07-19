@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace RandomizerMod.Components
+namespace RandomizerLib.Components
 {
     internal class ObjectDestroyer : MonoBehaviour
     {

@@ -5,12 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using JetBrains.Annotations;
 using SeanprCore;
-using static RandomizerMod.LogHelper;
+using static RandomizerLib.LogHelper;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
-    internal enum ItemType
+    public enum ItemType
     {
         Big,
         Charm,
@@ -21,7 +22,7 @@ namespace RandomizerMod.Randomization
 
     // ReSharper disable InconsistentNaming
 #pragma warning disable 0649 // Assigned via reflection
-    internal struct ReqDef
+    public struct ReqDef
     {
         // Control variables
         public string boolName;
@@ -66,7 +67,7 @@ namespace RandomizerMod.Randomization
         public int cost;
     }
 
-    internal struct ShopDef
+    public struct ShopDef
     {
         public string sceneName;
         public string objectName;
@@ -77,7 +78,8 @@ namespace RandomizerMod.Randomization
 #pragma warning restore 0649
     // ReSharper restore InconsistentNaming
 
-    internal static class LogicManager
+    [PublicAPI]
+    public static class LogicManager
     {
         private static Dictionary<string, ReqDef> _items;
         private static Dictionary<string, ShopDef> _shops;
@@ -146,7 +148,7 @@ namespace RandomizerMod.Randomization
             return def;
         }
 
-        public static bool ParseLogic(string item, string[] obtained)
+        public static bool ParseLogic(string item, string[] obtained, Settings settings)
         {
             string[] logic;
 
@@ -196,25 +198,25 @@ namespace RandomizerMod.Randomization
                         stack.Push(stack.Pop() | stack.Pop());
                         break;
                     case "SHADESKIPS":
-                        stack.Push(RandomizerMod.Instance.Settings.ShadeSkips);
+                        stack.Push(settings.ShadeSkips);
                         break;
                     case "ACIDSKIPS":
-                        stack.Push(RandomizerMod.Instance.Settings.AcidSkips);
+                        stack.Push(settings.AcidSkips);
                         break;
                     case "SPIKETUNNELS":
-                        stack.Push(RandomizerMod.Instance.Settings.SpikeTunnels);
+                        stack.Push(settings.SpikeTunnels);
                         break;
                     case "MISCSKIPS":
-                        stack.Push(RandomizerMod.Instance.Settings.MiscSkips);
+                        stack.Push(settings.MiscSkips);
                         break;
                     case "FIREBALLSKIPS":
-                        stack.Push(RandomizerMod.Instance.Settings.FireballSkips);
+                        stack.Push(settings.FireballSkips);
                         break;
                     case "MAGSKIPS":
-                        stack.Push(RandomizerMod.Instance.Settings.MagSkips);
+                        stack.Push(settings.MagSkips);
                         break;
                     case "NOCLAW":
-                        stack.Push(RandomizerMod.Instance.Settings.NoClaw);
+                        stack.Push(settings.NoClaw);
                         break;
                     case "EVERYTHING":
                         stack.Push(false);
@@ -515,6 +517,17 @@ namespace RandomizerMod.Randomization
                 LogDebug($"Parsed XML for shop \"{nameAttr.InnerText}\"");
                 _shops.Add(nameAttr.InnerText, (ShopDef) def);
             }
+        }
+
+        public struct Settings
+        {
+            public bool ShadeSkips;
+            public bool AcidSkips;
+            public bool SpikeTunnels;
+            public bool MiscSkips;
+            public bool FireballSkips;
+            public bool MagSkips;
+            public bool NoClaw;
         }
     }
 }

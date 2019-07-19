@@ -1,10 +1,13 @@
-﻿using On.HutongGames.PlayMaker.Actions;
+﻿using JetBrains.Annotations;
 using SeanprCore;
 
-namespace RandomizerMod
+namespace RandomizerLib
 {
-    internal static class BenchHandler
+    [PublicAPI]
+    public static class BenchHandler
     {
+        public static bool NoClaw { get; set; }
+
         public static void Hook()
         {
             UnHook();
@@ -12,7 +15,7 @@ namespace RandomizerMod
             On.PlayerData.SetBenchRespawn_RespawnMarker_string_int += HandleBenchSave;
             On.PlayerData.SetBenchRespawn_string_string_bool += HandleBenchSave;
             On.PlayerData.SetBenchRespawn_string_string_int_bool += HandleBenchSave;
-            BoolTest.OnEnter += HandleBenchBoolTest;
+            On.HutongGames.PlayMaker.Actions.BoolTest.OnEnter += HandleBenchBoolTest;
         }
 
         public static void UnHook()
@@ -20,7 +23,7 @@ namespace RandomizerMod
             On.PlayerData.SetBenchRespawn_RespawnMarker_string_int -= HandleBenchSave;
             On.PlayerData.SetBenchRespawn_string_string_bool -= HandleBenchSave;
             On.PlayerData.SetBenchRespawn_string_string_int_bool -= HandleBenchSave;
-            BoolTest.OnEnter -= HandleBenchBoolTest;
+            On.HutongGames.PlayMaker.Actions.BoolTest.OnEnter -= HandleBenchBoolTest;
         }
 
         private static void HandleBenchSave(On.PlayerData.orig_SetBenchRespawn_RespawnMarker_string_int orig,
@@ -50,7 +53,8 @@ namespace RandomizerMod
             }
         }
 
-        private static void HandleBenchBoolTest(BoolTest.orig_OnEnter orig, HutongGames.PlayMaker.Actions.BoolTest self)
+        private static void HandleBenchBoolTest(On.HutongGames.PlayMaker.Actions.BoolTest.orig_OnEnter orig,
+            HutongGames.PlayMaker.Actions.BoolTest self)
         {
             if (self.State?.Name == "Rest Burst" && self.boolVariable?.Name == "Set Respawn")
             {
@@ -67,7 +71,7 @@ namespace RandomizerMod
             switch (sceneName)
             {
                 case SceneNames.Abyss_18: // Basin bench
-                    return pd.hasWalljump || RandomizerMod.Instance.Settings.NoClaw && pd.hasDoubleJump;
+                    return pd.hasWalljump || (NoClaw && pd.hasDoubleJump);
                 case SceneNames.GG_Waterways: // Godhome
                     return pd.hasWalljump;
                 case SceneNames.Room_Slug_Shrine: // Unn bench

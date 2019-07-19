@@ -3,13 +3,12 @@ using System.Reflection;
 using GlobalEnums;
 using Modding;
 using MonoMod.Utils;
-using RandomizerMod.Extensions;
 using SeanprCore;
 using UnityEngine;
 
 // ReSharper disable file UnusedMember.Global
 
-namespace RandomizerMod.Components
+namespace RandomizerLib.Components
 {
     internal class StickyWall : MonoBehaviour
     {
@@ -133,8 +132,8 @@ namespace RandomizerMod.Components
                 hero.transform.SetPositionX(transform.position.x + _box.size.x + .15f);
 
                 hero.transform.SetPositionY(hero.transform.position.y +
-                                                     hc.GetRunSpeed() * Time.deltaTime);
-                hc.GetComponent<tk2dSpriteAnimator>().Play(hc.GetRunAnimName());
+                                                     GetHCRunSpeed() * Time.deltaTime);
+                hc.GetComponent<tk2dSpriteAnimator>().Play(GetHCRunAnimName());
             }
             else if (hc.transform.position.y > transform.position.y - _box.size.y / 2 &&
                      Ref.Input.inputActions.right.IsPressed)
@@ -143,8 +142,8 @@ namespace RandomizerMod.Components
                 hero.transform.SetPositionX(transform.position.x + _box.size.x + .15f);
 
                 hero.transform.SetPositionY(hero.transform.position.y -
-                                                     hc.GetRunSpeed() * Time.deltaTime);
-                hc.GetComponent<tk2dSpriteAnimator>().Play(hc.GetRunAnimName());
+                                                     GetHCRunSpeed() * Time.deltaTime);
+                hc.GetComponent<tk2dSpriteAnimator>().Play(GetHCRunAnimName());
             }
             else if (Ref.Input.inputActions.left.WasReleased ||
                      Ref.Input.inputActions.right.WasReleased)
@@ -267,6 +266,24 @@ namespace RandomizerMod.Components
         {
             yield return new WaitForEndOfFrame();
             On.HeroController.DoDoubleJump -= No;
+        }
+
+        private static float GetHCRunSpeed()
+        {
+            // Sprintmaster and dashmaster
+            if (Ref.PD.GetBool(nameof(PlayerData.equippedCharm_37)))
+            {
+                return Ref.PD.GetBool(nameof(PlayerData.equippedCharm_31))
+                    ? Ref.Hero.RUN_SPEED_CH_COMBO
+                    : Ref.Hero.RUN_SPEED_CH;
+            }
+
+            return Ref.Hero.RUN_SPEED;
+        }
+
+        private static string GetHCRunAnimName()
+        {
+            return Ref.PD.GetBool(nameof(PlayerData.equippedCharm_37)) ? "Sprint" : "Run";
         }
     }
 }

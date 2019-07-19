@@ -14,7 +14,6 @@ namespace RandomizerMod
 {
     public class RandomizerMod : Mod
     {
-        private static Dictionary<string, Sprite> _sprites;
         private static Dictionary<string, string> _secondaryBools;
 
         private static Thread _logicParseThread;
@@ -46,9 +45,6 @@ namespace RandomizerMod
             // Unlock godseeker too because idk why not
             Ref.GM.SetStatusRecordInt("RecBossRushMode", 1);
 
-            // Load embedded resources
-            _sprites = ResourceHelper.GetSprites("RandomizerMod.Resources.");
-
             Assembly randoDLL = GetType().Assembly;
             try
             {
@@ -73,9 +69,6 @@ namespace RandomizerMod
             RandomizerAction.Hook();
             BenchHandler.Hook();
             MiscSceneChanges.Hook();
-
-            // Setup preloaded objects
-            ObjectCache.GetPrefabs(preloaded[SceneNames.Tutorial_01]);
 
             // Some items have two bools for no reason, gotta deal with that
             _secondaryBools = new Dictionary<string, string>

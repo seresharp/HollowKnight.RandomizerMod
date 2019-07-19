@@ -2,7 +2,7 @@
 using UnityEngine;
 using Random = System.Random;
 
-namespace RandomizerMod.Components
+namespace RandomizerLib.Components
 {
     internal class RandomizerTinkEffect : MonoBehaviour
     {

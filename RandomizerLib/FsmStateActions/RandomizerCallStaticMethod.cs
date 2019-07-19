@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Reflection;
 using HutongGames.PlayMaker;
+using JetBrains.Annotations;
 using MonoMod.Utils;
 
-namespace RandomizerMod.FsmStateActions
+namespace RandomizerLib.FsmStateActions
 {
-    internal class RandomizerCallStaticMethod : FsmStateAction
+    [PublicAPI]
+    public class RandomizerCallStaticMethod : FsmStateAction
     {
         private readonly FastReflectionDelegate _method;
         private readonly object[] _parameters;
@@ -32,7 +34,7 @@ namespace RandomizerMod.FsmStateActions
             }
             catch (Exception e)
             {
-                LogError("Error invoking static method from FSM:\n" + e);
+                LogHelper.LogError("Error invoking static method from FSM:\n" + e);
             }
 
             Finish();

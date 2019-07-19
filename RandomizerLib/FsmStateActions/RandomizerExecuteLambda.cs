@@ -1,9 +1,9 @@
 ﻿using System;
 using HutongGames.PlayMaker;
 
-namespace RandomizerMod.FsmStateActions
+namespace RandomizerLib.FsmStateActions
 {
-    internal class RandomizerExecuteLambda : FsmStateAction
+    public class RandomizerExecuteLambda : FsmStateAction
     {
         private readonly Action _method;
 
@@ -20,7 +20,7 @@ namespace RandomizerMod.FsmStateActions
             }
             catch (Exception e)
             {
-                LogError("Error in RandomizerExecuteLambda:\n" + e);
+                LogHelper.LogError("Error in RandomizerExecuteLambda:\n" + e);
             }
 
             Finish();

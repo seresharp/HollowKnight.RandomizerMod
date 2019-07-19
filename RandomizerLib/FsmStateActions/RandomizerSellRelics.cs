@@ -1,13 +1,15 @@
 ﻿using HutongGames.PlayMaker;
+using JetBrains.Annotations;
 using SeanprCore;
 
-namespace RandomizerMod.FsmStateActions
+namespace RandomizerLib.FsmStateActions
 {
-    internal class RandomizerSellRelics : FsmStateAction
+    [PublicAPI]
+    public class RandomizerSellRelics : FsmStateAction
     {
         public override void OnEnter()
         {
-            if (!Ref.PD.GetBool("equippedCharm_10"))
+            if (!Ref.PD.GetBool(nameof(PlayerData.equippedCharm_10)))
             {
                 int money = Ref.PD.trinket1 * 200;
                 money += Ref.PD.trinket2 * 450;
