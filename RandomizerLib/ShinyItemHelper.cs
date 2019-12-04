@@ -23,7 +23,7 @@ namespace RandomizerLib
             GameObject shiny = ObjectCache.ShinyItem;
             shiny.name = shinyName;
 
-            if (obj.transform.parent != null)
+            if (shiny.transform.parent != null)
             {
                 shiny.transform.SetParent(obj.transform.parent);
             }
@@ -33,10 +33,10 @@ namespace RandomizerLib
             shiny.SetActive(obj.activeSelf);
 
             // Force the new shiny to fall straight downwards
-            RemoveFling(obj);
+            RemoveFling(shiny);
 
             // Destroy the original object
-            Object.Destroy(obj);
+            Object.DestroyImmediate(obj);
 
             return shiny;
         }
@@ -91,12 +91,17 @@ namespace RandomizerLib
             pdBool.AddAction(new RandomizerBoolTest(mod, boolName, null, "COLLECTED"));
 
             // The "Charm?" state is a good entry point for our geo spawning
-            charm.AddAction(new RandomizerSetBool(mod, boolName, true));
+            charm.AddAction(new RandomizerSetBool(mod, boolName, true, true));
             charm.AddAction(new RandomizerAddGeo(fsm.gameObject, geo));
 
             // Skip all the other type checks
             charm.ClearTransitions();
             charm.AddTransition("FINISHED", "Flash");
+        }
+
+        public static void ChangeIntoCharm(GameObject obj, Mod mod, string boolName, string charmBool)
+        {
+            ChangeIntoCharm(obj, mod, boolName, int.Parse(charmBool.Substring(9)));
         }
 
         public static void ChangeIntoCharm(GameObject obj, Mod mod, string boolName, int charmNum)
@@ -153,11 +158,41 @@ namespace RandomizerLib
 
             // Don't actually need to set the skill here, that happens in BigItemPopup
             // Maybe change that at some point, it's not where it should happen
-            bigGetFlash.AddAction(new RandomizerSetBool(mod, boolName, true));
+            bigGetFlash.AddAction(new RandomizerSetBool(mod, boolName, true, true));
 
             // Exit the fsm after the popup
             bigGetFlash.ClearTransitions();
             bigGetFlash.AddTransition("GET ITEM MSG END", "Hero Up");
+            bigGetFlash.AddTransition("HERO DAMAGED", "Finish");
+        }
+
+        public static void ChangeIntoSimple(GameObject obj, Mod mod, string boolName)
+        {
+            PlayMakerFSM fsm = obj.LocateFSM("Shiny Control");
+
+            FsmState pdBool = fsm.GetState("PD Bool?");
+            FsmState charm = fsm.GetState("Charm?");
+            FsmState bigGetFlash = fsm.GetState("Big Get Flash");
+
+            // Remove actions that stop shiny from spawning
+            pdBool.RemoveActionsOfType<StringCompare>();
+
+            // Change pd bool test to our new bool
+            PlayerDataBoolTest boolTest = pdBool.GetActionsOfType<PlayerDataBoolTest>()[0];
+            RandomizerBoolTest randBoolTest = new RandomizerBoolTest(mod, boolName, boolTest.isFalse, boolTest.isTrue);
+            pdBool.RemoveActionsOfType<PlayerDataBoolTest>();
+            pdBool.AddFirstAction(randBoolTest);
+
+            // Force the FSM to show the big item flash
+            charm.ClearTransitions();
+            charm.AddTransition("FINISHED", "Big Get Flash");
+
+            // Set the given bool
+            bigGetFlash.AddAction(new RandomizerSetBool(mod, boolName, true, true));
+
+            // Exit the fsm after giving the item
+            bigGetFlash.ClearTransitions();
+            bigGetFlash.AddTransition("FINISHED", "Hero Up");
             bigGetFlash.AddTransition("HERO DAMAGED", "Finish");
         }
 

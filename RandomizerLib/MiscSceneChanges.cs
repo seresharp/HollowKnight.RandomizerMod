@@ -13,7 +13,7 @@ using Random = System.Random;
 namespace RandomizerLib
 {
     [PublicAPI]
-    internal static class MiscSceneChanges
+    public static class MiscSceneChanges
     {
         private static readonly Random Rnd = new Random();
         private static int _rndNum;
